@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_today">Today</string>
+    <string name="tab_body">Body</string>
+    <string name="tab_health">Health</string>
+    <string name="tab_calendar">Calendar</string>
+    <string name="tab_settings">Settings</string>
+
+    <string name="action_back">Back</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_add">Add</string>
+    <string name="action_ok">OK</string>
+    <string name="field_pick_date">Pick a date</string>
+    <string name="field_pick_time">Pick a time</string>
+    <string name="confirm_type_label">Type %1$s to confirm</string>
+
+    <string name="reminder_channel_name">Reminders</string>
+    <string name="reminder_channel_description">Reminders you set up in the app. The text is discreet and hidden on the lock screen.</string>
+
+    <string name="lock_title">Changes is locked</string>
+    <string name="lock_unlock">Unlock</string>
+    <string name="lock_prompt_title">Unlock Changes</string>
+</resources>

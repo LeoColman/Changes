@@ -1,0 +1,135 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Catálogo de analitos. Sem faixas de referência embutidas (Seção 7.6).
+CREATE TABLE lab_analyte (
+    id TEXT NOT NULL PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE,
+    label_key TEXT,
+    custom_label TEXT,
+    default_unit TEXT NOT NULL,
+    is_builtin INTEGER NOT NULL CHECK (is_builtin IN (0, 1)),
+    is_hidden INTEGER NOT NULL CHECK (is_hidden IN (0, 1)),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER,
+    CHECK ((is_builtin = 1 AND label_key IS NOT NULL) OR (is_builtin = 0 AND custom_label IS NOT NULL))
+);
+
+-- Faixa de referência vem do laudo da pessoa, digitada por ela.
+CREATE TABLE lab_result (
+    id TEXT NOT NULL PRIMARY KEY,
+    analyte_id TEXT NOT NULL REFERENCES lab_analyte(id),
+    value REAL NOT NULL,
+    unit TEXT NOT NULL,
+    collected_at INTEGER NOT NULL,
+    collected_at_offset_seconds INTEGER NOT NULL,
+    reference_low REAL,
+    reference_high REAL,
+    lab_name TEXT,
+    notes TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER,
+    CHECK (reference_low IS NULL OR reference_high IS NULL OR reference_low <= reference_high)
+);
+
+CREATE INDEX lab_result_analyte_collected ON lab_result(analyte_id, collected_at);
+
+selectAnalyteById:
+SELECT * FROM lab_analyte WHERE id = ?;
+
+selectVisibleAnalytes:
+SELECT * FROM lab_analyte WHERE deleted_at IS NULL AND is_hidden = 0 ORDER BY is_builtin DESC, code;
+
+selectAllAnalytes:
+SELECT * FROM lab_analyte WHERE deleted_at IS NULL ORDER BY is_builtin DESC, code;
+
+selectDeletedAnalytesSince:
+SELECT * FROM lab_analyte WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insertAnalyte:
+INSERT INTO lab_analyte VALUES ?;
+
+insertBuiltinAnalyteIfMissing:
+INSERT OR IGNORE INTO lab_analyte VALUES ?;
+
+updateBuiltinAnalyteDefinition:
+UPDATE lab_analyte SET label_key = ?, default_unit = ? WHERE id = ? AND is_builtin = 1;
+
+updateCustomAnalyte:
+UPDATE lab_analyte SET custom_label = ?, default_unit = ?, updated_at = ? WHERE id = ? AND is_builtin = 0;
+
+setAnalyteHidden:
+UPDATE lab_analyte SET is_hidden = ?, updated_at = ? WHERE id = ?;
+
+softDeleteAnalyte:
+UPDATE lab_analyte SET deleted_at = :now, updated_at = :now WHERE id = :id AND is_builtin = 0 AND deleted_at IS NULL;
+
+restoreAnalyte:
+UPDATE lab_analyte SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+selectResultById:
+SELECT * FROM lab_result WHERE id = ?;
+
+selectResultsByAnalyte:
+SELECT * FROM lab_result WHERE deleted_at IS NULL AND analyte_id = ? ORDER BY collected_at;
+
+selectAllResults:
+SELECT * FROM lab_result WHERE deleted_at IS NULL ORDER BY collected_at DESC;
+
+selectResultsBetween:
+SELECT * FROM lab_result WHERE deleted_at IS NULL AND collected_at >= ? AND collected_at < ? ORDER BY collected_at;
+
+selectDeletedResultsSince:
+SELECT * FROM lab_result WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insertResult:
+INSERT INTO lab_result VALUES ?;
+
+updateResult:
+UPDATE lab_result SET
+    analyte_id = :analyteId,
+    value = :value,
+    unit = :unit,
+    collected_at = :collectedAt,
+    collected_at_offset_seconds = :collectedAtOffsetSeconds,
+    reference_low = :referenceLow,
+    reference_high = :referenceHigh,
+    lab_name = :labName,
+    notes = :notes,
+    updated_at = :updatedAt
+WHERE id = :id;
+
+softDeleteResult:
+UPDATE lab_result SET deleted_at = :now, updated_at = :now WHERE id = :id AND deleted_at IS NULL;
+
+restoreResult:
+UPDATE lab_result SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllAnalytesForBackup:
+SELECT * FROM lab_analyte ORDER BY id;
+
+selectAllResultsForBackup:
+SELECT * FROM lab_result ORDER BY id;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeAnalyteById:
+UPDATE lab_analyte SET custom_label = '', deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpiredAnalyte:
+UPDATE lab_analyte SET custom_label = '', deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeResultById:
+UPDATE lab_result SET lab_name = NULL, notes = NULL, deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpiredResult:
+UPDATE lab_result SET lab_name = NULL, notes = NULL, deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;

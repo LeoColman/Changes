@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Só o diretório temporário de fotos da câmera fica exposto ao FileProvider. A mídia final
+     (filesDir/media) nunca recebe Uri externo. -->
+<paths>
+    <cache-path name="photos" path="photos/" />
+</paths>

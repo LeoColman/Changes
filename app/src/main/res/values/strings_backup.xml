@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos da feature backup (Seção 7.8, ADR 0009): exportar e importar tudo. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <!-- Títulos de tela -->
+    <string name="backup_title">Backup</string>
+    <string name="backup_preview_title">Prévia da importação</string>
+
+    <!-- Tela Backup -->
+    <string name="backup_explanation">O backup é um arquivo com todos os seus dados e fotos. Ele não é criptografado: quem tiver o arquivo consegue ler os dados. Guarde-o num lugar seguro.</string>
+    <string name="backup_export_section">Exportar</string>
+    <string name="backup_export_action">Exportar backup</string>
+    <string name="backup_import_section">Importar</string>
+    <string name="backup_import_action">Escolher arquivo de backup</string>
+    <string name="backup_import_mode_prompt">O que fazer com este arquivo?</string>
+
+    <!-- Modos de import -->
+    <string name="backup_import_mode_merge_title">Mesclar</string>
+    <string name="backup_import_mode_merge_description">Mantém os dados que já existem neste aparelho e acrescenta o que houver de novo no arquivo. Em caso de conflito, vale o registro mais recente.</string>
+    <string name="backup_import_mode_replace_title">Substituir</string>
+    <string name="backup_import_mode_replace_description">Apaga todos os dados atuais deste aparelho e coloca no lugar os dados do arquivo.</string>
+    <string name="backup_replace_confirm_word">SUBSTITUIR</string>
+
+    <!-- Prévia do import -->
+    <string name="backup_preview_info">Backup de %1$s, feito pela versão %2$s do Changes.</string>
+    <string name="backup_preview_tables_title">O que vai mudar</string>
+    <string name="backup_result_title">Importação concluída</string>
+    <string name="backup_action_merge">Mesclar</string>
+    <string name="backup_action_replace">Substituir</string>
+    <string name="backup_action_done">Concluir</string>
+    <string name="backup_stat_none">Sem mudanças</string>
+
+    <!-- Diálogos de confirmação -->
+    <string name="backup_confirm_merge_title">Mesclar dados do backup?</string>
+    <string name="backup_confirm_merge_body">Os dados deste arquivo vão se juntar aos que já estão neste aparelho, conforme mostrado acima.</string>
+    <string name="backup_confirm_replace_title">Substituir todos os dados?</string>
+    <string name="backup_confirm_replace_body">Todos os dados atuais deste aparelho serão apagados e trocados pelos dados do arquivo. Esta ação não pode ser desfeita.</string>
+
+    <!-- Mensagens de erro (Seção 7.8): sempre deixam claro que nada foi alterado -->
+    <string name="backup_error_unreadable">Não foi possível ler o arquivo. Nada foi alterado.</string>
+    <string name="backup_error_not_a_backup">Esse arquivo não é um backup do Changes. Nada foi alterado.</string>
+    <string name="backup_error_newer_version">Esse backup foi feito por uma versão mais nova do Changes. Atualize o app para importar. Nada foi alterado.</string>
+    <string name="backup_error_unsupported_version">Esse backup é de uma versão antiga demais, sem suporte. Nada foi alterado.</string>
+    <string name="backup_error_checksum_mismatch">O arquivo parece corrompido ou alterado: a verificação de integridade não bateu. Nada foi alterado.</string>
+    <string name="backup_error_missing_media">Faltam fotos referenciadas no arquivo de backup. Nada foi alterado.</string>
+    <string name="backup_error_invalid_data">O conteúdo do arquivo não pôde ser lido pelo app. Nada foi alterado.</string>
+    <string name="backup_error_export_failed">Não foi possível gravar o arquivo de backup. Nada foi alterado.</string>
+    <string name="backup_error_import_failed">Não foi possível gravar os dados durante a importação. Nada foi alterado.</string>
+
+    <!-- Nomes amigáveis das tabelas exportadas -->
+    <string name="backup_table_profile">Perfil</string>
+    <string name="backup_table_medication">Medicações</string>
+    <string name="backup_table_regimen">Regimes</string>
+    <string name="backup_table_dose_log">Doses registradas</string>
+    <string name="backup_table_body_change_type">Tipos de mudança corporal</string>
+    <string name="backup_table_body_change_entry">Registros de mudança corporal</string>
+    <string name="backup_table_media_attachment">Fotos</string>
+    <string name="backup_table_measurement">Medidas</string>
+    <string name="backup_table_exercise_session">Sessões de exercício</string>
+    <string name="backup_table_health_condition">Condições de saúde</string>
+    <string name="backup_table_lab_analyte">Tipos de exame</string>
+    <string name="backup_table_lab_result">Resultados de exame</string>
+    <string name="backup_table_mood_log">Registros de humor</string>
+    <string name="backup_table_calendar_event">Eventos do calendário</string>
+    <string name="backup_table_generic">Outros dados</string>
+
+    <!-- Plurais: resumo do export -->
+    <plurals name="backup_export_summary_records">
+        <item quantity="one">%1$d registro exportado</item>
+        <item quantity="many">%1$d registros exportados</item>
+        <item quantity="other">%1$d registros exportados</item>
+    </plurals>
+    <plurals name="backup_export_summary_photos">
+        <item quantity="one">%1$d foto incluída</item>
+        <item quantity="many">%1$d fotos incluídas</item>
+        <item quantity="other">%1$d fotos incluídas</item>
+    </plurals>
+    <plurals name="backup_export_summary_missing_media">
+        <item quantity="one">%1$d foto não pôde ser incluída (já não existia neste aparelho)</item>
+        <item quantity="many">%1$d fotos não puderam ser incluídas (já não existiam neste aparelho)</item>
+        <item quantity="other">%1$d fotos não puderam ser incluídas (já não existiam neste aparelho)</item>
+    </plurals>
+
+    <!-- Plurais: contagens por tabela na prévia e no resumo final -->
+    <plurals name="backup_stat_inserted">
+        <item quantity="one">%1$d novo</item>
+        <item quantity="many">%1$d novos</item>
+        <item quantity="other">%1$d novos</item>
+    </plurals>
+    <plurals name="backup_stat_updated">
+        <item quantity="one">%1$d atualizado</item>
+        <item quantity="many">%1$d atualizados</item>
+        <item quantity="other">%1$d atualizados</item>
+    </plurals>
+    <plurals name="backup_stat_unchanged">
+        <item quantity="one">%1$d igual</item>
+        <item quantity="many">%1$d iguais</item>
+        <item quantity="other">%1$d iguais</item>
+    </plurals>
+    <plurals name="backup_stat_kept">
+        <item quantity="one">%1$d mantido</item>
+        <item quantity="many">%1$d mantidos</item>
+        <item quantity="other">%1$d mantidos</item>
+    </plurals>
+    <plurals name="backup_stat_removed">
+        <item quantity="one">%1$d removido</item>
+        <item quantity="many">%1$d removidos</item>
+        <item quantity="other">%1$d removidos</item>
+    </plurals>
+    <plurals name="backup_stat_media_to_add">
+        <item quantity="one">%1$d foto vai entrar</item>
+        <item quantity="many">%1$d fotos vão entrar</item>
+        <item quantity="other">%1$d fotos vão entrar</item>
+    </plurals>
+    <plurals name="backup_stat_media_added">
+        <item quantity="one">%1$d foto adicionada</item>
+        <item quantity="many">%1$d fotos adicionadas</item>
+        <item quantity="other">%1$d fotos adicionadas</item>
+    </plurals>
+    <plurals name="backup_stat_missing_media">
+        <item quantity="one">%1$d foto referenciada não foi encontrada</item>
+        <item quantity="many">%1$d fotos referenciadas não foram encontradas</item>
+        <item quantity="other">%1$d fotos referenciadas não foram encontradas</item>
+    </plurals>
+</resources>

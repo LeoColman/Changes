@@ -1,0 +1,97 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Eventos persistidos. Doses previstas (DERIVED) são geradas em tempo de consulta e não moram aqui.
+-- Evento de dia inteiro: a data é a data local de start_at no offset gravado; nunca muda com o fuso.
+-- recurrence_rule: subconjunto de RRULE (FREQ, INTERVAL, BYDAY, UNTIL, COUNT).
+CREATE TABLE calendar_event (
+    id TEXT NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    start_at INTEGER NOT NULL,
+    start_at_offset_seconds INTEGER NOT NULL,
+    end_at INTEGER,
+    end_at_offset_seconds INTEGER,
+    is_all_day INTEGER NOT NULL CHECK (is_all_day IN (0, 1)),
+    category TEXT NOT NULL,
+    source_type TEXT NOT NULL,
+    source_id TEXT,
+    reminder_minutes_before INTEGER CHECK (reminder_minutes_before IS NULL OR reminder_minutes_before >= 0),
+    recurrence_rule TEXT,
+    completed_at INTEGER,
+    completed_at_offset_seconds INTEGER,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER,
+    CHECK ((end_at IS NULL) = (end_at_offset_seconds IS NULL)),
+    CHECK ((completed_at IS NULL) = (completed_at_offset_seconds IS NULL)),
+    CHECK (end_at IS NULL OR end_at >= start_at)
+);
+
+CREATE INDEX calendar_event_start_at ON calendar_event(start_at);
+
+selectById:
+SELECT * FROM calendar_event WHERE id = ?;
+
+-- Candidatos para a janela [from, to): eventos simples que a intersectam e todo evento recorrente
+-- iniciado antes do fim da janela (a expansão da recorrência acontece no repositório).
+selectCandidatesBetween:
+SELECT * FROM calendar_event
+WHERE deleted_at IS NULL
+  AND start_at < :toMillis
+  AND (recurrence_rule IS NOT NULL OR COALESCE(end_at, start_at) >= :fromMillis)
+ORDER BY start_at;
+
+selectWithReminders:
+SELECT * FROM calendar_event WHERE deleted_at IS NULL AND reminder_minutes_before IS NOT NULL ORDER BY start_at;
+
+selectAll:
+SELECT * FROM calendar_event WHERE deleted_at IS NULL ORDER BY start_at DESC;
+
+-- Eventos de uma categoria fora da lixeira: as rotinas de exercício são `EXERCISE` (ADR 0011).
+selectByCategory:
+SELECT * FROM calendar_event WHERE deleted_at IS NULL AND category = ? ORDER BY start_at, id;
+
+selectDeletedSince:
+SELECT * FROM calendar_event WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insert:
+INSERT INTO calendar_event VALUES ?;
+
+update:
+UPDATE calendar_event SET
+    title = :title,
+    description = :description,
+    start_at = :startAt,
+    start_at_offset_seconds = :startAtOffsetSeconds,
+    end_at = :endAt,
+    end_at_offset_seconds = :endAtOffsetSeconds,
+    is_all_day = :isAllDay,
+    category = :category,
+    reminder_minutes_before = :reminderMinutesBefore,
+    recurrence_rule = :recurrenceRule,
+    updated_at = :updatedAt
+WHERE id = :id;
+
+setCompleted:
+UPDATE calendar_event SET completed_at = ?, completed_at_offset_seconds = ?, updated_at = ? WHERE id = ?;
+
+softDelete:
+UPDATE calendar_event SET deleted_at = :now, updated_at = :now WHERE id = :id AND deleted_at IS NULL;
+
+restore:
+UPDATE calendar_event SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllForBackup:
+SELECT * FROM calendar_event ORDER BY id;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeById:
+UPDATE calendar_event SET title = '', description = NULL, deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpired:
+UPDATE calendar_event SET title = '', description = NULL, deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Textos da feature health (rótulos de navegação, botões e mensagens de formulário). Frases de
+  conteúdo sobre condições e exames vêm de strings_sensitive.xml (docs/app-guidelines.md).
+-->
+<resources>
+    <!-- Entradas da aba Saúde: cada uma abre uma tela própria ou de outra feature. -->
+    <string name="health_entry_conditions">Health conditions</string>
+    <string name="health_entry_labs">Lab results</string>
+    <string name="health_entry_regimens">Regimens and dose history</string>
+    <string name="health_entry_measurements">Weight, BMI and measurements</string>
+    <string name="health_entry_exercise">Exercise</string>
+
+    <!-- Condições: chrome de tela (botões, títulos de diálogo), sem frase de conteúdo. -->
+    <string name="health_add_condition">Add condition</string>
+    <string name="health_edit_condition">Edit condition</string>
+    <string name="health_delete_condition">Delete condition</string>
+    <string name="health_condition_deleted">Condition deleted</string>
+
+    <!-- Exames: chrome de tela. -->
+    <string name="health_add_analyte">New custom analyte</string>
+    <string name="health_analyte_label_field">Analyte name</string>
+    <string name="health_add_result">Add result</string>
+    <string name="health_edit_result">Edit result</string>
+    <string name="health_delete_result">Delete result</string>
+    <string name="health_result_deleted">Result deleted</string>
+    <string name="health_no_results_for_analyte">No results recorded yet.</string>
+
+    <!-- Campo compartilhado pelos dois editores. -->
+    <string name="health_notes_field">Notes</string>
+
+    <!-- Mensagens neutras de validação de formulário (Seção 9): nenhuma palavra de julgamento. -->
+    <string name="health_error_required">Fill in this field.</string>
+    <string name="health_error_not_finite">Enter a valid number.</string>
+    <string name="health_error_future_date">The date cannot be in the future.</string>
+    <string name="health_error_end_before_start">Check the order of the dates or values entered.</string>
+    <string name="health_error_out_of_range">The value entered is outside what is allowed.</string>
+    <string name="health_error_not_positive">Enter a value greater than zero.</string>
+    <string name="health_error_builtin_immutable">This item cannot be changed.</string>
+    <string name="health_error_duplicate">This record already exists.</string>
+    <string name="health_error_not_found">This record could not be found.</string>
+</resources>

@@ -1,0 +1,74 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Prescrição vigente. start_date/end_date são epoch day local; end_date é inclusiva.
+-- time_of_day em minutos desde a meia-noite local.
+CREATE TABLE regimen (
+    id TEXT NOT NULL PRIMARY KEY,
+    medication_id TEXT NOT NULL REFERENCES medication(id),
+    dose_value REAL NOT NULL CHECK (dose_value > 0),
+    dose_unit TEXT NOT NULL,
+    route TEXT NOT NULL,
+    schedule_type TEXT NOT NULL,
+    schedule_config TEXT NOT NULL,
+    time_of_day INTEGER CHECK (time_of_day IS NULL OR time_of_day BETWEEN 0 AND 1439),
+    start_date INTEGER NOT NULL,
+    end_date INTEGER,
+    is_active INTEGER NOT NULL CHECK (is_active IN (0, 1)),
+    notes TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER,
+    CHECK (end_date IS NULL OR end_date >= start_date)
+);
+
+selectById:
+SELECT * FROM regimen WHERE id = ?;
+
+selectActive:
+SELECT * FROM regimen WHERE deleted_at IS NULL AND is_active = 1 ORDER BY start_date, created_at;
+
+selectAllNotDeleted:
+SELECT * FROM regimen WHERE deleted_at IS NULL ORDER BY is_active DESC, start_date DESC;
+
+selectDeletedSince:
+SELECT * FROM regimen WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insert:
+INSERT INTO regimen VALUES ?;
+
+update:
+UPDATE regimen SET
+    medication_id = :medicationId,
+    dose_value = :doseValue,
+    dose_unit = :doseUnit,
+    route = :route,
+    schedule_type = :scheduleType,
+    schedule_config = :scheduleConfig,
+    time_of_day = :timeOfDay,
+    start_date = :startDate,
+    end_date = :endDate,
+    is_active = :isActive,
+    notes = :notes,
+    updated_at = :updatedAt
+WHERE id = :id;
+
+softDelete:
+UPDATE regimen SET deleted_at = :now, updated_at = :now WHERE id = :id AND deleted_at IS NULL;
+
+restore:
+UPDATE regimen SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllForBackup:
+SELECT * FROM regimen ORDER BY id;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeById:
+UPDATE regimen SET notes = NULL, deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpired:
+UPDATE regimen SET notes = NULL, deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;

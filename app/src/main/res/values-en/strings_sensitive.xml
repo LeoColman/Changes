@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English versions of the sensitive texts. Features reference them, never rewrite them. -->
+<resources>
+    <string name="sensitive_disclaimer">Changes records what you and whoever supports your care have decided. It does not give medical advice, does not suggest doses and does not replace professional care.</string>
+
+    <string name="expected_title">Changes described in the literature</string>
+    <string name="expected_disclaimer">Ranges observed in population studies. Individual variation is large, and being outside a range does not indicate a problem. Talk to whoever supports your care.</string>
+    <string name="expected_status_not_yet">Not expected yet</string>
+    <string name="expected_status_within">Within the typical onset window</string>
+    <string name="expected_status_past">Past the typical onset window</string>
+    <string name="expected_onset">Typical onset: %1$s</string>
+    <string name="expected_max_effect">Maximum effect: %1$s</string>
+    <string name="expected_range_months">%1$s to %2$s months</string>
+    <string name="expected_range_years">%1$s to %2$s years</string>
+    <string name="expected_not_stated">not stated by the source</string>
+    <string name="expected_permanence_permanent">Described by the source as permanent</string>
+    <string name="expected_permanence_partial">Described by the source as partially permanent</string>
+    <string name="expected_permanence_not_permanent">Described by the source as reversible if testosterone is stopped</string>
+    <string name="expected_permanence_not_stated">The source does not say whether it is permanent</string>
+    <string name="expected_source">Source: %1$s</string>
+    <string name="expected_sources_title">References</string>
+    <string name="expected_first_observation">Your first observation: %1$s</string>
+    <string name="expected_first_observation_months">Your first observation: %1$s, at %2$s months of treatment</string>
+    <string name="expected_no_start_date">Enter your treatment start date to see where each range falls on your calendar.</string>
+    <string name="expected_set_start_date">Enter start date</string>
+    <string name="expected_window_dates">Typical onset window on your calendar: %1$s to %2$s</string>
+    <string name="expected_window_open">Typical onset window on your calendar: from %1$s</string>
+    <plurals name="expected_chart_summary">
+        <item quantity="one">Timeline with %1$d change described in the literature.</item>
+        <item quantity="other">Timeline with %1$d changes described in the literature.</item>
+    </plurals>
+
+    <string name="conditions_title">Health conditions</string>
+    <string name="conditions_empty_title">No conditions recorded</string>
+    <string name="conditions_empty_body">Here you record health conditions, current or past, with dates and notes. The ones you mark as relevant to hormone therapy stay at the top and go into the report.</string>
+    <string name="conditions_label">Condition</string>
+    <string name="conditions_code">ICD-10 (optional)</string>
+    <string name="conditions_severity">Severity</string>
+    <string name="conditions_status">Status</string>
+    <string name="conditions_diagnosed_at">Diagnosis date</string>
+    <string name="conditions_resolved_at">Resolution date</string>
+    <string name="conditions_affects_treatment">Relevant to hormone therapy</string>
+    <string name="conditions_affects_treatment_help">Marked conditions stay at the top and go into the report, so you can bring them to appointments.</string>
+    <string name="conditions_pinned_header">To bring to appointments</string>
+    <string name="conditions_other_header">Other conditions</string>
+    <string name="conditions_severity_mild">Mild</string>
+    <string name="conditions_severity_moderate">Moderate</string>
+    <string name="conditions_severity_severe">Severe</string>
+    <string name="conditions_severity_unknown">Not stated</string>
+    <string name="conditions_status_active">Active</string>
+    <string name="conditions_status_resolved">Resolved</string>
+    <string name="conditions_status_in_remission">In remission</string>
+    <string name="conditions_status_suspected">Suspected</string>
+    <string name="conditions_suggestions_hint">Suggestions to fill in faster. You can write any condition.</string>
+
+    <string name="labs_title">Lab results</string>
+    <string name="labs_empty_title">No lab results recorded</string>
+    <string name="labs_empty_body">Here you record lab results with the reference range printed on your report. The app shows how each result changes over time.</string>
+    <string name="labs_value">Result</string>
+    <string name="labs_unit">Unit</string>
+    <string name="labs_collected_at">Collection date</string>
+    <string name="labs_reference_low">Report reference minimum</string>
+    <string name="labs_reference_high">Report reference maximum</string>
+    <string name="labs_reference_help">Use the range printed on your report. The app has no ranges of its own, because they differ from lab to lab.</string>
+    <string name="labs_lab_name">Laboratory</string>
+    <string name="labs_out_of_range">Outside the range stated by the laboratory</string>
+    <string name="labs_out_of_range_hint">Bring it to whoever supports your care.</string>
+    <plurals name="labs_chart_summary">
+        <item quantity="one">%1$s: %2$d result, on %3$s. Value: %5$s.</item>
+        <item quantity="other">%1$s: %2$d results, from %3$s to %4$s. Latest: %5$s.</item>
+    </plurals>
+
+    <string name="mood_title">How are you today</string>
+    <string name="mood_intro">One entry per day. Fill in what makes sense; optional fields can stay empty.</string>
+    <string name="mood_mood">Mood</string>
+    <string name="mood_energy">Energy</string>
+    <string name="mood_anxiety">Anxiety (optional)</string>
+    <string name="mood_dysphoria">Dysphoria (optional)</string>
+    <string name="mood_sleep">Hours of sleep (optional)</string>
+    <string name="mood_note">Note (optional)</string>
+    <string name="mood_note_private">Only you see this note. The app does not read, classify or analyze what you write.</string>
+    <string name="mood_tags">Tags (optional)</string>
+    <string name="mood_tags_hint">Free words, separated by commas</string>
+    <string name="mood_scale_1">1, very low</string>
+    <string name="mood_scale_2">2, low</string>
+    <string name="mood_scale_3">3, medium</string>
+    <string name="mood_scale_4">4, high</string>
+    <string name="mood_scale_5">5, very high</string>
+    <string name="mood_saved">Today\'s entry saved</string>
+    <string name="mood_history_title">Previous entries</string>
+    <string name="mood_empty_body">Your daily mood, energy and sleep entries appear here, in a monthly calendar and a trend chart.</string>
+    <plurals name="mood_heatmap_summary">
+        <item quantity="one">Calendar for %1$s with %2$d day recorded.</item>
+        <item quantity="other">Calendar for %1$s with %2$d days recorded.</item>
+    </plurals>
+    <plurals name="mood_trend_summary">
+        <item quantity="one">Mood and energy trend with %1$d entry, on %2$s.</item>
+        <item quantity="other">Mood and energy trend with %1$d entries between %2$s and %3$s.</item>
+    </plurals>
+    <string name="mood_reminder_default_text">Reminder</string>
+
+    <string name="support_entry">Support in difficult moments</string>
+    <string name="support_title">Support in difficult moments</string>
+    <string name="support_body">If you are going through a difficult moment, you do not have to face it without support.</string>
+    <string name="support_cvv_title">CVV, Centro de Valorização da Vida (Brazil)</string>
+    <string name="support_cvv_body">Free call to 188, 24 hours a day. Chat is also available at cvv.org.br.</string>
+    <string name="support_caps_title">CAPS, Psychosocial Care Center (Brazil)</string>
+    <string name="support_caps_body">Mental health care through SUS, the Brazilian public health system. Your nearest primary care unit can tell you where the CAPS in your area is.</string>
+    <string name="support_call_cvv">Call 188</string>
+
+    <string name="vocabulary_title">How the app refers to your body</string>
+    <string name="vocabulary_intro">Choose the terms the app uses on screens and in reports. You can change them at any time, and nothing already recorded changes.</string>
+    <string name="vocabulary_custom">Another term</string>
+    <string name="vocabulary_custom_hint">Write the term you prefer</string>
+    <string name="vocabulary_preview">Example: %1$s</string>
+
+    <string name="bmi_label">BMI</string>
+    <string name="bmi_note">BMI does not distinguish lean mass from fat and has limited validity while body composition is changing.</string>
+    <string name="bmi_needs_height">To see your BMI, enter your height in Settings.</string>
+    <string name="bmi_needs_weight">To see your BMI, record your weight.</string>
+
+    <plurals name="adherence_sentence">
+        <item quantity="one">%1$d of %2$d planned dose recorded in the last %3$d days</item>
+        <item quantity="other">%1$d of %2$d planned doses recorded in the last %3$d days</item>
+    </plurals>
+    <string name="adherence_none_expected">No planned doses in the %1$s window</string>
+</resources>

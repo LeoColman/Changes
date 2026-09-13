@@ -1,0 +1,96 @@
+{
+  "datasetVersion": 1,
+  "protocol": "MASCULINIZING",
+  "rows": [
+    {
+      "code": "SKIN_OILINESS_ACNE",
+      "onsetMonthsMin": 1.0,
+      "onsetMonthsMax": 6.0,
+      "maxEffectMonthsMin": 12.0,
+      "maxEffectMonthsMax": 24.0,
+      "permanence": "NOT_STATED",
+      "permanenceSource": null,
+      "source": "ENDO_2017"
+    },
+    {
+      "code": "FACIAL_BODY_HAIR",
+      "onsetMonthsMin": 6.0,
+      "onsetMonthsMax": 12.0,
+      "maxEffectMonthsMin": 48.0,
+      "maxEffectMonthsMax": 60.0,
+      "permanence": "PARTIALLY_PERMANENT",
+      "permanenceSource": "WPATH_SOC8",
+      "source": "ENDO_2017"
+    },
+    {
+      "code": "SCALP_HAIR_LOSS",
+      "onsetMonthsMin": 6.0,
+      "onsetMonthsMax": 12.0,
+      "maxEffectMonthsMin": null,
+      "maxEffectMonthsMax": null,
+      "permanence": "PERMANENT",
+      "permanenceSource": "WPATH_SOC8",
+      "source": "ENDO_2017"
+    },
+    {
+      "code": "MUSCLE_MASS_STRENGTH",
+      "onsetMonthsMin": 6.0,
+      "onsetMonthsMax": 12.0,
+      "maxEffectMonthsMin": 24.0,
+      "maxEffectMonthsMax": 60.0,
+      "permanence": "NOT_STATED",
+      "permanenceSource": null,
+      "source": "ENDO_2017"
+    },
+    {
+      "code": "FAT_REDISTRIBUTION",
+      "onsetMonthsMin": 1.0,
+      "onsetMonthsMax": 6.0,
+      "maxEffectMonthsMin": 24.0,
+      "maxEffectMonthsMax": 60.0,
+      "permanence": "NOT_STATED",
+      "permanenceSource": null,
+      "source": "ENDO_2017"
+    },
+    {
+      "code": "MENSES_CESSATION",
+      "onsetMonthsMin": 1.0,
+      "onsetMonthsMax": 6.0,
+      "maxEffectMonthsMin": null,
+      "maxEffectMonthsMax": null,
+      "permanence": "NOT_PERMANENT",
+      "permanenceSource": "WPATH_SOC8",
+      "source": "ENDO_2017"
+    },
+    {
+      "code": "CLITORAL_ENLARGEMENT",
+      "onsetMonthsMin": 1.0,
+      "onsetMonthsMax": 6.0,
+      "maxEffectMonthsMin": 12.0,
+      "maxEffectMonthsMax": 24.0,
+      "permanence": "PERMANENT",
+      "permanenceSource": "WPATH_SOC8",
+      "source": "ENDO_2017"
+    },
+    {
+      "code": "VAGINAL_ATROPHY",
+      "onsetMonthsMin": 1.0,
+      "onsetMonthsMax": 6.0,
+      "maxEffectMonthsMin": 12.0,
+      "maxEffectMonthsMax": 24.0,
+      "permanence": "NOT_STATED",
+      "permanenceSource": null,
+      "source": "ENDO_2017"
+    },
+    {
+      "code": "VOICE_DEEPENING",
+      "onsetMonthsMin": 6.0,
+      "onsetMonthsMax": 12.0,
+      "maxEffectMonthsMin": 12.0,
+      "maxEffectMonthsMax": 24.0,
+      "permanence": "PERMANENT",
+      "permanenceSource": "WPATH_SOC8",
+      "source": "ENDO_2017"
+    }
+  ]
+}

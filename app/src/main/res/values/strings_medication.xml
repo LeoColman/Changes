@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos da feature medication (Seção 7.1): regimes, registro e histórico de doses. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <!-- Ações -->
+    <string name="medication_action_create">Novo regime</string>
+    <string name="medication_action_history">Ver histórico de doses</string>
+    <string name="medication_action_new_medication">Nova medicação</string>
+    <string name="medication_action_confirm_new_medication">Adicionar medicação</string>
+    <string name="medication_action_add_step">Adicionar dose</string>
+    <string name="medication_action_remove_step">Remover última dose</string>
+
+    <!-- Títulos de tela -->
+    <string name="medication_list_title">Regimes</string>
+    <string name="medication_edit_title_new">Novo regime</string>
+    <string name="medication_edit_title_edit">Editar regime</string>
+    <string name="medication_log_title_new">Registrar dose</string>
+    <string name="medication_log_title_edit">Editar dose</string>
+    <string name="medication_history_title">Histórico de doses</string>
+
+    <!-- Seções do formulário -->
+    <string name="medication_section_medication">Medicação</string>
+    <string name="medication_section_dose">Dose</string>
+    <string name="medication_section_schedule">Agenda</string>
+    <string name="medication_section_dates">Datas</string>
+    <string name="medication_section_active">Ativos</string>
+    <string name="medication_section_ended">Encerrados</string>
+
+    <!-- Campos -->
+    <string name="medication_field_medication">Medicação</string>
+    <string name="medication_field_dose_value">Dose</string>
+    <string name="medication_field_dose_unit">Unidade</string>
+    <string name="medication_field_route">Via</string>
+    <string name="medication_field_schedule_type">Tipo de agenda</string>
+    <string name="medication_field_interval_days">Intervalo em dias</string>
+    <string name="medication_field_every_weeks">A cada quantas semanas</string>
+    <string name="medication_field_every_months">A cada quantos meses</string>
+    <string name="medication_field_step_first">Dose 1: dias após a data de início (0 = na própria data)</string>
+    <string name="medication_field_step_next">Dose %1$d: dias após a dose anterior</string>
+    <string name="medication_field_continuous">Depois, uso contínuo</string>
+    <string name="medication_field_continuous_every">Uso contínuo: a cada quantos dias</string>
+    <string name="medication_field_time_of_day">Hora</string>
+    <string name="medication_field_time_of_day_clear">Remover hora</string>
+    <string name="medication_field_start_date">Data de início</string>
+    <string name="medication_field_end_date">Data de fim</string>
+    <string name="medication_field_end_date_clear">Remover data de fim</string>
+    <string name="medication_field_active">Regime ativo</string>
+    <string name="medication_field_notes">Notas</string>
+    <string name="medication_field_injection_site">Local de aplicação</string>
+    <string name="medication_field_date">Data</string>
+    <string name="medication_field_time">Hora</string>
+    <string name="medication_field_new_name">Nome</string>
+    <string name="medication_field_new_substance">Substância</string>
+    <string name="medication_field_new_default_route">Via padrão</string>
+    <string name="medication_field_new_concentration">Concentração (mg/mL)</string>
+
+    <!-- Unidades de dose -->
+    <string name="medication_dose_unit_mg">mg</string>
+    <string name="medication_dose_unit_ml">mL</string>
+    <string name="medication_dose_unit_iu">UI</string>
+    <string name="medication_dose_unit_g">g</string>
+    <string name="medication_dose_unit_puff">jato</string>
+    <string name="medication_dose_unit_patch">adesivo</string>
+
+    <!-- Vias de administração -->
+    <string name="medication_route_intramuscular">Intramuscular</string>
+    <string name="medication_route_subcutaneous">Subcutânea</string>
+    <string name="medication_route_transdermal">Transdérmica</string>
+    <string name="medication_route_oral">Oral</string>
+    <string name="medication_route_sublingual">Sublingual</string>
+    <string name="medication_route_topical">Tópica</string>
+    <string name="medication_route_nasal">Nasal</string>
+    <string name="medication_route_other">Outra</string>
+
+    <!-- Locais de aplicação (rodízio mecânico, Seção 7.1) -->
+    <string name="medication_site_thigh_left">Coxa esquerda</string>
+    <string name="medication_site_thigh_right">Coxa direita</string>
+    <string name="medication_site_glute_left">Glúteo esquerdo</string>
+    <string name="medication_site_glute_right">Glúteo direito</string>
+    <string name="medication_site_deltoid_left">Deltoide esquerdo</string>
+    <string name="medication_site_deltoid_right">Deltoide direito</string>
+    <string name="medication_site_abdomen_left">Abdômen esquerdo</string>
+    <string name="medication_site_abdomen_right">Abdômen direito</string>
+    <string name="medication_site_other">Outro local</string>
+
+    <!-- Dias da semana (agenda semanal) -->
+    <string name="medication_weekday_monday">Segunda</string>
+    <string name="medication_weekday_tuesday">Terça</string>
+    <string name="medication_weekday_wednesday">Quarta</string>
+    <string name="medication_weekday_thursday">Quinta</string>
+    <string name="medication_weekday_friday">Sexta</string>
+    <string name="medication_weekday_saturday">Sábado</string>
+    <string name="medication_weekday_sunday">Domingo</string>
+
+    <!-- Tipos e resumo de agenda (ADR 0007) -->
+    <string name="medication_schedule_type_interval">Intervalo em dias</string>
+    <string name="medication_schedule_type_weekly">Semanal</string>
+    <string name="medication_schedule_type_as_needed">Quando necessário</string>
+    <string name="medication_schedule_type_custom">Personalizada</string>
+    <string name="medication_schedule_type_daily">Diariamente</string>
+    <string name="medication_schedule_type_monthly">Mensal</string>
+    <string name="medication_schedule_type_quarterly">Trimestral</string>
+    <string name="medication_schedule_type_stepped">Intervalos variáveis</string>
+    <string name="medication_stepped_help">Cada dose conta a partir da anterior. Ex.: primeira dose em 45 dias, a segunda 90 dias depois e daí uso contínuo a cada 90 dias.</string>
+    <string name="medication_next_doses_preview">Próximas doses previstas: %1$s</string>
+    <string name="medication_schedule_as_needed">Quando necessário</string>
+    <string name="medication_schedule_custom">Agenda personalizada</string>
+    <string name="medication_schedule_weekly">Semanal: %1$s</string>
+    <string name="medication_schedule_weekly_every">A cada %1$d semanas: %2$s</string>
+    <plurals name="medication_schedule_interval_days">
+        <item quantity="one">A cada %1$d dia</item>
+        <item quantity="many">A cada %1$d dias</item>
+        <item quantity="other">A cada %1$d dias</item>
+    </plurals>
+    <string name="medication_schedule_daily">Diariamente</string>
+    <string name="medication_schedule_monthly">Mensal</string>
+    <string name="medication_schedule_quarterly">Trimestral</string>
+    <plurals name="medication_schedule_every_months">
+        <item quantity="one">A cada %1$d mês</item>
+        <item quantity="many">A cada %1$d meses</item>
+        <item quantity="other">A cada %1$d meses</item>
+    </plurals>
+    <string name="medication_schedule_stepped">Intervalos de %1$s dias</string>
+    <plurals name="medication_schedule_stepped_then">
+        <item quantity="one">Intervalos de %1$s dias, depois a cada %2$d dia</item>
+        <item quantity="many">Intervalos de %1$s dias, depois a cada %2$d dias</item>
+        <item quantity="other">Intervalos de %1$s dias, depois a cada %2$d dias</item>
+    </plurals>
+
+    <!-- Período do histórico -->
+    <string name="medication_period_30">30 dias</string>
+    <string name="medication_period_90">90 dias</string>
+    <string name="medication_period_365">365 dias</string>
+    <string name="medication_period_all">Tudo</string>
+
+    <!-- Texto combinado de dose, unidade e via numa linha de lista -->
+    <string name="medication_dose_and_route">%1$s %2$s, via %3$s</string>
+    <string name="medication_next_dose">Próxima dose prevista: %1$s</string>
+    <string name="medication_next_dose_none">Sem próxima dose prevista</string>
+    <string name="medication_next_dose_as_needed">Uso conforme necessário</string>
+
+    <!-- Janela de dias usada na frase de adesão (adherence_none_expected, em strings_sensitive.xml) -->
+    <plurals name="medication_window_days">
+        <item quantity="one">%1$d dia</item>
+        <item quantity="many">%1$d dias</item>
+        <item quantity="other">%1$d dias</item>
+    </plurals>
+
+    <!-- Estados vazios -->
+    <string name="medication_list_empty_title">Nenhum regime cadastrado</string>
+    <string name="medication_list_empty_body">Cadastre um regime para acompanhar doses e ver a próxima dose prevista.</string>
+    <string name="medication_history_empty_title">Nenhum registro no período</string>
+    <string name="medication_history_empty_body">Os registros de dose aparecem aqui, agrupados por mês.</string>
+    <string name="medication_history_filter_all">Todas</string>
+
+    <!-- Confirmações de exclusão (soft delete, Seção 9) -->
+    <string name="medication_delete_confirm_title">Excluir regime</string>
+    <string name="medication_delete_confirm_body">O regime é excluído, mas as doses já registradas continuam no histórico.</string>
+    <string name="medication_log_delete_confirm_title">Excluir registro</string>
+    <string name="medication_log_delete_confirm_body">Este registro de dose é excluído. É possível desfazer logo em seguida.</string>
+    <string name="medication_log_deleted">Registro excluído</string>
+
+    <!-- Erros de domínio (texto neutro, Seção 7.1.3) -->
+    <string name="medication_error_required">Preencha este campo para continuar.</string>
+    <string name="medication_error_out_of_range">Este valor está fora do intervalo aceito.</string>
+    <string name="medication_error_not_positive">Informe um número maior que zero.</string>
+    <string name="medication_error_future_date">Esta data e hora ainda não aconteceram.</string>
+    <string name="medication_error_end_before_start">A data de fim não pode vir antes da data de início.</string>
+    <string name="medication_error_builtin_immutable">Esta medicação vem do catálogo do app e não pode ser alterada.</string>
+    <string name="medication_error_duplicate">Já existe um registro assim.</string>
+    <string name="medication_error_not_found">Este item não foi encontrado.</string>
+</resources>

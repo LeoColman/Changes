@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Textos de navegação, títulos de seção e botões da feature settings (Seção 7.10, 9 e 14).
+  Frases de conteúdo sensível (vocabulário, aviso geral, apoio) vêm de strings_sensitive.xml.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <!-- Painel de Ajustes: entradas de navegação -->
+    <string name="settings_section_profile">Perfil</string>
+    <string name="settings_section_vocabulary">Vocabulário do corpo</string>
+    <string name="settings_section_appearance">Aparência</string>
+    <string name="settings_section_reminders">Lembretes</string>
+    <string name="settings_section_privacy">Privacidade</string>
+    <string name="settings_section_about">Sobre o app</string>
+    <string name="settings_backup_entry">Backup e restauração</string>
+    <string name="settings_trash_entry">Lixeira</string>
+    <string name="settings_about_entry">Sobre</string>
+    <string name="settings_licenses_entry">Licenças de terceiros</string>
+
+    <!-- Aparência -->
+    <string name="settings_appearance_theme">Tema</string>
+    <string name="settings_theme_system">Padrão do sistema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Escuro</string>
+    <string name="settings_appearance_dynamic_color">Cor dinâmica</string>
+
+    <!-- Lembretes (Seção 7.9): texto default vem de mood_reminder_default_text. -->
+    <string name="settings_dose_reminders">Lembrete de dose</string>
+    <string name="settings_reminder_text_label">Texto do lembrete</string>
+    <string name="settings_mood_reminder">Lembrete diário de check-in</string>
+    <string name="settings_mood_reminder_time">Horário do lembrete</string>
+
+    <!-- Privacidade -->
+    <string name="settings_biometric_lock">Bloqueio biométrico</string>
+    <string name="settings_biometric_unavailable">Seu aparelho não tem biometria nem bloqueio de tela configurado, então este bloqueio não pode ser ligado.</string>
+
+    <!-- Perfil (Seção 6.1): nenhum campo obrigatório. -->
+    <string name="settings_profile_display_name">Nome de exibição</string>
+    <string name="settings_profile_hrt_start_date">Início do tratamento hormonal</string>
+    <string name="settings_profile_height_cm">Altura (cm)</string>
+    <string name="settings_profile_height_in">Altura (pol)</string>
+    <string name="settings_profile_birth_year">Ano de nascimento</string>
+    <string name="settings_profile_unit_system">Sistema de unidades</string>
+    <string name="settings_unit_metric">Métrico (cm, kg)</string>
+    <string name="settings_unit_imperial">Imperial (pol, lb)</string>
+    <!-- %1$s recebe bmi_label (strings_sensitive.xml), para não duplicar a sigla noutra redação. -->
+    <string name="settings_profile_show_bmi">Mostrar %1$s</string>
+
+    <!-- Sobre (Seções 13 e 14) -->
+    <string name="settings_about_version">Versão %1$s</string>
+    <string name="settings_about_license_title">Licença</string>
+    <string name="settings_about_license_body">Este aplicativo é distribuído sob a licença AGPL-3.0-or-later, sem garantia de qualquer tipo, na forma permitida por lei.</string>
+    <string name="settings_about_no_internet">O Changes não se conecta à internet nem envia dados para nenhum servidor.</string>
+
+    <!-- Onboarding (Seção 9): no máximo 4 passos, todos puláveis. -->
+    <string name="settings_onboarding_skip">Pular</string>
+    <string name="settings_onboarding_next">Próximo</string>
+    <string name="settings_onboarding_finish">Concluir</string>
+    <string name="settings_onboarding_welcome_title">Boas-vindas</string>
+    <string name="settings_onboarding_start_date_body">Se quiser, informe quando começou o tratamento hormonal. É opcional e pode ser preenchido depois em Ajustes.</string>
+    <string name="settings_onboarding_height_title">Altura e peso</string>
+    <string name="settings_onboarding_height_body">Se quiser ver o IMC como número simples, informe sua altura e seu peso atual. É opcional: a altura pode ser mudada depois em Ajustes, e o peso fica em Medidas.</string>
+    <string name="settings_onboarding_weight_label">Peso atual (kg)</string>
+    <string name="settings_onboarding_weight_error">Informe um número maior que zero.</string>
+</resources>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English versions of the vitals feature texts (section 7.4): weight, BMI and exercise. -->
+<resources>
+    <string name="vitals_measurements_title">Measurements</string>
+    <string name="vitals_exercise_title">Exercise</string>
+
+    <string name="vitals_type_weight">Weight</string>
+    <string name="vitals_type_waist">Waist</string>
+    <string name="vitals_type_hip">Hip</string>
+    <string name="vitals_type_bicep">Arm</string>
+    <string name="vitals_type_neck">Neck</string>
+    <string name="vitals_type_body_fat">Body fat percentage</string>
+    <string name="vitals_type_custom">Custom</string>
+
+    <string name="vitals_unit_kg">kg</string>
+    <string name="vitals_unit_lb">lb</string>
+    <string name="vitals_unit_cm">cm</string>
+    <string name="vitals_unit_in">in</string>
+    <string name="vitals_unit_percent">%</string>
+
+    <string name="vitals_current_value">Current value: %1$s</string>
+    <string name="vitals_value_with_unit">%1$s %2$s</string>
+    <string name="vitals_no_entries">No entries yet</string>
+    <string name="vitals_measurements_empty_title">No measurements recorded</string>
+    <string name="vitals_measurements_empty_body">Here you record weight and other body measurements, with a chart of how each one changes over time.</string>
+    <string name="vitals_open_settings">Open Settings</string>
+    <string name="vitals_record_weight">Record weight</string>
+
+    <string name="vitals_add_measurement">Add measurement</string>
+    <string name="vitals_edit_measurement">Edit measurement</string>
+    <string name="vitals_add_custom_measurement">Add custom measurement</string>
+    <string name="vitals_field_type">Type</string>
+    <string name="vitals_field_custom_label">Measurement name</string>
+    <string name="vitals_field_unit">Unit</string>
+    <string name="vitals_field_value">Value</string>
+    <string name="vitals_field_date">Date</string>
+    <string name="vitals_field_notes">Notes (optional)</string>
+    <string name="vitals_value_error">Enter a valid number</string>
+    <string name="vitals_edit_entry">Edit entry</string>
+    <string name="vitals_delete_entry">Delete entry</string>
+    <string name="vitals_entry_deleted">Entry deleted</string>
+    <plurals name="vitals_measurement_chart_summary">
+        <item quantity="one">%1$s: %2$d entry, on %3$s. Value: %5$s.</item>
+        <item quantity="other">%1$s: %2$d entries, from %3$s to %4$s. Latest: %5$s.</item>
+    </plurals>
+
+    <string name="vitals_exercise_empty_title">No sessions recorded</string>
+    <string name="vitals_exercise_empty_body">Here you record free exercise sessions, with duration and intensity, and see the total minutes per week.</string>
+    <string name="vitals_field_activity">Activity</string>
+    <string name="vitals_activity_error">Enter the activity</string>
+    <string name="vitals_field_duration">Duration (minutes)</string>
+    <string name="vitals_duration_error">Enter a whole number greater than zero</string>
+    <string name="vitals_date_future_error">Date cannot be in the future</string>
+    <string name="vitals_field_intensity">Intensity</string>
+    <string name="vitals_intensity_light">Light</string>
+    <string name="vitals_intensity_moderate">Moderate</string>
+    <string name="vitals_intensity_vigorous">Vigorous</string>
+    <string name="vitals_add_session">Add session</string>
+    <string name="vitals_edit_session">Edit session</string>
+    <string name="vitals_delete_session">Delete session</string>
+    <string name="vitals_session_deleted">Session deleted</string>
+    <string name="vitals_session_summary">%1$s · %2$d min · %3$s</string>
+    <string name="vitals_weekly_title">Exercise minutes per week</string>
+    <string name="vitals_week_minutes">%1$s: %2$d min</string>
+    <plurals name="vitals_weekly_chart_summary">
+        <item quantity="one">Weekly exercise summary with %1$d week, %2$s.</item>
+        <item quantity="other">Weekly exercise summary with %1$d weeks, from %2$s to %3$s.</item>
+    </plurals>
+
+    <!-- Exercise routines (ADR 0011): recurring calendar events, section above the sessions. -->
+    <string name="vitals_routines_title">Routines</string>
+    <string name="vitals_routines_empty">No routines yet. A routine is an exercise that repeats and shows up on the calendar on the chosen days.</string>
+    <string name="vitals_add_routine">Add routine</string>
+    <string name="vitals_edit_routine">Edit routine</string>
+    <string name="vitals_delete_routine">Delete routine</string>
+    <string name="vitals_routine_deleted">Routine deleted</string>
+    <string name="vitals_field_frequency">Frequency</string>
+    <string name="vitals_frequency_daily">Daily</string>
+    <string name="vitals_frequency_weekly">Weekly</string>
+    <string name="vitals_field_weekly_interval">Every how many weeks</string>
+    <string name="vitals_weekly_interval_error">Enter a whole number greater than zero</string>
+    <string name="vitals_weekly_days_error">Choose at least one day</string>
+    <string name="vitals_field_start_date">Starts on</string>
+    <string name="vitals_field_time">Time (optional)</string>
+    <string name="vitals_field_time_clear">Clear time</string>
+    <string name="vitals_field_reminder">Reminder</string>
+    <string name="vitals_reminder_none">None</string>
+    <string name="vitals_reminder_at_time">At the time</string>
+    <string name="vitals_reminder_15_minutes">15 minutes before</string>
+    <string name="vitals_reminder_1_hour">1 hour before</string>
+    <string name="vitals_weekday_monday">Monday</string>
+    <string name="vitals_weekday_tuesday">Tuesday</string>
+    <string name="vitals_weekday_wednesday">Wednesday</string>
+    <string name="vitals_weekday_thursday">Thursday</string>
+    <string name="vitals_weekday_friday">Friday</string>
+    <string name="vitals_weekday_saturday">Saturday</string>
+    <string name="vitals_weekday_sunday">Sunday</string>
+    <string name="vitals_routine_frequency_weekly_once">Every week: %1$s</string>
+    <string name="vitals_routine_frequency_weekly_interval">Every %1$d weeks: %2$s</string>
+    <string name="vitals_routine_summary_with_time">%1$s · %2$s</string>
+</resources>

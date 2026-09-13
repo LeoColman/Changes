@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Textos das telas sensíveis, com redação revisada.
+  Features referenciam; não editam nem reescrevem com outras palavras.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <!-- Aviso geral (Seção 13): onboarding e Ajustes > Sobre, uma vez cada. -->
+    <string name="sensitive_disclaimer">O Changes registra o que você e quem acompanha seu tratamento decidiram. Ele não dá conselho médico, não sugere doses e não substitui acompanhamento profissional.</string>
+
+    <!-- Mudanças esperadas (7.2). O aviso fixo é o texto do dossiê. -->
+    <string name="expected_title">Mudanças descritas na literatura</string>
+    <string name="expected_disclaimer">Faixas observadas em estudos populacionais. Variação individual é grande e estar fora da faixa não indica problema. Converse com quem acompanha seu tratamento.</string>
+    <string name="expected_status_not_yet">Ainda não esperada</string>
+    <string name="expected_status_within">Dentro da janela típica de início</string>
+    <string name="expected_status_past">Passou da janela típica de início</string>
+    <string name="expected_onset">Início típico: %1$s</string>
+    <string name="expected_max_effect">Efeito máximo: %1$s</string>
+    <string name="expected_range_months">%1$s a %2$s meses</string>
+    <string name="expected_range_years">%1$s a %2$s anos</string>
+    <string name="expected_not_stated">não informado pela fonte</string>
+    <string name="expected_permanence_permanent">Descrita pela fonte como permanente</string>
+    <string name="expected_permanence_partial">Descrita pela fonte como parcialmente permanente</string>
+    <string name="expected_permanence_not_permanent">Descrita pela fonte como reversível se a testosterona for suspensa</string>
+    <string name="expected_permanence_not_stated">A fonte não informa se é permanente</string>
+    <string name="expected_source">Fonte: %1$s</string>
+    <string name="expected_sources_title">Referências</string>
+    <string name="expected_first_observation">Sua primeira observação: %1$s</string>
+    <string name="expected_first_observation_months">Sua primeira observação: %1$s, com %2$s meses de tratamento</string>
+    <string name="expected_no_start_date">Informe a data de início do tratamento para ver em que ponto do seu calendário cada faixa cai.</string>
+    <string name="expected_set_start_date">Informar data de início</string>
+    <string name="expected_window_dates">Janela típica de início no seu calendário: %1$s a %2$s</string>
+    <string name="expected_window_open">Janela típica de início no seu calendário: a partir de %1$s</string>
+    <plurals name="expected_chart_summary">
+        <item quantity="one">Linha do tempo com %1$d mudança descrita na literatura.</item>
+        <item quantity="many">Linha do tempo com %1$d mudanças descritas na literatura.</item>
+        <item quantity="other">Linha do tempo com %1$d mudanças descritas na literatura.</item>
+    </plurals>
+
+    <!-- Condições de saúde (7.5). Nada de risco, contraindicação ou alerta. -->
+    <string name="conditions_title">Condições de saúde</string>
+    <string name="conditions_empty_title">Nenhuma condição registrada</string>
+    <string name="conditions_empty_body">Aqui você registra condições de saúde, atuais ou passadas, com datas e observações. As que você marcar como relevantes para o tratamento hormonal aparecem no topo e no relatório.</string>
+    <string name="conditions_label">Condição</string>
+    <string name="conditions_code">CID-10 (opcional)</string>
+    <string name="conditions_severity">Gravidade</string>
+    <string name="conditions_status">Situação</string>
+    <string name="conditions_diagnosed_at">Data do diagnóstico</string>
+    <string name="conditions_resolved_at">Data da resolução</string>
+    <string name="conditions_affects_treatment">Relevante para o tratamento hormonal</string>
+    <string name="conditions_affects_treatment_help">Condições marcadas ficam no topo e entram no relatório, para você levar à consulta.</string>
+    <string name="conditions_pinned_header">Para levar à consulta</string>
+    <string name="conditions_other_header">Outras condições</string>
+    <string name="conditions_severity_mild">Leve</string>
+    <string name="conditions_severity_moderate">Moderada</string>
+    <string name="conditions_severity_severe">Grave</string>
+    <string name="conditions_severity_unknown">Não informada</string>
+    <string name="conditions_status_active">Ativa</string>
+    <string name="conditions_status_resolved">Resolvida</string>
+    <string name="conditions_status_in_remission">Em remissão</string>
+    <string name="conditions_status_suspected">Suspeita</string>
+    <string name="conditions_suggestions_hint">Sugestões para preencher mais rápido. Você pode escrever qualquer condição.</string>
+
+    <!-- Exames (7.6). Marcação puramente aritmética, cor neutra. -->
+    <string name="labs_title">Exames</string>
+    <string name="labs_empty_title">Nenhum exame registrado</string>
+    <string name="labs_empty_body">Aqui você registra resultados de exames com a faixa de referência impressa no seu laudo. O app mostra a evolução de cada exame ao longo do tempo.</string>
+    <string name="labs_value">Resultado</string>
+    <string name="labs_unit">Unidade</string>
+    <string name="labs_collected_at">Data da coleta</string>
+    <string name="labs_reference_low">Referência mínima do laudo</string>
+    <string name="labs_reference_high">Referência máxima do laudo</string>
+    <string name="labs_reference_help">Use a faixa impressa no seu laudo. O app não tem faixas próprias, porque elas mudam de laboratório para laboratório.</string>
+    <string name="labs_lab_name">Laboratório</string>
+    <string name="labs_out_of_range">Fora da faixa informada pelo laboratório</string>
+    <string name="labs_out_of_range_hint">Leve para quem acompanha seu tratamento.</string>
+    <plurals name="labs_chart_summary">
+        <item quantity="one">%1$s: %2$d resultado, em %3$s. Valor: %5$s.</item>
+        <item quantity="many">%1$s: %2$d resultados, de %3$s a %4$s. Último: %5$s.</item>
+        <item quantity="other">%1$s: %2$d resultados, de %3$s a %4$s. Último: %5$s.</item>
+    </plurals>
+
+    <!-- Saúde mental (7.7). Sem instrumento clínico, sem análise da nota, sem streak. -->
+    <string name="mood_title">Como você está hoje</string>
+    <string name="mood_intro">Um registro por dia. Preencha o que fizer sentido; os campos opcionais podem ficar em branco.</string>
+    <string name="mood_mood">Humor</string>
+    <string name="mood_energy">Energia</string>
+    <string name="mood_anxiety">Ansiedade (opcional)</string>
+    <string name="mood_dysphoria">Disforia (opcional)</string>
+    <string name="mood_sleep">Horas de sono (opcional)</string>
+    <string name="mood_note">Nota (opcional)</string>
+    <string name="mood_note_private">Só você vê esta nota. O app não lê, não classifica e não analisa o que você escreve.</string>
+    <string name="mood_tags">Etiquetas (opcional)</string>
+    <string name="mood_tags_hint">Palavras livres, separadas por vírgula</string>
+    <string name="mood_scale_1">1, muito baixo</string>
+    <string name="mood_scale_2">2, baixo</string>
+    <string name="mood_scale_3">3, médio</string>
+    <string name="mood_scale_4">4, alto</string>
+    <string name="mood_scale_5">5, muito alto</string>
+    <string name="mood_saved">Registro do dia salvo</string>
+    <string name="mood_history_title">Registros anteriores</string>
+    <string name="mood_empty_body">Aqui ficam os seus registros diários de humor, energia e sono, num calendário do mês e num gráfico de tendência.</string>
+    <plurals name="mood_heatmap_summary">
+        <item quantity="one">Calendário de %1$s com %2$d dia registrado.</item>
+        <item quantity="many">Calendário de %1$s com %2$d dias registrados.</item>
+        <item quantity="other">Calendário de %1$s com %2$d dias registrados.</item>
+    </plurals>
+    <plurals name="mood_trend_summary">
+        <item quantity="one">Tendência de humor e energia com %1$d registro, em %2$s.</item>
+        <item quantity="many">Tendência de humor e energia com %1$d registros entre %2$s e %3$s.</item>
+        <item quantity="other">Tendência de humor e energia com %1$d registros entre %2$s e %3$s.</item>
+    </plurals>
+    <string name="mood_reminder_default_text">Lembrete</string>
+
+    <!-- Apoio em momentos difíceis (7.7): estático, sem detecção automática de crise. -->
+    <string name="support_entry">Apoio em momentos difíceis</string>
+    <string name="support_title">Apoio em momentos difíceis</string>
+    <string name="support_body">Se você está passando por um momento difícil, não precisa atravessar isso sem apoio.</string>
+    <string name="support_cvv_title">CVV, Centro de Valorização da Vida</string>
+    <string name="support_cvv_body">Ligação gratuita para 188, 24 horas por dia. Também há atendimento por chat em cvv.org.br.</string>
+    <string name="support_caps_title">CAPS, Centro de Atenção Psicossocial</string>
+    <string name="support_caps_body">Atendimento em saúde mental pelo SUS. A unidade básica de saúde mais perto de você informa onde fica o CAPS da sua região.</string>
+    <string name="support_call_cvv">Ligar para 188</string>
+
+    <!-- Vocabulário corporal (7.10). Os termos em si vêm do BodyVocabularyResolver. -->
+    <string name="vocabulary_title">Como o app se refere ao seu corpo</string>
+    <string name="vocabulary_intro">Escolha os termos que o app usa nas telas e nos relatórios. Dá para mudar quando quiser, e nada do que já foi registrado muda.</string>
+    <string name="vocabulary_custom">Outro termo</string>
+    <string name="vocabulary_custom_hint">Escreva o termo que você prefere</string>
+    <string name="vocabulary_preview">Exemplo: %1$s</string>
+
+    <!-- IMC (7.4): número puro, sem classificação. -->
+    <string name="bmi_label">IMC</string>
+    <string name="bmi_note">O IMC não distingue massa magra de gordura e tem validade limitada durante mudanças de composição corporal.</string>
+    <string name="bmi_needs_height">Para ver o IMC, informe sua altura em Ajustes.</string>
+    <string name="bmi_needs_weight">Para ver o IMC, registre seu peso.</string>
+
+    <!-- Adesão (7.1): fato neutro. -->
+    <!-- Quantidade = doses previstas (%2$d). A janela é sempre de vários dias. -->
+    <plurals name="adherence_sentence">
+        <item quantity="one">%1$d de %2$d dose prevista registrada nos últimos %3$d dias</item>
+        <item quantity="many">%1$d de %2$d doses previstas registradas nos últimos %3$d dias</item>
+        <item quantity="other">%1$d de %2$d doses previstas registradas nos últimos %3$d dias</item>
+    </plurals>
+    <string name="adherence_none_expected">Nenhuma dose prevista na janela de %1$s</string>
+</resources>

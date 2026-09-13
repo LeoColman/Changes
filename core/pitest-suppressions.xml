@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Supressões de mutantes comprovadamente equivalentes (ADR 0005).
+  Formato: <suppress class="FQN" method="nome" line="N" mutator="SufixoDoMutador" justification="uma linha"/>
+  Toda entrada exige justificativa e precisa casar com um mutante real (o gate falha com entrada órfã).
+  Cada entrada exige um ADR.
+-->
+<suppressions>
+</suppressions>

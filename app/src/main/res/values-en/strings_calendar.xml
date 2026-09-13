@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Actions and views -->
+    <string name="calendar_action_new_event">New event</string>
+    <string name="calendar_view_month">Month</string>
+    <string name="calendar_view_agenda">Agenda</string>
+    <string name="calendar_toggle_milestones">Literature milestones</string>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+
+    <!-- Month grid and day selection -->
+    <string name="calendar_selected_day_header">Items on %1$s</string>
+    <string name="calendar_selected_day_empty">Nothing recorded on this day.</string>
+    <string name="calendar_day_empty_description">%1$s, no items</string>
+    <string name="calendar_day_items_description">%1$s: %2$s</string>
+
+    <!-- Agenda -->
+    <string name="calendar_agenda_empty_title">Nothing planned</string>
+    <string name="calendar_agenda_empty_body">Planned and logged doses, events and milestones show up here, grouped by day.</string>
+
+    <!-- List item text -->
+    <string name="calendar_item_date">%1$s</string>
+    <string name="calendar_item_datetime">%1$s at %2$s</string>
+    <string name="calendar_event_completed">Completed</string>
+
+    <!-- Marker kind labels (Section 7.9) -->
+    <string name="calendar_marker_planned_dose">Planned dose</string>
+    <string name="calendar_marker_logged_dose">Logged dose</string>
+    <string name="calendar_marker_event">Event</string>
+    <string name="calendar_marker_milestone">Literature milestone</string>
+
+    <!-- Manual event categories (neutral text) -->
+    <string name="calendar_category_dose">Medication</string>
+    <string name="calendar_category_appointment">Appointment</string>
+    <string name="calendar_category_lab">Lab</string>
+    <string name="calendar_category_surgery">Surgery</string>
+    <string name="calendar_category_personal">Personal</string>
+    <string name="calendar_category_exercise">Exercise</string>
+    <string name="calendar_category_other">Other</string>
+
+    <!-- Reminder -->
+    <string name="calendar_reminder_none">None</string>
+    <string name="calendar_reminder_at_time">At the time</string>
+    <string name="calendar_reminder_15_minutes">15 minutes before</string>
+    <string name="calendar_reminder_1_hour">1 hour before</string>
+    <string name="calendar_reminder_1_day">1 day before</string>
+
+    <!-- Recurrence -->
+    <string name="calendar_recurrence_none">Does not repeat</string>
+    <string name="calendar_recurrence_daily">Daily</string>
+    <string name="calendar_recurrence_weekly">Weekly</string>
+    <string name="calendar_recurrence_monthly">Monthly</string>
+    <string name="calendar_recurrence_yearly">Yearly</string>
+    <string name="calendar_recurrence_end_never">Never ends</string>
+    <string name="calendar_recurrence_end_on_date">Ends on a date</string>
+    <string name="calendar_recurrence_end_after_count">Ends after N times</string>
+
+    <!-- Weekdays (weekly recurrence) -->
+    <string name="calendar_weekday_monday">Monday</string>
+    <string name="calendar_weekday_tuesday">Tuesday</string>
+    <string name="calendar_weekday_wednesday">Wednesday</string>
+    <string name="calendar_weekday_thursday">Thursday</string>
+    <string name="calendar_weekday_friday">Friday</string>
+    <string name="calendar_weekday_saturday">Saturday</string>
+    <string name="calendar_weekday_sunday">Sunday</string>
+
+    <!-- Create/edit event screen -->
+    <string name="calendar_event_title_new">New event</string>
+    <string name="calendar_event_title_edit">Edit event</string>
+    <string name="calendar_section_when">When</string>
+    <string name="calendar_section_recurrence">Recurrence</string>
+    <string name="calendar_field_title">Title</string>
+    <string name="calendar_field_description">Description</string>
+    <string name="calendar_field_category">Category</string>
+    <string name="calendar_field_all_day">All day</string>
+    <string name="calendar_field_start_date">Start date</string>
+    <string name="calendar_field_start_time">Start time</string>
+    <string name="calendar_field_end_date">End date</string>
+    <string name="calendar_field_end_time">End time</string>
+    <string name="calendar_field_end_date_clear">Remove end date</string>
+    <string name="calendar_field_reminder">Reminder</string>
+    <string name="calendar_field_recurrence_frequency">Repeat</string>
+    <string name="calendar_field_recurrence_interval">Interval</string>
+    <string name="calendar_field_recurrence_until">Ends on</string>
+    <string name="calendar_field_recurrence_count">Number of times</string>
+    <string name="calendar_field_completed">Completed</string>
+
+    <!-- Deletion (soft delete with undo, Section 9) -->
+    <string name="calendar_delete_confirm_title">Delete event</string>
+    <string name="calendar_delete_confirm_body">The event is deleted. You can undo it right after.</string>
+    <string name="calendar_event_deleted_message">Event deleted</string>
+
+    <!-- Domain errors (neutral text) -->
+    <string name="calendar_error_required">Fill in this field to continue.</string>
+    <string name="calendar_error_out_of_range">This value is outside the accepted range.</string>
+    <string name="calendar_error_end_before_start">The end date cannot come before the start date.</string>
+    <string name="calendar_error_generic">These values could not be saved.</string>
+    <string name="calendar_error_not_found">This item was not found.</string>
+</resources>

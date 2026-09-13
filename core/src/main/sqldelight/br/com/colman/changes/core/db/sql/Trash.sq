@@ -1,0 +1,24 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Lixeira (Seção 9, ADR 0008): tudo que foi excluído desde :since, de todas as tabelas de usuário,
+-- do mais recente para o mais antigo. Linha purgada tem `deleted_at = 0` e fica de fora. Catálogo
+-- builtin nunca é excluído. `label` é o texto da própria pessoa para reconhecer o item, '' se não há.
+selectTrash:
+SELECT 'MEDICATION' AS kind, id, COALESCE(deleted_at, 0) AS deleted_at, name AS label
+FROM medication WHERE deleted_at >= :since
+UNION ALL SELECT 'REGIMEN', id, COALESCE(deleted_at, 0), COALESCE(notes, '') FROM regimen WHERE deleted_at >= :since
+UNION ALL SELECT 'DOSE_LOG', id, COALESCE(deleted_at, 0), COALESCE(notes, '') FROM dose_log WHERE deleted_at >= :since
+UNION ALL SELECT 'BODY_CHANGE_TYPE', id, COALESCE(deleted_at, 0), COALESCE(custom_label, '')
+FROM body_change_type WHERE deleted_at >= :since
+UNION ALL SELECT 'BODY_CHANGE_ENTRY', id, COALESCE(deleted_at, 0), COALESCE(notes, '')
+FROM body_change_entry WHERE deleted_at >= :since
+UNION ALL SELECT 'MEASUREMENT', id, COALESCE(deleted_at, 0), COALESCE(custom_label, notes, '')
+FROM measurement WHERE deleted_at >= :since
+UNION ALL SELECT 'EXERCISE', id, COALESCE(deleted_at, 0), activity FROM exercise_session WHERE deleted_at >= :since
+UNION ALL SELECT 'HEALTH_CONDITION', id, COALESCE(deleted_at, 0), label FROM health_condition WHERE deleted_at >= :since
+UNION ALL SELECT 'LAB_ANALYTE', id, COALESCE(deleted_at, 0), COALESCE(custom_label, '') FROM lab_analyte WHERE deleted_at >= :since
+UNION ALL SELECT 'LAB_RESULT', id, COALESCE(deleted_at, 0), COALESCE(lab_name, notes, '') FROM lab_result WHERE deleted_at >= :since
+UNION ALL SELECT 'MOOD', id, COALESCE(deleted_at, 0), COALESCE(note, '') FROM mood_log WHERE deleted_at >= :since
+UNION ALL SELECT 'CALENDAR_EVENT', id, COALESCE(deleted_at, 0), title FROM calendar_event WHERE deleted_at >= :since
+ORDER BY deleted_at DESC, id;

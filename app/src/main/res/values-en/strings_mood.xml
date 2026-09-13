@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English versions of the mood feature texts (section 7.7). Content sentences come from strings_sensitive.xml. -->
+<resources>
+    <string name="mood_heatmap_title">Calendar</string>
+    <string name="mood_trend_title">Trend</string>
+    <string name="mood_previous_month">Previous month</string>
+    <string name="mood_next_month">Next month</string>
+    <string name="mood_day_with_entry">%1$s, mood %2$d of 5</string>
+    <string name="mood_day_without_entry">%1$s, no entry</string>
+    <string name="mood_scale_required_error">Choose a value from 1 to 5</string>
+    <string name="mood_sleep_hours_error">Enter a number between 0 and 24</string>
+    <string name="mood_entry_summary">%1$s: mood %2$s, energy %3$s</string>
+</resources>

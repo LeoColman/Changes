@@ -1,0 +1,71 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Valor gravado na unidade em que foi digitado (sem perda); a UI converte para exibição.
+-- IMC nunca é persistido.
+CREATE TABLE measurement (
+    id TEXT NOT NULL PRIMARY KEY,
+    type TEXT NOT NULL,
+    custom_label TEXT,
+    value REAL NOT NULL,
+    unit TEXT NOT NULL,
+    measured_at INTEGER NOT NULL,
+    measured_at_offset_seconds INTEGER NOT NULL,
+    notes TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER,
+    CHECK (type <> 'CUSTOM' OR custom_label IS NOT NULL)
+);
+
+CREATE INDEX measurement_type_measured ON measurement(type, measured_at);
+
+selectById:
+SELECT * FROM measurement WHERE id = ?;
+
+selectByType:
+SELECT * FROM measurement WHERE deleted_at IS NULL AND type = ? ORDER BY measured_at;
+
+selectLatestByType:
+SELECT * FROM measurement WHERE deleted_at IS NULL AND type = ? ORDER BY measured_at DESC LIMIT 1;
+
+selectAll:
+SELECT * FROM measurement WHERE deleted_at IS NULL ORDER BY measured_at DESC;
+
+selectDeletedSince:
+SELECT * FROM measurement WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insert:
+INSERT INTO measurement VALUES ?;
+
+update:
+UPDATE measurement SET
+    type = :type,
+    custom_label = :customLabel,
+    value = :value,
+    unit = :unit,
+    measured_at = :measuredAt,
+    measured_at_offset_seconds = :measuredAtOffsetSeconds,
+    notes = :notes,
+    updated_at = :updatedAt
+WHERE id = :id;
+
+softDelete:
+UPDATE measurement SET deleted_at = :now, updated_at = :now WHERE id = :id AND deleted_at IS NULL;
+
+restore:
+UPDATE measurement SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllForBackup:
+SELECT * FROM measurement ORDER BY id;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeById:
+UPDATE measurement SET notes = NULL, custom_label = CASE WHEN custom_label IS NULL THEN NULL ELSE '' END, deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpired:
+UPDATE measurement SET notes = NULL, custom_label = CASE WHEN custom_label IS NULL THEN NULL ELSE '' END, deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;

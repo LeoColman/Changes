@@ -1,0 +1,46 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Uma única linha (id = 'default'). Datas sem horário são epoch day local.
+CREATE TABLE profile (
+    id TEXT NOT NULL PRIMARY KEY CHECK (id = 'default'),
+    display_name TEXT,
+    height_cm REAL CHECK (height_cm IS NULL OR height_cm > 0),
+    birth_year INTEGER,
+    treatment_protocol TEXT NOT NULL,
+    hrt_start_date INTEGER,
+    locale TEXT,
+    unit_system TEXT NOT NULL,
+    show_bmi INTEGER NOT NULL CHECK (show_bmi IN (0, 1)),
+    body_vocabulary TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER
+);
+
+get:
+SELECT * FROM profile WHERE id = 'default';
+
+insertDefault:
+INSERT OR IGNORE INTO profile (
+    id, display_name, height_cm, birth_year, treatment_protocol, hrt_start_date, locale,
+    unit_system, show_bmi, body_vocabulary, created_at, updated_at, deleted_at
+) VALUES ('default', NULL, NULL, NULL, 'MASCULINIZING', NULL, NULL, 'METRIC', 0, '{}', :now, :now, NULL);
+
+update:
+UPDATE profile SET
+    display_name = :displayName,
+    height_cm = :heightCm,
+    birth_year = :birthYear,
+    treatment_protocol = :treatmentProtocol,
+    hrt_start_date = :hrtStartDate,
+    locale = :locale,
+    unit_system = :unitSystem,
+    show_bmi = :showBmi,
+    body_vocabulary = :bodyVocabulary,
+    updated_at = :updatedAt
+WHERE id = 'default';
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllForBackup:
+SELECT * FROM profile ORDER BY id;

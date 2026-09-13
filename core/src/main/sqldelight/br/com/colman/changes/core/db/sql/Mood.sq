@@ -1,0 +1,71 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- No máximo uma entrada por data local (entry_date = epoch day). O UNIQUE vale também para
+-- tombstones: registrar de novo numa data apagada reaproveita a linha (upsert no repositório).
+-- tags é um array JSON de strings livres.
+CREATE TABLE mood_log (
+    id TEXT NOT NULL PRIMARY KEY,
+    entry_date INTEGER NOT NULL UNIQUE,
+    mood INTEGER NOT NULL CHECK (mood BETWEEN 1 AND 5),
+    energy INTEGER NOT NULL CHECK (energy BETWEEN 1 AND 5),
+    anxiety INTEGER CHECK (anxiety IS NULL OR anxiety BETWEEN 1 AND 5),
+    dysphoria INTEGER CHECK (dysphoria IS NULL OR dysphoria BETWEEN 1 AND 5),
+    sleep_hours REAL CHECK (sleep_hours IS NULL OR sleep_hours BETWEEN 0 AND 24),
+    note TEXT,
+    tags TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER
+);
+
+selectById:
+SELECT * FROM mood_log WHERE id = ?;
+
+selectByDateIncludingDeleted:
+SELECT * FROM mood_log WHERE entry_date = ?;
+
+selectBetween:
+SELECT * FROM mood_log WHERE deleted_at IS NULL AND entry_date >= ? AND entry_date <= ? ORDER BY entry_date;
+
+selectAll:
+SELECT * FROM mood_log WHERE deleted_at IS NULL ORDER BY entry_date DESC;
+
+selectDeletedSince:
+SELECT * FROM mood_log WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insert:
+INSERT INTO mood_log VALUES ?;
+
+overwrite:
+UPDATE mood_log SET
+    mood = :mood,
+    energy = :energy,
+    anxiety = :anxiety,
+    dysphoria = :dysphoria,
+    sleep_hours = :sleepHours,
+    note = :note,
+    tags = :tags,
+    deleted_at = NULL,
+    updated_at = :updatedAt
+WHERE id = :id;
+
+softDelete:
+UPDATE mood_log SET deleted_at = :now, updated_at = :now WHERE id = :id AND deleted_at IS NULL;
+
+restore:
+UPDATE mood_log SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllForBackup:
+SELECT * FROM mood_log ORDER BY id;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeById:
+UPDATE mood_log SET note = NULL, tags = '[]', deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpired:
+UPDATE mood_log SET note = NULL, tags = '[]', deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;

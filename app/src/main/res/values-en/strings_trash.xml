@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English versions of the 30-day trash texts (section 9, ADR 0008). -->
+<resources>
+    <string name="trash_title">Trash</string>
+    <string name="trash_explanation">Deleted items stay here for 30 days, then disappear from this device, along with their photos.</string>
+    <string name="trash_empty_body">Deleted items appear here for 30 days before disappearing from this device, along with their photos.</string>
+    <string name="trash_deleted_at">Deleted on %1$s</string>
+    <string name="trash_purge_at">Leaves on %1$s</string>
+    <string name="trash_action_restore">Restore</string>
+    <string name="trash_action_delete_forever">Delete permanently</string>
+    <string name="trash_action_empty">Empty trash</string>
+    <string name="trash_confirm_delete_title">Delete permanently</string>
+    <string name="trash_confirm_delete_text">The item and its photos disappear from this device and do not come back.</string>
+    <string name="trash_confirm_empty_title">Empty trash</string>
+    <string name="trash_confirm_empty_text">Every item in the trash and their photos disappear from this device and do not come back.</string>
+    <string name="trash_confirm_empty_word">EMPTY</string>
+    <string name="trash_restored_message">Item restored.</string>
+    <string name="trash_kind_medication">Medications</string>
+    <string name="trash_kind_regimen">Regimens</string>
+    <string name="trash_kind_dose_log">Logged doses</string>
+    <string name="trash_kind_body_change">Body changes</string>
+    <string name="trash_kind_measurement">Measurements</string>
+    <string name="trash_kind_exercise">Exercises</string>
+    <string name="trash_kind_health_condition">Health conditions</string>
+    <string name="trash_kind_lab">Lab exams</string>
+    <string name="trash_kind_mood">Mood entries</string>
+    <string name="trash_kind_calendar_event">Calendar events</string>
+</resources>

@@ -1,0 +1,31 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Dataset clínico versionado (Seção 8). Não é dado da pessoa: é reescrito inteiro a cada reseed
+-- e não entra no export. onset_months_max / max_effect_months_* NULL = a fonte não dá limite.
+-- permanence: PERMANENT | PARTIALLY_PERMANENT | NOT_PERMANENT | NOT_STATED.
+CREATE TABLE expected_change (
+    id TEXT NOT NULL PRIMARY KEY,
+    change_type_code TEXT NOT NULL,
+    protocol TEXT NOT NULL,
+    onset_months_min REAL NOT NULL,
+    onset_months_max REAL,
+    max_effect_months_min REAL,
+    max_effect_months_max REAL,
+    permanence TEXT NOT NULL,
+    permanence_source_key TEXT,
+    source_key TEXT NOT NULL,
+    dataset_version INTEGER NOT NULL,
+    UNIQUE (change_type_code, protocol, source_key),
+    CHECK (onset_months_max IS NULL OR onset_months_max >= onset_months_min),
+    CHECK (max_effect_months_min IS NULL OR max_effect_months_max IS NULL OR max_effect_months_max >= max_effect_months_min)
+);
+
+selectByProtocol:
+SELECT * FROM expected_change WHERE protocol = ? ORDER BY onset_months_min, change_type_code;
+
+deleteAll:
+DELETE FROM expected_change;
+
+insert:
+INSERT INTO expected_change VALUES ?;

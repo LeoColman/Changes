@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Textos da feature health (rótulos de navegação, botões e mensagens de formulário). Frases de
+  conteúdo sobre condições e exames vêm de strings_sensitive.xml (docs/app-guidelines.md).
+-->
+<resources>
+    <!-- Entradas da aba Saúde: cada uma abre uma tela própria ou de outra feature. -->
+    <string name="health_entry_conditions">Condições de saúde</string>
+    <string name="health_entry_labs">Exames</string>
+    <string name="health_entry_regimens">Regimes e histórico de doses</string>
+    <string name="health_entry_measurements">Peso, IMC e medidas</string>
+    <string name="health_entry_exercise">Exercício</string>
+
+    <!-- Condições: chrome de tela (botões, títulos de diálogo), sem frase de conteúdo. -->
+    <string name="health_add_condition">Adicionar condição</string>
+    <string name="health_edit_condition">Editar condição</string>
+    <string name="health_delete_condition">Excluir condição</string>
+    <string name="health_condition_deleted">Condição excluída</string>
+
+    <!-- Exames: chrome de tela. -->
+    <string name="health_add_analyte">Novo analito personalizado</string>
+    <string name="health_analyte_label_field">Nome do analito</string>
+    <string name="health_add_result">Adicionar resultado</string>
+    <string name="health_edit_result">Editar resultado</string>
+    <string name="health_delete_result">Excluir resultado</string>
+    <string name="health_result_deleted">Resultado excluído</string>
+    <string name="health_no_results_for_analyte">Nenhum resultado registrado ainda.</string>
+
+    <!-- Campo compartilhado pelos dois editores. -->
+    <string name="health_notes_field">Notas</string>
+
+    <!-- Mensagens neutras de validação de formulário (Seção 9): nenhuma palavra de julgamento. -->
+    <string name="health_error_required">Preencha este campo.</string>
+    <string name="health_error_not_finite">Informe um número válido.</string>
+    <string name="health_error_future_date">A data não pode ser no futuro.</string>
+    <string name="health_error_end_before_start">Confira a ordem das datas ou valores informados.</string>
+    <string name="health_error_out_of_range">O valor informado está fora do permitido.</string>
+    <string name="health_error_not_positive">Informe um valor maior que zero.</string>
+    <string name="health_error_builtin_immutable">Este item não pode ser alterado.</string>
+    <string name="health_error_duplicate">Este registro já existe.</string>
+    <string name="health_error_not_found">Não foi possível encontrar este registro.</string>
+</resources>

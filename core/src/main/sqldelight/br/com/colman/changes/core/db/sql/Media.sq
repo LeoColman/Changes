@@ -1,0 +1,82 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Blobs nunca entram no banco. relative_path é '<uuid>.<ext>', relativo a filesDir/media/.
+-- Dono polimórfico (owner_type, owner_id), por isso sem FK.
+CREATE TABLE media_attachment (
+    id TEXT NOT NULL PRIMARY KEY,
+    owner_type TEXT NOT NULL,
+    owner_id TEXT NOT NULL,
+    relative_path TEXT NOT NULL UNIQUE,
+    mime_type TEXT NOT NULL,
+    captured_at INTEGER,
+    captured_at_offset_seconds INTEGER,
+    checksum_sha256 TEXT NOT NULL,
+    caption TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER,
+    CHECK ((captured_at IS NULL) = (captured_at_offset_seconds IS NULL))
+);
+
+CREATE INDEX media_attachment_owner ON media_attachment(owner_type, owner_id);
+
+selectById:
+SELECT * FROM media_attachment WHERE id = ?;
+
+selectByOwner:
+SELECT * FROM media_attachment
+WHERE deleted_at IS NULL AND owner_type = ? AND owner_id = ?
+ORDER BY COALESCE(captured_at, created_at), id;
+
+selectByOwnerType:
+SELECT * FROM media_attachment
+WHERE deleted_at IS NULL AND owner_type = ?
+ORDER BY COALESCE(captured_at, created_at), id;
+
+selectAllPaths:
+SELECT relative_path FROM media_attachment;
+
+selectDeletedSince:
+SELECT * FROM media_attachment WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insert:
+INSERT INTO media_attachment VALUES ?;
+
+updateCaption:
+UPDATE media_attachment SET caption = ?, updated_at = ? WHERE id = ?;
+
+softDelete:
+UPDATE media_attachment SET deleted_at = :now, updated_at = :now WHERE id = :id AND deleted_at IS NULL;
+
+softDeleteByOwner:
+UPDATE media_attachment SET deleted_at = :now, updated_at = :now
+WHERE owner_type = :ownerType AND owner_id = :ownerId AND deleted_at IS NULL;
+
+restoreByOwnerDeletedAt:
+UPDATE media_attachment SET deleted_at = NULL, updated_at = :now
+WHERE owner_type = :ownerType AND owner_id = :ownerId AND deleted_at = :deletedAt;
+
+restore:
+UPDATE media_attachment SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllForBackup:
+SELECT * FROM media_attachment ORDER BY id;
+
+-- Purga de mídia (ADR 0008): os caminhos são lidos na mesma transação e os arquivos apagados depois
+-- do commit. A linha fica como tombstone (caminho e checksum ficam; legenda sai).
+selectPurgeablePathsByOwner:
+SELECT relative_path FROM media_attachment
+WHERE owner_type = :ownerType AND owner_id = :ownerId AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeByOwner:
+UPDATE media_attachment SET caption = NULL, deleted_at = 0, updated_at = :now
+WHERE owner_type = :ownerType AND owner_id = :ownerId AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+selectExpiredPaths:
+SELECT relative_path FROM media_attachment WHERE deleted_at > 0 AND deleted_at < :cutoff;
+
+purgeExpired:
+UPDATE media_attachment SET caption = NULL, deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;

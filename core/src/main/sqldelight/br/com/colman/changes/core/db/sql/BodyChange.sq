@@ -1,0 +1,145 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Catálogo de tipos de mudança. Builtin: label_key resolvido pelo BodyVocabularyResolver.
+-- Customizado: custom_label com o texto da pessoa; code = 'CUSTOM_' || id.
+-- is_reversible NULL significa "a fonte não informa".
+CREATE TABLE body_change_type (
+    id TEXT NOT NULL PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE,
+    label_key TEXT,
+    custom_label TEXT,
+    category TEXT NOT NULL,
+    is_reversible INTEGER CHECK (is_reversible IS NULL OR is_reversible IN (0, 1)),
+    supports_measurement INTEGER NOT NULL CHECK (supports_measurement IN (0, 1)),
+    measurement_unit TEXT,
+    is_builtin INTEGER NOT NULL CHECK (is_builtin IN (0, 1)),
+    is_hidden INTEGER NOT NULL CHECK (is_hidden IN (0, 1)),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER,
+    CHECK ((is_builtin = 1 AND label_key IS NOT NULL) OR (is_builtin = 0 AND custom_label IS NOT NULL))
+);
+
+-- intensity: 0 nenhuma, 1 leve, 2 moderada, 3 acentuada, 4 completa (escala descritiva).
+CREATE TABLE body_change_entry (
+    id TEXT NOT NULL PRIMARY KEY,
+    change_type_id TEXT NOT NULL REFERENCES body_change_type(id),
+    observed_at INTEGER NOT NULL,
+    observed_at_offset_seconds INTEGER NOT NULL,
+    intensity INTEGER CHECK (intensity IS NULL OR intensity BETWEEN 0 AND 4),
+    measurement_value REAL,
+    measurement_unit TEXT,
+    notes TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER
+);
+
+CREATE INDEX body_change_entry_type_observed ON body_change_entry(change_type_id, observed_at);
+
+selectTypeById:
+SELECT * FROM body_change_type WHERE id = ?;
+
+selectTypeByCode:
+SELECT * FROM body_change_type WHERE code = ?;
+
+selectVisibleTypes:
+SELECT * FROM body_change_type WHERE deleted_at IS NULL AND is_hidden = 0 ORDER BY is_builtin DESC, category, code;
+
+selectAllTypes:
+SELECT * FROM body_change_type WHERE deleted_at IS NULL ORDER BY is_builtin DESC, category, code;
+
+selectDeletedTypesSince:
+SELECT * FROM body_change_type WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insertType:
+INSERT INTO body_change_type VALUES ?;
+
+insertBuiltinTypeIfMissing:
+INSERT OR IGNORE INTO body_change_type VALUES ?;
+
+updateBuiltinTypeDefinition:
+UPDATE body_change_type SET label_key = ?, category = ?, is_reversible = ?, supports_measurement = ?, measurement_unit = ?
+WHERE id = ? AND is_builtin = 1;
+
+updateCustomType:
+UPDATE body_change_type SET custom_label = ?, category = ?, supports_measurement = ?, measurement_unit = ?, updated_at = ?
+WHERE id = ? AND is_builtin = 0;
+
+setTypeHidden:
+UPDATE body_change_type SET is_hidden = ?, updated_at = ? WHERE id = ?;
+
+softDeleteType:
+UPDATE body_change_type SET deleted_at = :now, updated_at = :now WHERE id = :id AND is_builtin = 0 AND deleted_at IS NULL;
+
+restoreType:
+UPDATE body_change_type SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+selectEntryById:
+SELECT * FROM body_change_entry WHERE id = ?;
+
+selectEntriesByType:
+SELECT * FROM body_change_entry WHERE deleted_at IS NULL AND change_type_id = ? ORDER BY observed_at;
+
+selectAllEntries:
+SELECT * FROM body_change_entry WHERE deleted_at IS NULL ORDER BY observed_at DESC;
+
+selectEntriesBetween:
+SELECT * FROM body_change_entry WHERE deleted_at IS NULL AND observed_at >= ? AND observed_at < ? ORDER BY observed_at;
+
+selectFirstObservations:
+SELECT change_type_id, MIN(observed_at) AS first_observed_at FROM body_change_entry
+WHERE deleted_at IS NULL
+GROUP BY change_type_id;
+
+selectDeletedEntriesSince:
+SELECT * FROM body_change_entry WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insertEntry:
+INSERT INTO body_change_entry VALUES ?;
+
+updateEntry:
+UPDATE body_change_entry SET
+    change_type_id = :changeTypeId,
+    observed_at = :observedAt,
+    observed_at_offset_seconds = :observedAtOffsetSeconds,
+    intensity = :intensity,
+    measurement_value = :measurementValue,
+    measurement_unit = :measurementUnit,
+    notes = :notes,
+    updated_at = :updatedAt
+WHERE id = :id;
+
+softDeleteEntry:
+UPDATE body_change_entry SET deleted_at = :now, updated_at = :now WHERE id = :id AND deleted_at IS NULL;
+
+restoreEntry:
+UPDATE body_change_entry SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllTypesForBackup:
+SELECT * FROM body_change_type ORDER BY id;
+
+selectAllEntriesForBackup:
+SELECT * FROM body_change_entry ORDER BY id;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeTypeById:
+UPDATE body_change_type SET custom_label = '', deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpiredType:
+UPDATE body_change_type SET custom_label = '', deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeEntryById:
+UPDATE body_change_entry SET notes = NULL, intensity = NULL, measurement_value = NULL, measurement_unit = NULL, deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpiredEntry:
+UPDATE body_change_entry SET notes = NULL, intensity = NULL, measurement_value = NULL, measurement_unit = NULL, deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;

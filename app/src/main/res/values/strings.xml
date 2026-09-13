@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <string name="app_name" translatable="false">Changes</string>
+
+    <string name="tab_today">Hoje</string>
+    <string name="tab_body">Corpo</string>
+    <string name="tab_health">Saúde</string>
+    <string name="tab_calendar">Calendário</string>
+    <string name="tab_settings">Ajustes</string>
+
+    <string name="action_back">Voltar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Salvar</string>
+    <string name="action_delete">Excluir</string>
+    <string name="action_undo">Desfazer</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_add">Adicionar</string>
+    <string name="action_ok">OK</string>
+    <string name="field_pick_date">Escolher data</string>
+    <string name="field_pick_time">Escolher hora</string>
+    <string name="confirm_type_label">Digite %1$s para confirmar</string>
+
+    <string name="reminder_channel_name">Lembretes</string>
+    <string name="reminder_channel_description">Lembretes que você configurou no app. O texto é discreto e não aparece na tela bloqueada.</string>
+
+    <string name="lock_title">O Changes está bloqueado</string>
+    <string name="lock_unlock">Desbloquear</string>
+    <string name="lock_prompt_title">Desbloquear o Changes</string>
+</resources>

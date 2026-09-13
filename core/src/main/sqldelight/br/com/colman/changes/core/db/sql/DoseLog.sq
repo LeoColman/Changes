@@ -1,0 +1,86 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Evento de dose tomada. Dose, unidade e via são denormalizadas de propósito: mudar o regime
+-- nunca reescreve a história. Se o regime for removido definitivamente, regimen_id vira NULL.
+CREATE TABLE dose_log (
+    id TEXT NOT NULL PRIMARY KEY,
+    regimen_id TEXT REFERENCES regimen(id) ON DELETE SET NULL,
+    medication_id TEXT NOT NULL REFERENCES medication(id),
+    dose_value REAL NOT NULL CHECK (dose_value > 0),
+    dose_unit TEXT NOT NULL,
+    route TEXT NOT NULL,
+    injection_site TEXT,
+    taken_at INTEGER NOT NULL,
+    taken_at_offset_seconds INTEGER NOT NULL,
+    notes TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER
+);
+
+CREATE INDEX dose_log_taken_at ON dose_log(taken_at);
+
+selectById:
+SELECT * FROM dose_log WHERE id = ?;
+
+selectHistory:
+SELECT * FROM dose_log
+WHERE deleted_at IS NULL
+  AND (:medicationId IS NULL OR medication_id = :medicationId)
+  AND taken_at >= :fromMillis AND taken_at < :toMillis
+ORDER BY taken_at DESC;
+
+selectBetween:
+SELECT * FROM dose_log WHERE deleted_at IS NULL AND taken_at >= ? AND taken_at < ? ORDER BY taken_at;
+
+selectRecentInjectionSites:
+SELECT injection_site FROM dose_log
+WHERE deleted_at IS NULL AND injection_site IS NOT NULL
+ORDER BY taken_at DESC
+LIMIT :limit;
+
+countForRegimenBetween:
+SELECT COUNT(*) FROM dose_log
+WHERE deleted_at IS NULL AND regimen_id = ? AND taken_at >= ? AND taken_at < ?;
+
+selectLastForRegimen:
+SELECT * FROM dose_log WHERE deleted_at IS NULL AND regimen_id = ? ORDER BY taken_at DESC LIMIT 1;
+
+selectDeletedSince:
+SELECT * FROM dose_log WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insert:
+INSERT INTO dose_log VALUES ?;
+
+update:
+UPDATE dose_log SET
+    dose_value = :doseValue,
+    dose_unit = :doseUnit,
+    route = :route,
+    injection_site = :injectionSite,
+    taken_at = :takenAt,
+    taken_at_offset_seconds = :takenAtOffsetSeconds,
+    notes = :notes,
+    updated_at = :updatedAt
+WHERE id = :id;
+
+softDelete:
+UPDATE dose_log SET deleted_at = :now, updated_at = :now WHERE id = :id AND deleted_at IS NULL;
+
+restore:
+UPDATE dose_log SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllForBackup:
+SELECT * FROM dose_log ORDER BY id;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeById:
+UPDATE dose_log SET notes = NULL, deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpired:
+UPDATE dose_log SET notes = NULL, deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;

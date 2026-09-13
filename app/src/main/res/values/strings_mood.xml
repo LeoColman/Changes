@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos de navegação e botões da feature mood (Seção 7.7). Frases de conteúdo vêm de strings_sensitive.xml. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <string name="mood_heatmap_title">Calendário</string>
+    <string name="mood_trend_title">Tendência</string>
+    <string name="mood_previous_month">Mês anterior</string>
+    <string name="mood_next_month">Próximo mês</string>
+    <string name="mood_day_with_entry">%1$s, humor %2$d de 5</string>
+    <string name="mood_day_without_entry">%1$s, sem registro</string>
+    <string name="mood_scale_required_error">Escolha um valor de 1 a 5</string>
+    <string name="mood_sleep_hours_error">Digite um número entre 0 e 24</string>
+    <string name="mood_entry_summary">%1$s: humor %2$s, energia %3$s</string>
+</resources>

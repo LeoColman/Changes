@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos da feature calendar (Seção 7.9): agenda unificada, mês e edição de eventos. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <!-- Ações e visões -->
+    <string name="calendar_action_new_event">Novo evento</string>
+    <string name="calendar_view_month">Mês</string>
+    <string name="calendar_view_agenda">Agenda</string>
+    <string name="calendar_toggle_milestones">Marcos da literatura</string>
+    <string name="calendar_previous_month">Mês anterior</string>
+    <string name="calendar_next_month">Próximo mês</string>
+
+    <!-- Grade do mês e seleção de dia -->
+    <string name="calendar_selected_day_header">Itens de %1$s</string>
+    <string name="calendar_selected_day_empty">Nada registrado neste dia.</string>
+    <string name="calendar_day_empty_description">%1$s, sem itens</string>
+    <string name="calendar_day_items_description">%1$s: %2$s</string>
+
+    <!-- Agenda -->
+    <string name="calendar_agenda_empty_title">Nada previsto</string>
+    <string name="calendar_agenda_empty_body">Doses previstas, registradas, eventos e marcos aparecem aqui, agrupados por dia.</string>
+
+    <!-- Texto de um item da lista -->
+    <string name="calendar_item_date">%1$s</string>
+    <string name="calendar_item_datetime">%1$s às %2$s</string>
+    <string name="calendar_event_completed">Concluído</string>
+
+    <!-- Rótulos dos tipos de marcador (Seção 7.9) -->
+    <string name="calendar_marker_planned_dose">Dose prevista</string>
+    <string name="calendar_marker_logged_dose">Dose registrada</string>
+    <string name="calendar_marker_event">Evento</string>
+    <string name="calendar_marker_milestone">Marco da literatura</string>
+
+    <!-- Categorias de evento manual (texto neutro) -->
+    <string name="calendar_category_dose">Medicação</string>
+    <string name="calendar_category_appointment">Consulta</string>
+    <string name="calendar_category_lab">Exame</string>
+    <string name="calendar_category_surgery">Cirurgia</string>
+    <string name="calendar_category_personal">Pessoal</string>
+    <string name="calendar_category_exercise">Exercício</string>
+    <string name="calendar_category_other">Outro</string>
+
+    <!-- Lembrete -->
+    <string name="calendar_reminder_none">Nenhum</string>
+    <string name="calendar_reminder_at_time">Na hora</string>
+    <string name="calendar_reminder_15_minutes">15 minutos antes</string>
+    <string name="calendar_reminder_1_hour">1 hora antes</string>
+    <string name="calendar_reminder_1_day">1 dia antes</string>
+
+    <!-- Recorrência -->
+    <string name="calendar_recurrence_none">Não repete</string>
+    <string name="calendar_recurrence_daily">Diária</string>
+    <string name="calendar_recurrence_weekly">Semanal</string>
+    <string name="calendar_recurrence_monthly">Mensal</string>
+    <string name="calendar_recurrence_yearly">Anual</string>
+    <string name="calendar_recurrence_end_never">Nunca termina</string>
+    <string name="calendar_recurrence_end_on_date">Termina numa data</string>
+    <string name="calendar_recurrence_end_after_count">Termina após N vezes</string>
+
+    <!-- Dias da semana (recorrência semanal) -->
+    <string name="calendar_weekday_monday">Segunda</string>
+    <string name="calendar_weekday_tuesday">Terça</string>
+    <string name="calendar_weekday_wednesday">Quarta</string>
+    <string name="calendar_weekday_thursday">Quinta</string>
+    <string name="calendar_weekday_friday">Sexta</string>
+    <string name="calendar_weekday_saturday">Sábado</string>
+    <string name="calendar_weekday_sunday">Domingo</string>
+
+    <!-- Tela de criar/editar evento -->
+    <string name="calendar_event_title_new">Novo evento</string>
+    <string name="calendar_event_title_edit">Editar evento</string>
+    <string name="calendar_section_when">Quando</string>
+    <string name="calendar_section_recurrence">Recorrência</string>
+    <string name="calendar_field_title">Título</string>
+    <string name="calendar_field_description">Descrição</string>
+    <string name="calendar_field_category">Categoria</string>
+    <string name="calendar_field_all_day">Dia inteiro</string>
+    <string name="calendar_field_start_date">Data de início</string>
+    <string name="calendar_field_start_time">Hora de início</string>
+    <string name="calendar_field_end_date">Data de fim</string>
+    <string name="calendar_field_end_time">Hora de fim</string>
+    <string name="calendar_field_end_date_clear">Remover data de fim</string>
+    <string name="calendar_field_reminder">Lembrete</string>
+    <string name="calendar_field_recurrence_frequency">Repetir</string>
+    <string name="calendar_field_recurrence_interval">Intervalo</string>
+    <string name="calendar_field_recurrence_until">Termina em</string>
+    <string name="calendar_field_recurrence_count">Número de vezes</string>
+    <string name="calendar_field_completed">Concluído</string>
+
+    <!-- Exclusão (soft delete com desfazer, Seção 9) -->
+    <string name="calendar_delete_confirm_title">Excluir evento</string>
+    <string name="calendar_delete_confirm_body">O evento é excluído. É possível desfazer logo em seguida.</string>
+    <string name="calendar_event_deleted_message">Evento excluído</string>
+
+    <!-- Erros de domínio (texto neutro) -->
+    <string name="calendar_error_required">Preencha este campo para continuar.</string>
+    <string name="calendar_error_out_of_range">Este valor está fora do intervalo aceito.</string>
+    <string name="calendar_error_end_before_start">A data de fim não pode vir antes da data de início.</string>
+    <string name="calendar_error_generic">Não foi possível salvar com esses valores.</string>
+    <string name="calendar_error_not_found">Este item não foi encontrado.</string>
+</resources>

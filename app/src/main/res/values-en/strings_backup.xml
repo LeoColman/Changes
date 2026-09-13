@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen titles -->
+    <string name="backup_title">Backup</string>
+    <string name="backup_preview_title">Import preview</string>
+
+    <!-- Backup screen -->
+    <string name="backup_explanation">A backup is a file with all your data and photos. It is not encrypted: anyone with the file can read the data. Keep it somewhere safe.</string>
+    <string name="backup_export_section">Export</string>
+    <string name="backup_export_action">Export backup</string>
+    <string name="backup_import_section">Import</string>
+    <string name="backup_import_action">Choose backup file</string>
+    <string name="backup_import_mode_prompt">What should happen with this file?</string>
+
+    <!-- Import modes -->
+    <string name="backup_import_mode_merge_title">Merge</string>
+    <string name="backup_import_mode_merge_description">Keeps the data already on this device and adds anything new from the file. If there is a conflict, the most recent record wins.</string>
+    <string name="backup_import_mode_replace_title">Replace</string>
+    <string name="backup_import_mode_replace_description">Erases all current data on this device and puts the data from the file in its place.</string>
+    <string name="backup_replace_confirm_word">REPLACE</string>
+
+    <!-- Import preview -->
+    <string name="backup_preview_info">Backup from %1$s, made with Changes version %2$s.</string>
+    <string name="backup_preview_tables_title">What will change</string>
+    <string name="backup_result_title">Import complete</string>
+    <string name="backup_action_merge">Merge</string>
+    <string name="backup_action_replace">Replace</string>
+    <string name="backup_action_done">Done</string>
+    <string name="backup_stat_none">No changes</string>
+
+    <!-- Confirmation dialogs -->
+    <string name="backup_confirm_merge_title">Merge data from the backup?</string>
+    <string name="backup_confirm_merge_body">The data in this file will join what is already on this device, as shown above.</string>
+    <string name="backup_confirm_replace_title">Replace all data?</string>
+    <string name="backup_confirm_replace_body">All current data on this device will be erased and replaced with the data from the file. This cannot be undone.</string>
+
+    <!-- Error messages (Section 7.8): always make clear that nothing changed -->
+    <string name="backup_error_unreadable">The file could not be read. Nothing was changed.</string>
+    <string name="backup_error_not_a_backup">This file is not a Changes backup. Nothing was changed.</string>
+    <string name="backup_error_newer_version">This backup was made with a newer version of Changes. Update the app to import it. Nothing was changed.</string>
+    <string name="backup_error_unsupported_version">This backup is from a version too old to be supported. Nothing was changed.</string>
+    <string name="backup_error_checksum_mismatch">The file looks corrupted or altered: the integrity check did not match. Nothing was changed.</string>
+    <string name="backup_error_missing_media">Some photos referenced in the backup file are missing. Nothing was changed.</string>
+    <string name="backup_error_invalid_data">The content of the file could not be read by the app. Nothing was changed.</string>
+    <string name="backup_error_export_failed">The backup file could not be written. Nothing was changed.</string>
+    <string name="backup_error_import_failed">The data could not be written during import. Nothing was changed.</string>
+
+    <!-- Friendly names of the exported tables -->
+    <string name="backup_table_profile">Profile</string>
+    <string name="backup_table_medication">Medications</string>
+    <string name="backup_table_regimen">Regimens</string>
+    <string name="backup_table_dose_log">Logged doses</string>
+    <string name="backup_table_body_change_type">Body change types</string>
+    <string name="backup_table_body_change_entry">Body change entries</string>
+    <string name="backup_table_media_attachment">Photos</string>
+    <string name="backup_table_measurement">Measurements</string>
+    <string name="backup_table_exercise_session">Exercise sessions</string>
+    <string name="backup_table_health_condition">Health conditions</string>
+    <string name="backup_table_lab_analyte">Lab test types</string>
+    <string name="backup_table_lab_result">Lab results</string>
+    <string name="backup_table_mood_log">Mood logs</string>
+    <string name="backup_table_calendar_event">Calendar events</string>
+    <string name="backup_table_generic">Other data</string>
+
+    <!-- Plurals: export summary -->
+    <plurals name="backup_export_summary_records">
+        <item quantity="one">%1$d record exported</item>
+        <item quantity="other">%1$d records exported</item>
+    </plurals>
+    <plurals name="backup_export_summary_photos">
+        <item quantity="one">%1$d photo included</item>
+        <item quantity="other">%1$d photos included</item>
+    </plurals>
+    <plurals name="backup_export_summary_missing_media">
+        <item quantity="one">%1$d photo could not be included (it no longer existed on this device)</item>
+        <item quantity="other">%1$d photos could not be included (they no longer existed on this device)</item>
+    </plurals>
+
+    <!-- Plurals: per-table counts in the preview and final summary -->
+    <plurals name="backup_stat_inserted">
+        <item quantity="one">%1$d new</item>
+        <item quantity="other">%1$d new</item>
+    </plurals>
+    <plurals name="backup_stat_updated">
+        <item quantity="one">%1$d updated</item>
+        <item quantity="other">%1$d updated</item>
+    </plurals>
+    <plurals name="backup_stat_unchanged">
+        <item quantity="one">%1$d unchanged</item>
+        <item quantity="other">%1$d unchanged</item>
+    </plurals>
+    <plurals name="backup_stat_kept">
+        <item quantity="one">%1$d kept</item>
+        <item quantity="other">%1$d kept</item>
+    </plurals>
+    <plurals name="backup_stat_removed">
+        <item quantity="one">%1$d removed</item>
+        <item quantity="other">%1$d removed</item>
+    </plurals>
+    <plurals name="backup_stat_media_to_add">
+        <item quantity="one">%1$d photo will be added</item>
+        <item quantity="other">%1$d photos will be added</item>
+    </plurals>
+    <plurals name="backup_stat_media_added">
+        <item quantity="one">%1$d photo added</item>
+        <item quantity="other">%1$d photos added</item>
+    </plurals>
+    <plurals name="backup_stat_missing_media">
+        <item quantity="one">%1$d referenced photo was not found</item>
+        <item quantity="other">%1$d referenced photos were not found</item>
+    </plurals>
+</resources>

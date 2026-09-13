@@ -1,0 +1,63 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+CREATE TABLE exercise_session (
+    id TEXT NOT NULL PRIMARY KEY,
+    activity TEXT NOT NULL,
+    duration_minutes INTEGER NOT NULL CHECK (duration_minutes > 0),
+    intensity TEXT NOT NULL,
+    occurred_at INTEGER NOT NULL,
+    occurred_at_offset_seconds INTEGER NOT NULL,
+    notes TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER
+);
+
+CREATE INDEX exercise_session_occurred ON exercise_session(occurred_at);
+
+selectById:
+SELECT * FROM exercise_session WHERE id = ?;
+
+selectAll:
+SELECT * FROM exercise_session WHERE deleted_at IS NULL ORDER BY occurred_at DESC;
+
+selectBetween:
+SELECT * FROM exercise_session WHERE deleted_at IS NULL AND occurred_at >= ? AND occurred_at < ? ORDER BY occurred_at;
+
+selectDeletedSince:
+SELECT * FROM exercise_session WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insert:
+INSERT INTO exercise_session VALUES ?;
+
+update:
+UPDATE exercise_session SET
+    activity = :activity,
+    duration_minutes = :durationMinutes,
+    intensity = :intensity,
+    occurred_at = :occurredAt,
+    occurred_at_offset_seconds = :occurredAtOffsetSeconds,
+    notes = :notes,
+    updated_at = :updatedAt
+WHERE id = :id;
+
+softDelete:
+UPDATE exercise_session SET deleted_at = :now, updated_at = :now WHERE id = :id AND deleted_at IS NULL;
+
+restore:
+UPDATE exercise_session SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllForBackup:
+SELECT * FROM exercise_session ORDER BY id;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeById:
+UPDATE exercise_session SET activity = '', notes = NULL, deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpired:
+UPDATE exercise_session SET activity = '', notes = NULL, deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos da lixeira de 30 dias (Seção 9, ADR 0008). -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <string name="trash_title">Lixeira</string>
+    <string name="trash_explanation">Itens excluídos ficam aqui por 30 dias e depois somem deste aparelho, junto com as fotos.</string>
+    <string name="trash_empty_body">Itens excluídos aparecem aqui por 30 dias antes de sumir deste aparelho, junto com as fotos deles.</string>
+    <string name="trash_deleted_at">Excluído em %1$s</string>
+    <string name="trash_purge_at">Sai em %1$s</string>
+    <string name="trash_action_restore">Restaurar</string>
+    <string name="trash_action_delete_forever">Excluir definitivamente</string>
+    <string name="trash_action_empty">Esvaziar lixeira</string>
+    <string name="trash_confirm_delete_title">Excluir definitivamente</string>
+    <string name="trash_confirm_delete_text">O item e as fotos dele somem deste aparelho e não voltam.</string>
+    <string name="trash_confirm_empty_title">Esvaziar lixeira</string>
+    <string name="trash_confirm_empty_text">Todos os itens da lixeira e as fotos deles somem deste aparelho e não voltam.</string>
+    <string name="trash_confirm_empty_word">ESVAZIAR</string>
+    <string name="trash_restored_message">Item restaurado.</string>
+    <string name="trash_kind_medication">Medicações</string>
+    <string name="trash_kind_regimen">Regimes</string>
+    <string name="trash_kind_dose_log">Doses registradas</string>
+    <string name="trash_kind_body_change">Mudanças corporais</string>
+    <string name="trash_kind_measurement">Medidas</string>
+    <string name="trash_kind_exercise">Exercícios</string>
+    <string name="trash_kind_health_condition">Condições de saúde</string>
+    <string name="trash_kind_lab">Exames</string>
+    <string name="trash_kind_mood">Registros de humor</string>
+    <string name="trash_kind_calendar_event">Eventos do calendário</string>
+</resources>

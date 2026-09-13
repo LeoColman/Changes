@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="today_next_dose_header">Next dose</string>
+    <string name="today_no_regimen_title">No regimen registered</string>
+    <string name="today_no_regimen_body">Add a medication regimen to track upcoming doses.</string>
+    <string name="today_create_regimen_action">Create regimen</string>
+    <string name="today_no_scheduled_dose">No dose with a fixed schedule right now.</string>
+    <string name="today_next_dose_date">Expected on %1$s</string>
+    <string name="today_next_dose_datetime">Expected on %1$s at %2$s</string>
+    <string name="today_log_dose_action">Log dose</string>
+    <string name="today_log_dose_with_details_action">Log with adjustments</string>
+    <string name="today_dose_logged_message">Dose logged</string>
+    <string name="today_regimens_action">View regimens and dose history</string>
+
+    <string name="today_mood_header">Today\'s check-in</string>
+    <string name="today_mood_done">Today\'s check-in done</string>
+    <string name="today_mood_pending">Today\'s check-in not done yet</string>
+    <string name="today_mood_action">Do check-in</string>
+    <string name="today_mood_history_action">View check-in history</string>
+
+    <string name="today_agenda_header">Upcoming events</string>
+    <string name="today_agenda_empty">Nothing planned for the next 7 days.</string>
+    <string name="today_agenda_planned_dose">Planned dose</string>
+    <string name="today_agenda_date">%1$s</string>
+    <string name="today_agenda_datetime">%1$s at %2$s</string>
+    <string name="today_view_calendar_action">View calendar</string>
+</resources>

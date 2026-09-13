@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Textos da feature `body` (Seção 7.3). Nomes de partes do corpo nunca aparecem aqui: vêm do
+  BodyVocabularyResolver, resolvido em runtime com o vocabulário escolhido pela pessoa.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <string name="body_category_skin">Pele</string>
+    <string name="body_category_hair">Pelos e cabelo</string>
+    <string name="body_category_body">Corpo</string>
+    <string name="body_category_sexual_reproductive">Sexual e reprodutiva</string>
+    <string name="body_category_voice">Voz</string>
+    <string name="body_category_emotional">Emocional</string>
+    <string name="body_category_pain">Dor</string>
+    <string name="body_category_other">Outras</string>
+
+    <string name="body_home_empty_title">Nenhum tipo visível</string>
+    <string name="body_home_empty_body">Mostre um tipo oculto ou crie um tipo novo para começar a registrar mudanças.</string>
+    <string name="body_home_shortcut_expected_changes">Mudanças esperadas</string>
+    <string name="body_home_shortcut_measurements">Medidas</string>
+    <string name="body_home_no_entries">Sem registros ainda</string>
+    <string name="body_home_thumbnail_description">Última foto de %1$s</string>
+    <string name="body_home_last_entry_with_intensity">%1$s, intensidade %2$s</string>
+
+    <string name="body_new_type_title">Novo tipo de mudança</string>
+    <string name="body_new_type_name_label">Nome</string>
+    <string name="body_new_type_name_required_error">Informe um nome</string>
+    <string name="body_new_type_category_label">Categoria</string>
+    <string name="body_new_type_measurement_switch">Tem medida numérica</string>
+    <string name="body_new_type_measurement_unit_label">Unidade de medida</string>
+
+    <string name="body_unit_none">Sem unidade</string>
+    <string name="body_unit_cm">Centímetros (cm)</string>
+    <string name="body_unit_in">Polegadas (in)</string>
+    <string name="body_unit_hz">Hertz (Hz)</string>
+    <string name="body_unit_kg">Quilogramas (kg)</string>
+    <string name="body_unit_lb">Libras (lb)</string>
+    <string name="body_unit_percent">Porcentagem</string>
+    <string name="body_unit_symbol_cm">cm</string>
+    <string name="body_unit_symbol_in">in</string>
+    <string name="body_unit_symbol_hz">Hz</string>
+    <string name="body_unit_symbol_kg">kg</string>
+    <string name="body_unit_symbol_lb">lb</string>
+    <string name="body_unit_symbol_percent">%</string>
+
+    <string name="body_intensity_label">Intensidade</string>
+    <string name="body_intensity_unspecified">Não selecionada</string>
+    <string name="body_intensity_none">Nenhuma</string>
+    <string name="body_intensity_mild">Leve</string>
+    <string name="body_intensity_moderate">Moderada</string>
+    <string name="body_intensity_marked">Acentuada</string>
+    <string name="body_intensity_complete">Completa</string>
+
+    <string name="body_type_hide_action">Ocultar tipo</string>
+    <string name="body_type_show_action">Mostrar tipo</string>
+    <string name="body_type_delete_action">Excluir tipo</string>
+    <string name="body_type_delete_confirm_title">Excluir tipo personalizado?</string>
+    <string name="body_type_delete_confirm_text">As entradas registradas continuam disponíveis na lixeira por 30 dias.</string>
+    <string name="body_type_empty_title">Nenhum registro ainda</string>
+    <string name="body_type_empty_body">Toque no botão de adicionar para registrar a primeira observação deste tipo.</string>
+    <string name="body_type_add_entry">Adicionar registro</string>
+    <string name="body_type_timeline_title">Linha do tempo</string>
+    <string name="body_type_entry_deleted_message">Registro excluído</string>
+    <string name="body_type_entry_photo_description">Foto do registro de %1$s</string>
+    <string name="body_type_comparison_title">Comparar fotos</string>
+    <string name="body_type_comparison_empty">Adicione fotos a pelo menos duas entradas para comparar.</string>
+    <string name="body_type_comparison_pick_first">Primeira foto</string>
+    <string name="body_type_comparison_pick_second">Segunda foto</string>
+    <string name="body_type_comparison_slider_description">Comparação entre %1$s e %2$s</string>
+
+    <string name="body_entry_edit_new_title">Novo registro</string>
+    <string name="body_entry_edit_edit_title">Editar registro</string>
+    <string name="body_entry_edit_type_missing">Não foi possível encontrar este tipo de mudança.</string>
+    <string name="body_entry_edit_date_label">Data</string>
+    <string name="body_entry_edit_time_label">Hora</string>
+    <string name="body_entry_edit_measurement_label">Medida (%1$s)</string>
+    <string name="body_entry_edit_notes_label">Notas</string>
+    <string name="body_entry_edit_photos_label">Fotos</string>
+    <string name="body_entry_edit_add_camera_action">Tirar foto</string>
+    <string name="body_entry_edit_add_gallery_action">Escolher da galeria</string>
+    <string name="body_entry_edit_remove_photo_action">Remover foto</string>
+
+    <string name="body_error_required_field">Preencha os campos obrigatórios.</string>
+    <string name="body_error_future_date">A data não pode ser no futuro.</string>
+    <string name="body_error_measurement_unsupported">Este tipo não tem medida numérica.</string>
+    <string name="body_error_invalid_measurement">Informe um número válido.</string>
+    <string name="body_error_builtin_immutable">Tipos do catálogo não podem ser alterados dessa forma.</string>
+    <string name="body_error_not_found">Não foi possível encontrar o registro.</string>
+    <string name="body_error_unknown">Não foi possível salvar. Tente novamente.</string>
+</resources>

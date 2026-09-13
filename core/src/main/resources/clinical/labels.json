@@ -1,0 +1,269 @@
+{
+  "references": {
+    "ENDO_2017": "Hembree WC et al. Endocrine Treatment of Gender-Dysphoric/Gender-Incongruent Persons: An Endocrine Society Clinical Practice Guideline. J Clin Endocrinol Metab, 2017;102(11):3869-3903.",
+    "WPATH_SOC8": "World Professional Association for Transgender Health. Standards of Care for the Health of Transgender and Gender Diverse People, Version 8. Int J Transgend Health, 2022.",
+    "UCSF_2016": "UCSF Transgender Care, Department of Family and Community Medicine. Guidelines for the Primary and Gender-Affirming Care of Transgender and Gender Nonbinary People, 2nd ed., 2016."
+  },
+  "locales": {
+    "pt-BR": {
+      "changeTypes": {
+        "SKIN_OILINESS_ACNE": "Pele oleosa e acne",
+        "FACIAL_BODY_HAIR": "Pelos faciais e corporais",
+        "SCALP_HAIR_LOSS": "Rarefação capilar",
+        "MUSCLE_MASS_STRENGTH": "Massa e força muscular",
+        "FAT_REDISTRIBUTION": "Redistribuição de gordura corporal",
+        "VOICE_DEEPENING": "Engrossamento da voz",
+        "LIBIDO": "Libido",
+        "SWEAT_ODOR": "Suor e odor corporal",
+        "EMOTIONAL_SENSITIVITY": "Sensibilidade emocional",
+        "PELVIC_PAIN_CRAMPS": "Dor pélvica ou cólica",
+        "INJECTION_SITE_PAIN": "Dor no local da aplicação"
+      },
+      "regionTemplates": {
+        "CLITORAL_ENLARGEMENT": {
+          "region": "GENITAL",
+          "options": {
+            "NEUTRAL": "Crescimento genital",
+            "CLITORIS": "Crescimento do clitóris",
+            "DICK": "Crescimento do dick",
+            "PHALLUS": "Crescimento do falo",
+            "MY_GENITALS": "Crescimento da minha genitália"
+          },
+          "custom": "Crescimento: {term}"
+        },
+        "VAGINAL_ATROPHY": {
+          "region": "FRONT_CANAL",
+          "options": {
+            "FRONT_CANAL": "Atrofia do canal frontal",
+            "VAGINA": "Atrofia vaginal"
+          },
+          "custom": "Atrofia: {term}"
+        },
+        "MENSES_CESSATION": {
+          "region": "MENSTRUATION",
+          "options": {
+            "BLEEDING": "Cessação do sangramento",
+            "MENSTRUATION": "Cessação da menstruação",
+            "CYCLE": "Cessação do ciclo"
+          },
+          "custom": "Cessação: {term}"
+        },
+        "CHEST_TENDERNESS": {
+          "region": "CHEST",
+          "options": {
+            "THORAX": "Sensibilidade no tórax",
+            "CHEST": "Sensibilidade no peito",
+            "MY_CHEST_AREA": "Sensibilidade na minha região peitoral"
+          },
+          "custom": "Sensibilidade: {term}"
+        }
+      },
+      "regionTerms": {
+        "GENITAL": { "NEUTRAL": "genitália", "CLITORIS": "clitóris", "DICK": "dick", "PHALLUS": "falo", "MY_GENITALS": "minha genitália" },
+        "CHEST": { "THORAX": "tórax", "CHEST": "peito", "MY_CHEST_AREA": "minha região peitoral" },
+        "MENSTRUATION": { "BLEEDING": "sangramento", "MENSTRUATION": "menstruação", "CYCLE": "ciclo" },
+        "FRONT_CANAL": { "FRONT_CANAL": "canal frontal", "VAGINA": "vagina" }
+      },
+      "regionOptionLabels": {
+        "GENITAL": { "NEUTRAL": "Neutro (crescimento genital)", "CLITORIS": "clitóris", "DICK": "dick", "PHALLUS": "falo", "MY_GENITALS": "minha genitália" },
+        "CHEST": { "THORAX": "tórax", "CHEST": "peito", "MY_CHEST_AREA": "minha região peitoral" },
+        "MENSTRUATION": { "BLEEDING": "sangramento", "MENSTRUATION": "menstruação", "CYCLE": "ciclo" },
+        "FRONT_CANAL": { "FRONT_CANAL": "canal frontal", "VAGINA": "vagina" }
+      },
+      "regionNames": {
+        "GENITAL": "Genitália externa",
+        "CHEST": "Peito ou tórax",
+        "MENSTRUATION": "Ciclo ou sangramento",
+        "FRONT_CANAL": "Canal frontal"
+      },
+      "chestMeasurement": "Circunferência: {term}",
+      "analytes": {
+        "TESTOSTERONE_TOTAL": "Testosterona total",
+        "TESTOSTERONE_FREE": "Testosterona livre",
+        "ESTRADIOL": "Estradiol",
+        "SHBG": "SHBG",
+        "LH": "LH",
+        "FSH": "FSH",
+        "HEMATOCRIT": "Hematócrito",
+        "HEMOGLOBIN": "Hemoglobina",
+        "RED_BLOOD_CELLS": "Hemácias",
+        "FERRITIN": "Ferritina",
+        "ALT": "ALT (TGP)",
+        "AST": "AST (TGO)",
+        "GGT": "GGT",
+        "CREATININE": "Creatinina",
+        "CHOLESTEROL_TOTAL": "Colesterol total",
+        "HDL": "HDL",
+        "LDL": "LDL",
+        "TRIGLYCERIDES": "Triglicerídeos",
+        "FASTING_GLUCOSE": "Glicemia de jejum",
+        "HBA1C": "HbA1c",
+        "TSH": "TSH",
+        "VITAMIN_D": "Vitamina D",
+        "PROLACTIN": "Prolactina"
+      },
+      "medicationNames": {
+        "GENERIC_TESTOSTERONE_ENANTHATE": "Enantato de testosterona (genérico)",
+        "FINASTERIDE": "Finasterida",
+        "MINOXIDIL": "Minoxidil",
+        "OTHER_MEDICATION": "Outro medicamento"
+      },
+      "substances": {
+        "TESTOSTERONE_CYPIONATE": "cipionato de testosterona",
+        "TESTOSTERONE_ESTERS_BLEND": "associação de ésteres de testosterona",
+        "TESTOSTERONE_UNDECANOATE": "undecilato de testosterona",
+        "TESTOSTERONE": "testosterona",
+        "TESTOSTERONE_ENANTHATE": "enantato de testosterona",
+        "FINASTERIDE": "finasterida",
+        "MINOXIDIL": "minoxidil"
+      },
+      "conditionSuggestions": [
+        "Trombose venosa profunda",
+        "Tromboembolismo pulmonar",
+        "Trombofilia",
+        "Policitemia ou eritrocitose",
+        "Doença cardiovascular",
+        "Hipertensão",
+        "Dislipidemia",
+        "Diabetes",
+        "Doença hepática",
+        "Apneia obstrutiva do sono",
+        "Câncer de mama",
+        "Câncer de endométrio",
+        "Câncer hormônio-sensível",
+        "Epilepsia",
+        "Enxaqueca com aura"
+      ]
+    },
+    "en": {
+      "changeTypes": {
+        "SKIN_OILINESS_ACNE": "Oily skin and acne",
+        "FACIAL_BODY_HAIR": "Facial and body hair",
+        "SCALP_HAIR_LOSS": "Scalp hair thinning",
+        "MUSCLE_MASS_STRENGTH": "Muscle mass and strength",
+        "FAT_REDISTRIBUTION": "Body fat redistribution",
+        "VOICE_DEEPENING": "Voice deepening",
+        "LIBIDO": "Libido",
+        "SWEAT_ODOR": "Sweat and body odor",
+        "EMOTIONAL_SENSITIVITY": "Emotional sensitivity",
+        "PELVIC_PAIN_CRAMPS": "Pelvic pain or cramps",
+        "INJECTION_SITE_PAIN": "Injection site pain"
+      },
+      "regionTemplates": {
+        "CLITORAL_ENLARGEMENT": {
+          "region": "GENITAL",
+          "options": {
+            "NEUTRAL": "Genital growth",
+            "CLITORIS": "Clitoral growth",
+            "DICK": "Dick growth",
+            "PHALLUS": "Phallus growth",
+            "MY_GENITALS": "Growth of my genitals"
+          },
+          "custom": "Growth: {term}"
+        },
+        "VAGINAL_ATROPHY": {
+          "region": "FRONT_CANAL",
+          "options": {
+            "FRONT_CANAL": "Front hole atrophy",
+            "VAGINA": "Vaginal atrophy"
+          },
+          "custom": "Atrophy: {term}"
+        },
+        "MENSES_CESSATION": {
+          "region": "MENSTRUATION",
+          "options": {
+            "BLEEDING": "Bleeding stopping",
+            "MENSTRUATION": "Menstruation stopping",
+            "CYCLE": "Cycle stopping"
+          },
+          "custom": "Stopping: {term}"
+        },
+        "CHEST_TENDERNESS": {
+          "region": "CHEST",
+          "options": {
+            "THORAX": "Thorax tenderness",
+            "CHEST": "Chest tenderness",
+            "MY_CHEST_AREA": "Tenderness in my chest area"
+          },
+          "custom": "Tenderness: {term}"
+        }
+      },
+      "regionTerms": {
+        "GENITAL": { "NEUTRAL": "genitals", "CLITORIS": "clitoris", "DICK": "dick", "PHALLUS": "phallus", "MY_GENITALS": "my genitals" },
+        "CHEST": { "THORAX": "thorax", "CHEST": "chest", "MY_CHEST_AREA": "my chest area" },
+        "MENSTRUATION": { "BLEEDING": "bleeding", "MENSTRUATION": "menstruation", "CYCLE": "cycle" },
+        "FRONT_CANAL": { "FRONT_CANAL": "front hole", "VAGINA": "vagina" }
+      },
+      "regionOptionLabels": {
+        "GENITAL": { "NEUTRAL": "Neutral (genital growth)", "CLITORIS": "clitoris", "DICK": "dick", "PHALLUS": "phallus", "MY_GENITALS": "my genitals" },
+        "CHEST": { "THORAX": "thorax", "CHEST": "chest", "MY_CHEST_AREA": "my chest area" },
+        "MENSTRUATION": { "BLEEDING": "bleeding", "MENSTRUATION": "menstruation", "CYCLE": "cycle" },
+        "FRONT_CANAL": { "FRONT_CANAL": "front hole", "VAGINA": "vagina" }
+      },
+      "regionNames": {
+        "GENITAL": "External genitals",
+        "CHEST": "Chest",
+        "MENSTRUATION": "Cycle or bleeding",
+        "FRONT_CANAL": "Front hole"
+      },
+      "chestMeasurement": "Circumference: {term}",
+      "analytes": {
+        "TESTOSTERONE_TOTAL": "Total testosterone",
+        "TESTOSTERONE_FREE": "Free testosterone",
+        "ESTRADIOL": "Estradiol",
+        "SHBG": "SHBG",
+        "LH": "LH",
+        "FSH": "FSH",
+        "HEMATOCRIT": "Hematocrit",
+        "HEMOGLOBIN": "Hemoglobin",
+        "RED_BLOOD_CELLS": "Red blood cells",
+        "FERRITIN": "Ferritin",
+        "ALT": "ALT",
+        "AST": "AST",
+        "GGT": "GGT",
+        "CREATININE": "Creatinine",
+        "CHOLESTEROL_TOTAL": "Total cholesterol",
+        "HDL": "HDL",
+        "LDL": "LDL",
+        "TRIGLYCERIDES": "Triglycerides",
+        "FASTING_GLUCOSE": "Fasting glucose",
+        "HBA1C": "HbA1c",
+        "TSH": "TSH",
+        "VITAMIN_D": "Vitamin D",
+        "PROLACTIN": "Prolactin"
+      },
+      "medicationNames": {
+        "GENERIC_TESTOSTERONE_ENANTHATE": "Testosterone enanthate (generic)",
+        "FINASTERIDE": "Finasteride",
+        "MINOXIDIL": "Minoxidil",
+        "OTHER_MEDICATION": "Other medication"
+      },
+      "substances": {
+        "TESTOSTERONE_CYPIONATE": "testosterone cypionate",
+        "TESTOSTERONE_ESTERS_BLEND": "testosterone esters blend",
+        "TESTOSTERONE_UNDECANOATE": "testosterone undecanoate",
+        "TESTOSTERONE": "testosterone",
+        "TESTOSTERONE_ENANTHATE": "testosterone enanthate",
+        "FINASTERIDE": "finasteride",
+        "MINOXIDIL": "minoxidil"
+      },
+      "conditionSuggestions": [
+        "Deep vein thrombosis",
+        "Pulmonary embolism",
+        "Thrombophilia",
+        "Polycythemia or erythrocytosis",
+        "Cardiovascular disease",
+        "Hypertension",
+        "Dyslipidemia",
+        "Diabetes",
+        "Liver disease",
+        "Obstructive sleep apnea",
+        "Breast cancer",
+        "Endometrial cancer",
+        "Hormone-sensitive cancer",
+        "Epilepsy",
+        "Migraine with aura"
+      ]
+    }
+  }
+}

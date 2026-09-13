@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  English texts for the `body` feature (Section 7.3). Body part names never appear here: they come
+  from BodyVocabularyResolver, resolved at runtime with the vocabulary the person chose.
+-->
+<resources>
+    <string name="body_category_skin">Skin</string>
+    <string name="body_category_hair">Hair</string>
+    <string name="body_category_body">Body</string>
+    <string name="body_category_sexual_reproductive">Sexual and reproductive</string>
+    <string name="body_category_voice">Voice</string>
+    <string name="body_category_emotional">Emotional</string>
+    <string name="body_category_pain">Pain</string>
+    <string name="body_category_other">Other</string>
+
+    <string name="body_home_empty_title">No visible type</string>
+    <string name="body_home_empty_body">Show a hidden type or create a new one to start tracking changes.</string>
+    <string name="body_home_shortcut_expected_changes">Expected changes</string>
+    <string name="body_home_shortcut_measurements">Measurements</string>
+    <string name="body_home_no_entries">No entries yet</string>
+    <string name="body_home_thumbnail_description">Latest photo of %1$s</string>
+    <string name="body_home_last_entry_with_intensity">%1$s, intensity %2$s</string>
+
+    <string name="body_new_type_title">New change type</string>
+    <string name="body_new_type_name_label">Name</string>
+    <string name="body_new_type_name_required_error">Enter a name</string>
+    <string name="body_new_type_category_label">Category</string>
+    <string name="body_new_type_measurement_switch">Has a numeric measurement</string>
+    <string name="body_new_type_measurement_unit_label">Measurement unit</string>
+
+    <string name="body_unit_none">No unit</string>
+    <string name="body_unit_cm">Centimeters (cm)</string>
+    <string name="body_unit_in">Inches (in)</string>
+    <string name="body_unit_hz">Hertz (Hz)</string>
+    <string name="body_unit_kg">Kilograms (kg)</string>
+    <string name="body_unit_lb">Pounds (lb)</string>
+    <string name="body_unit_percent">Percentage</string>
+    <string name="body_unit_symbol_cm">cm</string>
+    <string name="body_unit_symbol_in">in</string>
+    <string name="body_unit_symbol_hz">Hz</string>
+    <string name="body_unit_symbol_kg">kg</string>
+    <string name="body_unit_symbol_lb">lb</string>
+    <string name="body_unit_symbol_percent">%</string>
+
+    <string name="body_intensity_label">Intensity</string>
+    <string name="body_intensity_unspecified">Not selected</string>
+    <string name="body_intensity_none">None</string>
+    <string name="body_intensity_mild">Mild</string>
+    <string name="body_intensity_moderate">Moderate</string>
+    <string name="body_intensity_marked">Marked</string>
+    <string name="body_intensity_complete">Complete</string>
+
+    <string name="body_type_hide_action">Hide type</string>
+    <string name="body_type_show_action">Show type</string>
+    <string name="body_type_delete_action">Delete type</string>
+    <string name="body_type_delete_confirm_title">Delete custom type?</string>
+    <string name="body_type_delete_confirm_text">Recorded entries remain available in the trash for 30 days.</string>
+    <string name="body_type_empty_title">No entries yet</string>
+    <string name="body_type_empty_body">Tap the add button to record the first observation of this type.</string>
+    <string name="body_type_add_entry">Add entry</string>
+    <string name="body_type_timeline_title">Timeline</string>
+    <string name="body_type_entry_deleted_message">Entry deleted</string>
+    <string name="body_type_entry_photo_description">Entry photo from %1$s</string>
+    <string name="body_type_comparison_title">Compare photos</string>
+    <string name="body_type_comparison_empty">Add photos to at least two entries to compare.</string>
+    <string name="body_type_comparison_pick_first">First photo</string>
+    <string name="body_type_comparison_pick_second">Second photo</string>
+    <string name="body_type_comparison_slider_description">Comparison between %1$s and %2$s</string>
+
+    <string name="body_entry_edit_new_title">New entry</string>
+    <string name="body_entry_edit_edit_title">Edit entry</string>
+    <string name="body_entry_edit_type_missing">Could not find this change type.</string>
+    <string name="body_entry_edit_date_label">Date</string>
+    <string name="body_entry_edit_time_label">Time</string>
+    <string name="body_entry_edit_measurement_label">Measurement (%1$s)</string>
+    <string name="body_entry_edit_notes_label">Notes</string>
+    <string name="body_entry_edit_photos_label">Photos</string>
+    <string name="body_entry_edit_add_camera_action">Take photo</string>
+    <string name="body_entry_edit_add_gallery_action">Choose from gallery</string>
+    <string name="body_entry_edit_remove_photo_action">Remove photo</string>
+
+    <string name="body_error_required_field">Fill in the required fields.</string>
+    <string name="body_error_future_date">The date cannot be in the future.</string>
+    <string name="body_error_measurement_unsupported">This type has no numeric measurement.</string>
+    <string name="body_error_invalid_measurement">Enter a valid number.</string>
+    <string name="body_error_builtin_immutable">Catalog types cannot be changed this way.</string>
+    <string name="body_error_not_found">Could not find the entry.</string>
+    <string name="body_error_unknown">Could not save. Please try again.</string>
+</resources>

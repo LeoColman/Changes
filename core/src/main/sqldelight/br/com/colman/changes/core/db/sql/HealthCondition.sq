@@ -1,0 +1,66 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Registro livre. diagnosed_at/resolved_at são epoch day local. code é CID-10 opcional, sem validação.
+CREATE TABLE health_condition (
+    id TEXT NOT NULL PRIMARY KEY,
+    label TEXT NOT NULL,
+    code TEXT,
+    severity TEXT NOT NULL,
+    status TEXT NOT NULL,
+    diagnosed_at INTEGER,
+    resolved_at INTEGER,
+    affects_treatment INTEGER NOT NULL CHECK (affects_treatment IN (0, 1)),
+    notes TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER,
+    CHECK (diagnosed_at IS NULL OR resolved_at IS NULL OR resolved_at >= diagnosed_at)
+);
+
+selectById:
+SELECT * FROM health_condition WHERE id = ?;
+
+selectAll:
+SELECT * FROM health_condition
+WHERE deleted_at IS NULL
+ORDER BY affects_treatment DESC, COALESCE(diagnosed_at, 0) DESC, label COLLATE NOCASE;
+
+selectDeletedSince:
+SELECT * FROM health_condition WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insert:
+INSERT INTO health_condition VALUES ?;
+
+update:
+UPDATE health_condition SET
+    label = :label,
+    code = :code,
+    severity = :severity,
+    status = :status,
+    diagnosed_at = :diagnosedAt,
+    resolved_at = :resolvedAt,
+    affects_treatment = :affectsTreatment,
+    notes = :notes,
+    updated_at = :updatedAt
+WHERE id = :id;
+
+softDelete:
+UPDATE health_condition SET deleted_at = :now, updated_at = :now WHERE id = :id AND deleted_at IS NULL;
+
+restore:
+UPDATE health_condition SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllForBackup:
+SELECT * FROM health_condition ORDER BY id;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeById:
+UPDATE health_condition SET label = '', code = NULL, notes = NULL, deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpired:
+UPDATE health_condition SET label = '', code = NULL, notes = NULL, deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;

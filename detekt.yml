@@ -1,0 +1,114 @@
+config:
+  validation: true
+  warningsAsErrors: false
+
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+complexity:
+  LongMethod:
+    active: true
+    threshold: 40
+  LongParameterList:
+    active: true
+    # "até 6 parâmetros": o rule dispara a partir de 7.
+    functionThreshold: 7
+    constructorThreshold: 7
+    ignoreDataClasses: true
+    ignoreDefaultParameters: false
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 12
+  TooManyFunctions:
+    active: true
+    excludes:
+      - '**/test/**'
+      - '**/testFixtures/**'
+      - '**/androidTest/**'
+      - '**/*ViewModel.kt'
+      - '**/*Repository.kt'
+
+coroutines:
+  InjectDispatcher:
+    active: true
+    dispatcherNames:
+      - 'IO'
+      - 'Default'
+      - 'Unconfined'
+      - 'Main'
+    excludes:
+      - '**/*Module.kt'
+      - '**/test/**'
+      - '**/testFixtures/**'
+      - '**/androidTest/**'
+
+naming:
+  FunctionNaming:
+    active: true
+    ignoreAnnotated:
+      - 'Composable'
+    excludes:
+      - '**/test/**'
+      - '**/testFixtures/**'
+      - '**/androidTest/**'
+
+style:
+  ForbiddenImport:
+    active: true
+    imports:
+      - value: 'android.util.Log'
+        reason: 'Use AppLogger (no-op em release).'
+      - value: 'java.util.Date'
+        reason: 'Use kotlinx-datetime.'
+      - value: 'java.text.SimpleDateFormat'
+        reason: 'Use kotlinx-datetime e formatação por locale.'
+      - value: 'kotlinx.coroutines.GlobalScope'
+        reason: 'Escopos estruturados apenas.'
+      - value: 'kotlinx.coroutines.runBlocking'
+        reason: 'runBlocking só em src/test.'
+    excludes:
+      - '**/test/**'
+      - '**/testFixtures/**'
+      - '**/androidTest/**'
+      - '**/AppLogger.kt'
+  MagicNumber:
+    active: true
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreNamedArgument: true
+    ignoreEnums: true
+    ignoreAnnotated:
+      - 'Composable'
+    excludes:
+      - '**/test/**'
+      - '**/testFixtures/**'
+      - '**/androidTest/**'
+      - '**/ui/theme/**'
+  ReturnCount:
+    active: true
+    max: 3
+    excludeGuardClauses: true
+  # Produção: 120 colunas. Testes ficam com o limite do ktlint (150) abaixo: asserts com literais
+  # longos leem melhor numa linha. Ver ADR 0004.
+  MaxLineLength:
+    active: true
+    maxLineLength: 120
+    excludes:
+      - '**/test/**'
+      - '**/testFixtures/**'
+      - '**/androidTest/**'
+  UnusedPrivateMember:
+    active: true
+    ignoreAnnotated:
+      - 'Preview'
+
+formatting:
+  active: true
+  android: false
+  autoCorrect: true
+  MaximumLineLength:
+    active: true
+    maxLineLength: 150
+  FunctionName:
+    active: false

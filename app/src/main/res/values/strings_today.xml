@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt">
+    <string name="today_next_dose_header">Próxima dose</string>
+    <string name="today_no_regimen_title">Nenhum regime cadastrado</string>
+    <string name="today_no_regimen_body">Cadastre um regime de medicação para acompanhar as próximas doses.</string>
+    <string name="today_create_regimen_action">Criar regime</string>
+    <string name="today_no_scheduled_dose">Nenhuma dose com horário fixo no momento.</string>
+    <string name="today_next_dose_date">Prevista para %1$s</string>
+    <string name="today_next_dose_datetime">Prevista para %1$s às %2$s</string>
+    <string name="today_log_dose_action">Registrar dose</string>
+    <string name="today_log_dose_with_details_action">Registrar com ajustes</string>
+    <string name="today_dose_logged_message">Dose registrada</string>
+    <string name="today_regimens_action">Ver regimes e histórico de doses</string>
+
+    <string name="today_mood_header">Check-in de hoje</string>
+    <string name="today_mood_done">Check-in de hoje feito</string>
+    <string name="today_mood_pending">Check-in de hoje ainda não feito</string>
+    <string name="today_mood_action">Fazer check-in</string>
+    <string name="today_mood_history_action">Ver histórico de check-ins</string>
+
+    <string name="today_agenda_header">Próximos eventos</string>
+    <string name="today_agenda_empty">Nada previsto nos próximos 7 dias.</string>
+    <string name="today_agenda_planned_dose">Dose prevista</string>
+    <string name="today_agenda_date">%1$s</string>
+    <string name="today_agenda_datetime">%1$s às %2$s</string>
+    <string name="today_view_calendar_action">Ver calendário</string>
+</resources>

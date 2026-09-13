@@ -1,0 +1,67 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Catálogo. Itens builtin têm id fixo (seed) e nunca são apagados, só ocultados.
+CREATE TABLE medication (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    substance TEXT,
+    default_route TEXT,
+    concentration_value REAL CHECK (concentration_value IS NULL OR concentration_value > 0),
+    concentration_unit TEXT,
+    is_builtin INTEGER NOT NULL CHECK (is_builtin IN (0, 1)),
+    is_hidden INTEGER NOT NULL CHECK (is_hidden IN (0, 1)),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER,
+    CHECK ((concentration_value IS NULL) = (concentration_unit IS NULL))
+);
+
+selectById:
+SELECT * FROM medication WHERE id = ?;
+
+selectVisible:
+SELECT * FROM medication WHERE deleted_at IS NULL AND is_hidden = 0 ORDER BY is_builtin, name COLLATE NOCASE;
+
+selectAllActive:
+SELECT * FROM medication WHERE deleted_at IS NULL ORDER BY is_builtin, name COLLATE NOCASE;
+
+selectDeletedSince:
+SELECT * FROM medication WHERE deleted_at IS NOT NULL AND deleted_at >= ? ORDER BY deleted_at DESC;
+
+insert:
+INSERT INTO medication VALUES ?;
+
+insertBuiltinIfMissing:
+INSERT OR IGNORE INTO medication VALUES ?;
+
+updateBuiltinDefinition:
+UPDATE medication SET name = ?, substance = ?, default_route = ?, concentration_value = ?, concentration_unit = ?
+WHERE id = ? AND is_builtin = 1;
+
+updateCustom:
+UPDATE medication SET name = ?, substance = ?, default_route = ?, concentration_value = ?, concentration_unit = ?, updated_at = ?
+WHERE id = ? AND is_builtin = 0;
+
+setHidden:
+UPDATE medication SET is_hidden = ?, updated_at = ? WHERE id = ?;
+
+softDelete:
+UPDATE medication SET deleted_at = :now, updated_at = :now WHERE id = :id AND is_builtin = 0 AND deleted_at IS NULL;
+
+restore:
+UPDATE medication SET deleted_at = NULL, updated_at = :now WHERE id = :id;
+
+-- Leitura completa, inclusive tombstones: só para validar e exportar backup (ADR 0009).
+selectAllForBackup:
+SELECT * FROM medication ORDER BY id;
+
+-- Purga (ADR 0008): texto livre apagado, `deleted_at = 0` marca a linha como purgada, `updated_at`
+-- sobe para o tombstone vencer cópias antigas num merge.
+purgeById:
+UPDATE medication SET name = '', substance = NULL, deleted_at = 0, updated_at = :now
+WHERE id = :id AND deleted_at IS NOT NULL AND deleted_at > 0;
+
+purgeExpired:
+UPDATE medication SET name = '', substance = NULL, deleted_at = 0, updated_at = :now
+WHERE deleted_at > 0 AND deleted_at < :cutoff;
