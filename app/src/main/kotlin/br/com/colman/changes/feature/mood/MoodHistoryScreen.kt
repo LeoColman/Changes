@@ -195,11 +195,37 @@ private fun EntryRow(entry: MoodEntryUiState, onOpenDay: (Long) -> Unit) {
     val moodLabel = stringResource(scaleLabelRes(entry.mood))
     val energyLabel = stringResource(scaleLabelRes(entry.energy))
     val summary = stringResource(R.string.mood_entry_summary, Formatters.date(entry.date), moodLabel, energyLabel)
+    val feelings = entryFeelingsSummary(entry)
     ListItem(
         headlineContent = { Text(Formatters.date(entry.date)) },
-        supportingContent = { Text(summary) },
+        supportingContent = {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(summary)
+                if (feelings != null) Text(feelings, style = MaterialTheme.typography.bodySmall)
+            }
+        },
         modifier = Modifier.fillMaxWidth().clickable { onOpenDay(entry.date.toEpochDays()) },
     )
+}
+
+/**
+ * Sentimentos preenchidos do registro (ADR 0012), na mesma ordem do check-in, sem cor de alerta e sem
+ * ordenar por "pior" (critério 7.7.2). `null` quando nenhum sentimento foi respondido.
+ */
+@Composable
+private fun entryFeelingsSummary(entry: MoodEntryUiState): String? {
+    val feelings = listOf(
+        R.string.mood_relief to entry.relief,
+        R.string.mood_irritability to entry.irritability,
+        R.string.mood_emotional_intensity to entry.emotionalIntensity,
+        R.string.mood_anxiety to entry.anxiety,
+    )
+    val filled = feelings.mapNotNull { (labelRes, value) ->
+        value?.let {
+            stringResource(R.string.mood_feeling_value, stringResource(labelRes), stringResource(scaleLabelRes(it)))
+        }
+    }
+    return if (filled.isEmpty()) null else filled.joinToString(", ")
 }
 
 private val SCALE_LABEL_RES = listOf(

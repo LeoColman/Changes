@@ -9,9 +9,10 @@ import kotlinx.datetime.LocalDate
 private val EPOCH = LocalDate(year = 1970, monthNumber = 1, dayOfMonth = 1)
 
 /**
- * Estado do check-in diário (Seção 7.7). Humor e energia são obrigatórios; ansiedade, disforia, sono,
- * nota e etiquetas são opcionais e podem ficar em branco. Nada aqui deriva do texto da nota (7.7.2):
- * a nota só é guardada e devolvida, nunca lida por heurística.
+ * Estado do check-in diário (Seção 7.7). Humor e energia são obrigatórios; os sentimentos (alívio,
+ * irritabilidade, intensidade emocional e ansiedade, ADR 0012), disforia, sono, nota e etiquetas são
+ * opcionais e podem ficar em branco. Nada aqui deriva do texto da nota (7.7.2): a nota só é guardada e
+ * devolvida, nunca lida por heurística.
  */
 @Immutable
 data class MoodCheckInUiState(
@@ -19,6 +20,9 @@ data class MoodCheckInUiState(
     val date: LocalDate = EPOCH,
     val mood: Int? = null,
     val energy: Int? = null,
+    val relief: Int? = null,
+    val irritability: Int? = null,
+    val emotionalIntensity: Int? = null,
     val anxiety: Int? = null,
     val dysphoria: Int? = null,
     val sleepHoursText: String = "",
@@ -37,9 +41,20 @@ sealed interface MoodCheckInUiEvent {
 
     data class EnergyChanged(val value: Int?) : MoodCheckInUiEvent
 
-    data class AnxietyChanged(val value: Int?) : MoodCheckInUiEvent
+    /** Sentimentos e disforia (ADR 0012): sempre opcionais, agrupados para reduzir a complexidade de `onEvent`. */
+    sealed interface FeelingChanged : MoodCheckInUiEvent {
+        val value: Int?
+    }
 
-    data class DysphoriaChanged(val value: Int?) : MoodCheckInUiEvent
+    data class ReliefChanged(override val value: Int?) : FeelingChanged
+
+    data class IrritabilityChanged(override val value: Int?) : FeelingChanged
+
+    data class EmotionalIntensityChanged(override val value: Int?) : FeelingChanged
+
+    data class AnxietyChanged(override val value: Int?) : FeelingChanged
+
+    data class DysphoriaChanged(override val value: Int?) : FeelingChanged
 
     data class SleepHoursChanged(val text: String) : MoodCheckInUiEvent
 

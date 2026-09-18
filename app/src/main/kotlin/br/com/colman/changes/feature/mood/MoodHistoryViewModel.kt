@@ -81,10 +81,21 @@ class MoodHistoryViewModel(
             trendEntryCount = trendLogs.size,
             trendFirstDate = trendLogs.firstOrNull()?.date,
             trendLastDate = trendLogs.lastOrNull()?.date,
-            entries = all.sortedByDescending { it.date }.map { MoodEntryUiState(it.id, it.date, it.mood, it.energy) },
+            entries = all.sortedByDescending { it.date }.map { it.toEntryUiState() },
         )
     }
 
     private fun daysInMonth(month: LocalDate): Int =
         (month.plus(1, DateTimeUnit.MONTH).toEpochDays() - month.toEpochDays()).toInt()
+
+    private fun MoodLog.toEntryUiState() = MoodEntryUiState(
+        id = id,
+        date = date,
+        mood = mood,
+        energy = energy,
+        relief = relief,
+        irritability = irritability,
+        emotionalIntensity = emotionalIntensity,
+        anxiety = anxiety,
+    )
 }
