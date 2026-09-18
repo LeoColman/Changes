@@ -257,6 +257,41 @@ class BodyEntryEditViewModelSpec : FunSpec({
         media.single().isAudio shouldBe true
     }
 
+    test("salvar no meio da gravação encerra a gravação e anexa o que foi gravado") {
+        val env = BodyTestEnvironment()
+        val type = env.typeByCode("VOICE_DEEPENING")
+        val viewModel = BodyEntryEditViewModel(
+            env.repositories,
+            FakePhotoIntake(),
+            env.timeZones,
+            env.voiceControls,
+            BodyEntryEditArgs(typeId = type.id.toString(), entryId = null),
+        )
+
+        turbineScope {
+            val stateTurbine = viewModel.state.testIn(this)
+            val effects = viewModel.effects.testIn(this)
+
+            var state = stateTurbine.awaitItem()
+            while (state.isLoading) state = stateTurbine.awaitItem()
+            viewModel.onEvent(BodyEntryEditUiEvent.StartRecordingVoice)
+            var recording = stateTurbine.awaitItem()
+            while (recording.voiceState !is VoiceRecordingUiState.Recording) recording = stateTurbine.awaitItem()
+
+            viewModel.onEvent(BodyEntryEditUiEvent.DateChanged(pastDate))
+            viewModel.onEvent(BodyEntryEditUiEvent.TimeChanged(pastTime))
+            viewModel.onEvent(BodyEntryEditUiEvent.Save)
+
+            effects.awaitItem() shouldBe BodyEntryEditEffect.Saved
+            stateTurbine.cancelAndIgnoreRemainingEvents()
+            effects.cancelAndIgnoreRemainingEvents()
+        }
+
+        val entry = env.bodyChangeRepository.observeAllEntries().first().single()
+        val media = env.mediaRepository.observeByOwner(MediaOwnerType.BODY_CHANGE_ENTRY, entry.id).first()
+        media.single().mimeType shouldBe MediaPaths.VOICE_MIME_TYPE
+    }
+
     test("aceite: uma entrada com foto e voz mantém as duas separadas, sem misturar mídia") {
         val env = BodyTestEnvironment()
         val type = env.typeByCode("VOICE_DEEPENING")

@@ -232,11 +232,15 @@ class BodyEntryEditViewModel(
         return true
     }
 
-    /** Uma gravação em curso não sobrevive à tela fechando, e nenhum áudio fica tocando sozinho. */
+    /**
+     * Uma gravação em curso não sobrevive à tela fechando, nenhum áudio fica tocando sozinho, e uma
+     * gravação pendente que não foi salva sai do cache.
+     */
     override fun onCleared() {
         super.onCleared()
         voiceControls.recorder.cancel()
         voiceControls.player.stop()
+        draft.value.pendingVoiceFile?.delete()
     }
 
     private suspend fun loadInitial() {
@@ -352,6 +356,8 @@ class BodyEntryEditViewModel(
     }
 
     private fun save() {
+        // Salvar no meio de uma gravação encerra a gravação e anexa o que foi gravado.
+        if (draft.value.recordingFile != null) stopRecordingVoice()
         val current = draft.value
         val type = current.type ?: return
         val date = current.date

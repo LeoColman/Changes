@@ -61,11 +61,13 @@ fun BodyThumbnailImage(
     var revealed by rememberSaveable(key) { mutableStateOf(false) }
     Box(modifier, contentAlignment = Alignment.Center) {
         CensoredImage(key, revealed, contentDescription, Modifier.matchParentSize(), load)
+        // No canto inferior esquerdo: o canto superior direito é do botão de remover na tira de fotos.
         RevealButton(
             revealed = revealed,
             showLabel = stringResource(R.string.body_photo_show),
             hideLabel = stringResource(R.string.body_photo_hide),
             onToggle = { revealed = !revealed },
+            modifier = Modifier.align(Alignment.BottomStart),
         )
     }
 }
