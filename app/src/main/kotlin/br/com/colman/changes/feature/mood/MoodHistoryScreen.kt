@@ -210,7 +210,8 @@ private fun EntryRow(entry: MoodEntryUiState, onOpenDay: (Long) -> Unit) {
 
 /**
  * Sentimentos preenchidos do registro (ADR 0012), na mesma ordem do check-in, sem cor de alerta e sem
- * ordenar por "pior" (critério 7.7.2). `null` quando nenhum sentimento foi respondido.
+ * ordenar por "pior" (critério 7.7.2). Um por linha: o valor já tem vírgula ("4, alto"). `null` quando
+ * nenhum sentimento foi respondido.
  */
 @Composable
 private fun entryFeelingsSummary(entry: MoodEntryUiState): String? {
@@ -225,7 +226,7 @@ private fun entryFeelingsSummary(entry: MoodEntryUiState): String? {
             stringResource(R.string.mood_feeling_value, stringResource(labelRes), stringResource(scaleLabelRes(it)))
         }
     }
-    return if (filled.isEmpty()) null else filled.joinToString(", ")
+    return if (filled.isEmpty()) null else filled.joinToString("\n")
 }
 
 private val SCALE_LABEL_RES = listOf(
