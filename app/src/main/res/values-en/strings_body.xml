@@ -86,4 +86,22 @@
     <string name="body_error_builtin_immutable">Catalog types cannot be changed this way.</string>
     <string name="body_error_not_found">Could not find the entry.</string>
     <string name="body_error_unknown">Could not save. Please try again.</string>
+
+    <string name="body_photo_censored">Hidden photo</string>
+    <string name="body_photo_show">Show photo</string>
+    <string name="body_photo_hide">Hide photo</string>
+    <string name="body_photos_show">Show the photos</string>
+
+    <string name="body_voice_section">Voice recording</string>
+    <string name="body_voice_instructions">Read aloud in your usual speaking voice. Recording the same sentence, in the same place and at the same distance from the phone, makes it easier to compare.</string>
+    <string name="body_voice_phrase">Today the sky is clear and the wind blows gently. One, two, three, four, five.</string>
+    <string name="body_voice_record">Record</string>
+    <string name="body_voice_stop">Stop</string>
+    <string name="body_voice_play">Play</string>
+    <string name="body_voice_delete">Delete recording</string>
+    <string name="body_voice_recording">Recording: %1$d s</string>
+    <string name="body_voice_permission_denied">To record, Changes needs the microphone. The recording stays on this device only.</string>
+    <string name="body_voice_play_first">Play the first one</string>
+    <string name="body_voice_play_latest">Play the latest one</string>
+    <string name="body_voice_play_entry">Play the recording from %1$s</string>
 </resources>

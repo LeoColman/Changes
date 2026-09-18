@@ -8,12 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.colman.changes.core.data.BodyChangeRepository
 import br.com.colman.changes.core.data.MediaRepository
+import br.com.colman.changes.core.model.BodyChangeCategory
 import br.com.colman.changes.core.model.BodyChangeEntry
 import br.com.colman.changes.core.model.BodyChangeType
 import br.com.colman.changes.core.model.BodyMeasurementUnit
 import br.com.colman.changes.core.model.BodyVocabulary
 import br.com.colman.changes.core.model.MediaOwnerType
 import br.com.colman.changes.core.model.Result
+import br.com.colman.changes.platform.VoicePlayer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +37,10 @@ data class BodyChangeTypeUiState(
     val measurementUnit: BodyMeasurementUnit? = null,
     val entries: List<BodyEntrySummary> = emptyList(),
     val comparison: ComparisonState = ComparisonState(),
+    /** Categoria `VOICE` (ADR 0013): oferece "Ouvir a primeira"/"Ouvir a mais recente". */
+    val isVoiceCategory: Boolean = false,
+    /** Id da entrada cuja gravação está tocando agora; um áudio por vez. */
+    val playingEntryId: String? = null,
     val pendingDeletionEntryId: String? = null,
     val deleteTypeRequested: Boolean = false,
     val errorMessage: BodyErrorMessage? = null,
@@ -70,6 +76,11 @@ sealed interface BodyChangeTypeUiEvent {
 
     data class SetComparisonSlider(val position: Float) : BodyChangeTypeUiEvent
 
+    /** Toca a gravação de voz de uma entrada (ADR 0013); usado também pelos botões do topo. */
+    data class PlayVoice(val entryId: String) : BodyChangeTypeUiEvent
+
+    data object StopVoice : BodyChangeTypeUiEvent
+
     data object ErrorMessageShown : BodyChangeTypeUiEvent
 }
 
@@ -77,6 +88,7 @@ class BodyChangeTypeViewModel(
     private val bodyChangeRepository: BodyChangeRepository,
     private val mediaRepository: MediaRepository,
     private val bodyLabels: BodyLabels,
+    private val voicePlayer: VoicePlayer,
     typeId: String,
 ) : ViewModel() {
 
@@ -92,6 +104,8 @@ class BodyChangeTypeViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), BodyChangeTypeUiState())
 
     fun onEvent(event: BodyChangeTypeUiEvent) {
+        if (handleVoiceEvent(event)) return
+        if (handleComparisonEvent(event)) return
         when (event) {
             BodyChangeTypeUiEvent.ToggleHidden -> toggleHidden()
             BodyChangeTypeUiEvent.RequestDeleteType -> local.update { it.copy(deleteTypeRequested = true) }
@@ -99,11 +113,47 @@ class BodyChangeTypeViewModel(
             BodyChangeTypeUiEvent.ConfirmDeleteType -> confirmDeleteType()
             is BodyChangeTypeUiEvent.DeleteEntry -> deleteEntry(event.entryId)
             BodyChangeTypeUiEvent.UndoDeleteEntry -> undoDeleteEntry()
-            is BodyChangeTypeUiEvent.SelectComparisonLeft -> local.update { it.copy(comparisonLeft = event.entryId) }
-            is BodyChangeTypeUiEvent.SelectComparisonRight -> local.update { it.copy(comparisonRight = event.entryId) }
-            is BodyChangeTypeUiEvent.SetComparisonSlider -> local.update { it.copy(sliderPosition = event.position) }
             BodyChangeTypeUiEvent.ErrorMessageShown -> local.update { it.copy(errorMessage = null) }
+            else -> Unit
         }
+    }
+
+    /** Seleção do par e do slider de comparação, fora do `when` principal (complexidade ciclomática). */
+    private fun handleComparisonEvent(event: BodyChangeTypeUiEvent): Boolean {
+        when (event) {
+            is BodyChangeTypeUiEvent.SelectComparisonLeft -> local.update { it.copy(comparisonLeft = event.entryId) }
+            is BodyChangeTypeUiEvent.SelectComparisonRight ->
+                local.update { it.copy(comparisonRight = event.entryId) }
+            is BodyChangeTypeUiEvent.SetComparisonSlider -> local.update { it.copy(sliderPosition = event.position) }
+            else -> return false
+        }
+        return true
+    }
+
+    /** Eventos de reprodução de voz, fora do `when` principal (complexidade ciclomática). */
+    private fun handleVoiceEvent(event: BodyChangeTypeUiEvent): Boolean {
+        when (event) {
+            is BodyChangeTypeUiEvent.PlayVoice -> playVoice(event.entryId)
+            BodyChangeTypeUiEvent.StopVoice -> stopVoice()
+            else -> return false
+        }
+        return true
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        voicePlayer.stop()
+    }
+
+    private fun playVoice(entryId: String) {
+        val voice = state.value.entries.firstOrNull { it.entryId == entryId }?.voice ?: return
+        local.update { it.copy(playingEntryId = entryId) }
+        voicePlayer.playMedia(voice.relativePath) { local.update { current -> current.copy(playingEntryId = null) } }
+    }
+
+    private fun stopVoice() {
+        voicePlayer.stop()
+        local.update { it.copy(playingEntryId = null) }
     }
 
     private fun toggleHidden() {
@@ -159,26 +209,34 @@ class BodyChangeTypeViewModel(
                 rightEntryId = localState.comparisonRight?.takeIf { id -> candidates.any { it.entryId == id } },
                 sliderPosition = localState.sliderPosition,
             ),
+            isVoiceCategory = type?.category == BodyChangeCategory.VOICE,
+            playingEntryId = localState.playingEntryId,
             pendingDeletionEntryId = localState.pendingDeletionEntryId,
             deleteTypeRequested = localState.deleteTypeRequested,
             errorMessage = localState.errorMessage,
         )
     }
 
-    private suspend fun toSummary(entry: BodyChangeEntry): BodyEntrySummary = BodyEntrySummary(
-        entryId = entry.id.toString(),
-        observedAt = entry.observedAt,
-        intensity = entry.intensity,
-        measurementValue = entry.measurementValue,
-        measurementUnit = entry.measurementUnit,
-        notes = entry.notes,
-        photo = mediaRepository.observeByOwner(MediaOwnerType.BODY_CHANGE_ENTRY, entry.id).first().firstOrNull(),
-    )
+    /** [BodyEntrySummary.photo] nunca é a gravação de voz da entrada, e vice-versa (ADR 0013). */
+    private suspend fun toSummary(entry: BodyChangeEntry): BodyEntrySummary {
+        val media = mediaRepository.observeByOwner(MediaOwnerType.BODY_CHANGE_ENTRY, entry.id).first()
+        return BodyEntrySummary(
+            entryId = entry.id.toString(),
+            observedAt = entry.observedAt,
+            intensity = entry.intensity,
+            measurementValue = entry.measurementValue,
+            measurementUnit = entry.measurementUnit,
+            notes = entry.notes,
+            photo = media.firstOrNull { !it.isAudio },
+            voice = media.firstOrNull { it.isAudio },
+        )
+    }
 
     private data class LocalState(
         val comparisonLeft: String? = null,
         val comparisonRight: String? = null,
         val sliderPosition: Float = DEFAULT_SLIDER_POSITION,
+        val playingEntryId: String? = null,
         val pendingDeletionEntryId: String? = null,
         val deleteTypeRequested: Boolean = false,
         val errorMessage: BodyErrorMessage? = null,

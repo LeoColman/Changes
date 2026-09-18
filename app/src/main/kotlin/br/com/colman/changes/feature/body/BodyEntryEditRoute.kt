@@ -3,6 +3,7 @@
 
 package br.com.colman.changes.feature.body
 
+import android.Manifest
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -27,7 +28,8 @@ import java.io.File
 
 /**
  * Wrapper fino de criação/edição de uma entrada (Seção 5). Conecta o `PhotoSanitizer` real da
- * plataforma ao `BodyPhotoIntake` que o ViewModel espera, e os contratos de câmera/galeria.
+ * plataforma ao `BodyPhotoIntake` que o ViewModel espera, os contratos de câmera/galeria, e o pedido
+ * de permissão do microfone para a gravação de voz (ADR 0013).
  */
 @Composable
 fun BodyEntryEditRoute(typeId: String?, entryId: String?, onSaved: () -> Unit, onBack: () -> Unit) {
@@ -45,13 +47,25 @@ fun BodyEntryEditRoute(typeId: String?, entryId: String?, onSaved: () -> Unit, o
     val onPickPhoto = rememberPhotoPickHandler(sanitizer) { raw ->
         viewModel.onEvent(BodyEntryEditUiEvent.PhotoSelected(raw))
     }
+    val recordPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            viewModel.onEvent(BodyEntryEditUiEvent.StartRecordingVoice)
+        } else {
+            viewModel.onEvent(BodyEntryEditUiEvent.MicrophonePermissionDenied)
+        }
+    }
 
     BodyEntryEditScreen(
         state = state,
         onEvent = viewModel::onEvent,
-        onBack = onBack,
-        loadPhoto = { photo -> loadEntryPhoto(mediaRepository, io, photo) },
-        onPickPhoto = onPickPhoto,
+        actions = BodyEntryEditActions(
+            onBack = onBack,
+            loadPhoto = { photo -> loadEntryPhoto(mediaRepository, io, photo) },
+            onPickPhoto = onPickPhoto,
+            onRecordRequested = { recordPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO) },
+        ),
     )
 }
 

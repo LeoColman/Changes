@@ -43,6 +43,7 @@ class BodyChangeTypeViewModelSpec : FunSpec({
             env.bodyChangeRepository,
             env.mediaRepository,
             env.bodyLabels,
+            env.voicePlayer,
             created.id.toString()
         )
 
@@ -77,6 +78,7 @@ class BodyChangeTypeViewModelSpec : FunSpec({
             env.bodyChangeRepository,
             env.mediaRepository,
             env.bodyLabels,
+            env.voicePlayer,
             type.id.toString()
         )
         viewModel.state.test {
@@ -120,6 +122,7 @@ class BodyChangeTypeViewModelSpec : FunSpec({
             env.bodyChangeRepository,
             env.mediaRepository,
             env.bodyLabels,
+            env.voicePlayer,
             type.id.toString()
         )
         viewModel.state.test {
@@ -154,6 +157,7 @@ class BodyChangeTypeViewModelSpec : FunSpec({
             env.bodyChangeRepository,
             env.mediaRepository,
             env.bodyLabels,
+            env.voicePlayer,
             created.id.toString()
         )
 

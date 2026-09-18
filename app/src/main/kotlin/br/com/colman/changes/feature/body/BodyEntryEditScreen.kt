@@ -6,6 +6,7 @@ package br.com.colman.changes.feature.body
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
@@ -49,9 +51,7 @@ import br.com.colman.changes.ui.format.Formatters
 fun BodyEntryEditScreen(
     state: BodyEntryEditUiState,
     onEvent: (BodyEntryEditUiEvent) -> Unit,
-    onBack: () -> Unit,
-    loadPhoto: suspend (EntryPhoto) -> ImageBitmap?,
-    onPickPhoto: (BodyPhotoPickSource) -> Unit,
+    actions: BodyEntryEditActions,
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -66,7 +66,7 @@ fun BodyEntryEditScreen(
         title = stringResource(
             if (state.isNew) R.string.body_entry_edit_new_title else R.string.body_entry_edit_edit_title,
         ),
-        onBack = onBack,
+        onBack = actions.onBack,
         snackbarHostState = snackbarHostState,
         actions = {
             TextButton(onClick = { onEvent(BodyEntryEditUiEvent.Save) }) {
@@ -74,7 +74,7 @@ fun BodyEntryEditScreen(
             }
         },
     ) { padding ->
-        BodyEntryEditContent(state, onEvent, loadPhoto, onPickPhoto, modifier.padding(padding))
+        BodyEntryEditContent(state, onEvent, actions, modifier.padding(padding))
     }
 }
 
@@ -82,8 +82,7 @@ fun BodyEntryEditScreen(
 private fun BodyEntryEditContent(
     state: BodyEntryEditUiState,
     onEvent: (BodyEntryEditUiEvent) -> Unit,
-    loadPhoto: suspend (EntryPhoto) -> ImageBitmap?,
-    onPickPhoto: (BodyPhotoPickSource) -> Unit,
+    actions: BodyEntryEditActions,
     modifier: Modifier,
 ) {
     when {
@@ -93,7 +92,10 @@ private fun BodyEntryEditContent(
             Text(state.typeLabel)
             BodyEntryEditFields(state, onEvent)
             SectionHeader(stringResource(R.string.body_entry_edit_photos_label))
-            PhotoPicker(state.photos, loadPhoto, onPickPhoto, onEvent)
+            PhotoPicker(state.photos, actions.loadPhoto, actions.onPickPhoto, onEvent)
+            if (state.supportsVoiceRecording) {
+                VoiceRecordingSection(state, onEvent, actions.onRecordRequested)
+            }
         }
     }
 }
@@ -187,5 +189,63 @@ private fun photoDescription(photo: EntryPhoto): String {
         stringResource(R.string.body_type_entry_photo_description, Formatters.recorded(capturedAt))
     } else {
         stringResource(R.string.body_entry_edit_photos_label)
+    }
+}
+
+/** Seção "Gravação de voz" (ADR 0013): frase fixa, controles de gravar/ouvir/apagar, e o aviso de microfone. */
+@Composable
+private fun VoiceRecordingSection(
+    state: BodyEntryEditUiState,
+    onEvent: (BodyEntryEditUiEvent) -> Unit,
+    onRecordRequested: () -> Unit,
+) {
+    SectionHeader(stringResource(R.string.body_voice_section))
+    Text(stringResource(R.string.body_voice_instructions))
+    Text(stringResource(R.string.body_voice_phrase), style = MaterialTheme.typography.bodyLarge)
+    if (state.microphoneUnavailable) {
+        Text(stringResource(R.string.body_voice_permission_denied), color = MaterialTheme.colorScheme.error)
+    }
+    VoiceRecordingControls(state.voiceState, onEvent, onRecordRequested)
+}
+
+@Composable
+private fun VoiceRecordingControls(
+    voiceState: VoiceRecordingUiState,
+    onEvent: (BodyEntryEditUiEvent) -> Unit,
+    onRecordRequested: () -> Unit,
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        when (voiceState) {
+            VoiceRecordingUiState.None -> OutlinedButton(onClick = onRecordRequested) {
+                Text(stringResource(R.string.body_voice_record))
+            }
+
+            is VoiceRecordingUiState.Recording -> RecordingControls(voiceState.elapsedSeconds, onEvent)
+
+            is VoiceRecordingUiState.Recorded -> RecordedControls(voiceState.isPlaying, onEvent)
+        }
+    }
+}
+
+@Composable
+private fun RowScope.RecordingControls(elapsedSeconds: Int, onEvent: (BodyEntryEditUiEvent) -> Unit) {
+    Text(
+        stringResource(R.string.body_voice_recording, elapsedSeconds),
+        modifier = Modifier.align(Alignment.CenterVertically),
+    )
+    OutlinedButton(onClick = { onEvent(BodyEntryEditUiEvent.StopRecordingVoice) }) {
+        Text(stringResource(R.string.body_voice_stop))
+    }
+}
+
+@Composable
+private fun RecordedControls(isPlaying: Boolean, onEvent: (BodyEntryEditUiEvent) -> Unit) {
+    OutlinedButton(onClick = {
+        onEvent(if (isPlaying) BodyEntryEditUiEvent.StopVoice else BodyEntryEditUiEvent.PlayVoice)
+    }) {
+        Text(stringResource(if (isPlaying) R.string.body_voice_stop else R.string.body_voice_play))
+    }
+    TextButton(onClick = { onEvent(BodyEntryEditUiEvent.DeleteVoice) }) {
+        Text(stringResource(R.string.body_voice_delete))
     }
 }
