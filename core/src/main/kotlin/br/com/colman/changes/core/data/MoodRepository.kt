@@ -53,7 +53,7 @@ public class MoodRepository(
      */
     public suspend fun upsert(draft: MoodLog): Result<MoodLog> = withContext(io) {
         val cleanedTags = cleanTags(draft.tags)
-        val error = moodError(draft.date, draft.mood, draft.energy, draft.anxiety, draft.dysphoria, draft.sleepHours)
+        val error = moodError(draft)
         if (error != null) {
             error.asFailure()
         } else {
@@ -68,15 +68,18 @@ public class MoodRepository(
                     database.moodQueries.insert(model.toRow(now, now))
                 } else {
                     database.moodQueries.overwrite(
-                        model.mood.toLong(),
-                        model.energy.toLong(),
-                        model.anxiety?.toLong(),
-                        model.dysphoria?.toLong(),
-                        model.sleepHours,
-                        model.note,
-                        Codecs.encodeTags(model.tags),
-                        now,
-                        id.toString(),
+                        mood = model.mood.toLong(),
+                        energy = model.energy.toLong(),
+                        anxiety = model.anxiety?.toLong(),
+                        dysphoria = model.dysphoria?.toLong(),
+                        relief = model.relief?.toLong(),
+                        irritability = model.irritability?.toLong(),
+                        emotionalIntensity = model.emotionalIntensity?.toLong(),
+                        sleepHours = model.sleepHours,
+                        note = model.note,
+                        tags = Codecs.encodeTags(model.tags),
+                        updatedAt = now,
+                        id = id.toString(),
                     )
                 }
             }
@@ -96,22 +99,18 @@ public class MoodRepository(
         Unit.asSuccess()
     }
 
-    private fun moodError(
-        date: LocalDate,
-        mood: Int,
-        energy: Int,
-        anxiety: Int?,
-        dysphoria: Int?,
-        sleepHours: Double?,
-    ): DomainError? {
+    private fun moodError(draft: MoodLog): DomainError? {
         val today = clock.now().toLocalDateTime(timeZones.current()).date
-        val dateError = if (date > today) DomainError.Invalid("date", DomainError.Reason.IN_THE_FUTURE) else null
+        val dateError = if (draft.date > today) DomainError.Invalid("date", DomainError.Reason.IN_THE_FUTURE) else null
         return firstError(
-            rangeError("mood", mood, SCALE_MIN..SCALE_MAX),
-            rangeError("energy", energy, SCALE_MIN..SCALE_MAX),
-            anxiety?.let { rangeError("anxiety", it, SCALE_MIN..SCALE_MAX) },
-            dysphoria?.let { rangeError("dysphoria", it, SCALE_MIN..SCALE_MAX) },
-            sleepHours?.let { rangeError("sleepHours", it, SLEEP_HOURS_MIN..SLEEP_HOURS_MAX) },
+            rangeError("mood", draft.mood, SCALE_MIN..SCALE_MAX),
+            rangeError("energy", draft.energy, SCALE_MIN..SCALE_MAX),
+            draft.anxiety?.let { rangeError("anxiety", it, SCALE_MIN..SCALE_MAX) },
+            draft.dysphoria?.let { rangeError("dysphoria", it, SCALE_MIN..SCALE_MAX) },
+            draft.relief?.let { rangeError("relief", it, SCALE_MIN..SCALE_MAX) },
+            draft.irritability?.let { rangeError("irritability", it, SCALE_MIN..SCALE_MAX) },
+            draft.emotionalIntensity?.let { rangeError("emotionalIntensity", it, SCALE_MIN..SCALE_MAX) },
+            draft.sleepHours?.let { rangeError("sleepHours", it, SLEEP_HOURS_MIN..SLEEP_HOURS_MAX) },
             dateError,
         )
     }

@@ -7,6 +7,9 @@
     <!-- Aviso geral (Seção 13): onboarding e Ajustes > Sobre, uma vez cada. -->
     <string name="sensitive_disclaimer">O Changes registra o que você e quem acompanha seu tratamento decidiram. Ele não dá conselho médico, não sugere doses e não substitui acompanhamento profissional.</string>
 
+    <!-- Aviso de privacidade: onboarding, Ajustes > Privacidade e Sobre. -->
+    <string name="privacy_offline_notice">O Changes funciona totalmente offline. Tudo o que você registra fica só neste aparelho: o app não tem acesso à internet e não envia, não sincroniza nem compartilha seus dados com ninguém, de nenhuma forma. Um dado só sai daqui se você mesmo exportar um backup.</string>
+
     <!-- Mudanças esperadas (7.2). O aviso fixo é o texto do dossiê. -->
     <string name="expected_title">Mudanças descritas na literatura</string>
     <string name="expected_disclaimer">Faixas observadas em estudos populacionais. Variação individual é grande e estar fora da faixa não indica problema. Converse com quem acompanha seu tratamento.</string>
@@ -84,8 +87,19 @@
     <string name="mood_intro">Um registro por dia. Preencha o que fizer sentido; os campos opcionais podem ficar em branco.</string>
     <string name="mood_mood">Humor</string>
     <string name="mood_energy">Energia</string>
-    <string name="mood_anxiety">Ansiedade (opcional)</string>
+    <string name="mood_anxiety">Ansiedade</string>
     <string name="mood_dysphoria">Disforia (opcional)</string>
+    <!-- Sentimentos comuns no início da testosterona (ADR 0012): cada um é uma escala opcional de 1 a 5.
+         A descrição só explica o sentimento; nada no app tira conclusão das escalas. -->
+    <string name="mood_feelings_section">Sentimentos (opcional)</string>
+    <string name="mood_feelings_intro">Sentimentos comuns no início da testosterona. Se quiser, marque a intensidade de hoje.</string>
+    <string name="mood_relief">Alívio e bem-estar</string>
+    <string name="mood_relief_description">Menos disforia e mais alinhamento com a própria identidade.</string>
+    <string name="mood_irritability">Irritabilidade e impaciência</string>
+    <string name="mood_irritability_description">Reações mais rápidas e menos paciência que o habitual.</string>
+    <string name="mood_emotional_intensity">Intensidade emocional</string>
+    <string name="mood_emotional_intensity_description">Emoções à flor da pele ou choro mais fácil.</string>
+    <string name="mood_anxiety_description">Preocupação com as mudanças do corpo e da vida social.</string>
     <string name="mood_sleep">Horas de sono (opcional)</string>
     <string name="mood_note">Nota (opcional)</string>
     <string name="mood_note_private">Só você vê esta nota. O app não lê, não classifica e não analisa o que você escreve.</string>

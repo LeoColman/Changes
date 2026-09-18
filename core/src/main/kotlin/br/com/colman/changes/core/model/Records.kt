@@ -82,7 +82,11 @@ public data class LabResult(
     val notes: String?,
 )
 
-/** Check-in do dia. Escalas 1..5; ansiedade e disforia opcionais. */
+/**
+ * Check-in do dia. Escalas 1..5: humor e energia obrigatórios, o resto opcional. Alívio e bem-estar
+ * ([relief]), irritabilidade e impaciência ([irritability]), intensidade emocional
+ * ([emotionalIntensity]) e ansiedade são os sentimentos comuns no início da testosterona (ADR 0012).
+ */
 public data class MoodLog(
     val id: Uuid,
     val date: LocalDate,
@@ -93,4 +97,7 @@ public data class MoodLog(
     val sleepHours: Double?,
     val note: String?,
     val tags: List<String>,
+    val relief: Int? = null,
+    val irritability: Int? = null,
+    val emotionalIntensity: Int? = null,
 )

@@ -23,6 +23,9 @@ internal fun Mood_log.toModel(): MoodLog = MoodLog(
     sleepHours = sleep_hours,
     note = note,
     tags = checkNotNull(Codecs.decodeTags(tags).getOrNull()) { "Corrupted tags for mood log $id" },
+    relief = relief?.toInt(),
+    irritability = irritability?.toInt(),
+    emotionalIntensity = emotional_intensity?.toInt(),
 )
 
 internal fun MoodLog.toRow(createdAt: Long, updatedAt: Long): Mood_log = Mood_log(
@@ -38,6 +41,9 @@ internal fun MoodLog.toRow(createdAt: Long, updatedAt: Long): Mood_log = Mood_lo
     created_at = createdAt,
     updated_at = updatedAt,
     deleted_at = null,
+    relief = relief?.toLong(),
+    irritability = irritability?.toLong(),
+    emotional_intensity = emotionalIntensity?.toLong(),
 )
 
 internal fun Calendar_event.toModel(): CalendarEvent = CalendarEvent(

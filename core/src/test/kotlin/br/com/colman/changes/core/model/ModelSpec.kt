@@ -99,6 +99,23 @@ class ModelSpec : FunSpec({
         test("new paths are '<uuid>.<ext>' in lower case") {
             MediaPaths.forNew(id, "JPG") shouldBe "0f8fad5b-d9cb-469f-a165-70867728950e.jpg"
             MediaPaths.isValid(MediaPaths.forNew(id, "png")).shouldBeTrue()
+            MediaPaths.isValid(MediaPaths.forNew(id, "m4a")).shouldBeTrue()
+        }
+
+        test("audio attachments are voice recordings, never images (ADR 0013)") {
+            fun attachment(mimeType: String) = MediaAttachment(
+                id,
+                MediaOwnerType.BODY_CHANGE_ENTRY,
+                id,
+                MediaPaths.forNew(id, "m4a"),
+                mimeType,
+                null,
+                "0".repeat(64),
+                null,
+            )
+            attachment(MediaPaths.VOICE_MIME_TYPE).isAudio.shouldBeTrue()
+            attachment("AUDIO/MP4").isAudio.shouldBeTrue()
+            attachment("image/jpeg").isAudio.shouldBeFalse()
         }
 
         test("anything that could escape the media root is invalid") {
@@ -121,7 +138,8 @@ class ModelSpec : FunSpec({
             MediaPaths.extensionForMimeType("image/heif") shouldBe "heif"
             MediaPaths.extensionForMimeType("image/jpeg") shouldBe "jpg"
             MediaPaths.extensionForMimeType("application/octet-stream") shouldBe "jpg"
-            MediaPaths.EXTENSIONS shouldBe setOf("jpg", "jpeg", "png", "webp", "heic", "heif")
+            MediaPaths.extensionForMimeType("audio/mp4") shouldBe "m4a"
+            MediaPaths.EXTENSIONS shouldBe setOf("jpg", "jpeg", "png", "webp", "heic", "heif", "m4a")
         }
     }
 

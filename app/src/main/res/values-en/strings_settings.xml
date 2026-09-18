@@ -49,7 +49,6 @@
     <string name="settings_about_version">Version %1$s</string>
     <string name="settings_about_license_title">License</string>
     <string name="settings_about_license_body">This app is distributed under the AGPL-3.0-or-later license, with no warranty of any kind, to the extent permitted by law.</string>
-    <string name="settings_about_no_internet">Changes does not connect to the internet or send data to any server.</string>
 
     <!-- Onboarding (Section 9): at most 4 steps, all skippable. -->
     <string name="settings_onboarding_skip">Skip</string>

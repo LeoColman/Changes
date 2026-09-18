@@ -69,6 +69,7 @@ private fun WelcomeStep() {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(stringResource(R.string.settings_onboarding_welcome_title), style = MaterialTheme.typography.headlineSmall)
         Text(stringResource(R.string.sensitive_disclaimer))
+        Text(stringResource(R.string.privacy_offline_notice), style = MaterialTheme.typography.titleSmall)
     }
 }
 

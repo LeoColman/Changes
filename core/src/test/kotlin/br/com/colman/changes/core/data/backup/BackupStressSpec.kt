@@ -99,4 +99,7 @@ private fun mood(day: Long, at: Long) = Mood_log(
     created_at = at,
     updated_at = at,
     deleted_at = null,
+    relief = null,
+    irritability = null,
+    emotional_intensity = null,
 )

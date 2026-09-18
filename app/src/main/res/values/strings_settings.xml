@@ -49,7 +49,6 @@
     <string name="settings_about_version">Versão %1$s</string>
     <string name="settings_about_license_title">Licença</string>
     <string name="settings_about_license_body">Este aplicativo é distribuído sob a licença AGPL-3.0-or-later, sem garantia de qualquer tipo, na forma permitida por lei.</string>
-    <string name="settings_about_no_internet">O Changes não se conecta à internet nem envia dados para nenhum servidor.</string>
 
     <!-- Onboarding (Seção 9): no máximo 4 passos, todos puláveis. -->
     <string name="settings_onboarding_skip">Pular</string>

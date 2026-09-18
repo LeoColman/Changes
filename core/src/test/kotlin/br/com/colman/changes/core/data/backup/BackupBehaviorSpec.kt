@@ -343,6 +343,9 @@ private fun mood(id: String, updatedAt: Long) = Mood_log(
     created_at = 100L,
     updated_at = updatedAt,
     deleted_at = null,
+    relief = null,
+    irritability = null,
+    emotional_intensity = null,
 )
 
 private fun customType(id: String, code: String) = Body_change_type(

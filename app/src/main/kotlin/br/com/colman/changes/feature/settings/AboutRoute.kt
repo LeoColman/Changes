@@ -19,7 +19,8 @@ import br.com.colman.changes.ui.components.ChangesScreen
 
 /**
  * Tela Sobre (Seções 13 e 14): identidade do app, versão, o aviso geral (única ocorrência fora do
- * onboarding), licença e a nota de que o app não acessa a internet. Estática, sem ViewModel.
+ * onboarding), o aviso de que o app é offline e não compartilha dados, e a licença. Estática, sem
+ * ViewModel.
  */
 @Composable
 fun AboutRoute(onBack: () -> Unit, modifier: Modifier = Modifier) {
@@ -30,6 +31,7 @@ fun AboutRoute(onBack: () -> Unit, modifier: Modifier = Modifier) {
         ) {
             item { Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall) }
             item { Text(stringResource(R.string.settings_about_version, BuildConfig.VERSION_NAME)) }
+            item { Text(stringResource(R.string.privacy_offline_notice), style = MaterialTheme.typography.titleSmall) }
             item { Text(stringResource(R.string.sensitive_disclaimer)) }
             item {
                 Text(
@@ -38,7 +40,6 @@ fun AboutRoute(onBack: () -> Unit, modifier: Modifier = Modifier) {
                 )
             }
             item { Text(stringResource(R.string.settings_about_license_body)) }
-            item { Text(stringResource(R.string.settings_about_no_internet)) }
         }
     }
 }

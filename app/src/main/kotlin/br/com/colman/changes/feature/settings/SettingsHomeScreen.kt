@@ -115,6 +115,11 @@ private fun RemindersSection(state: SettingsHomeUiState, onEvent: (SettingsHomeU
 @Composable
 private fun PrivacySection(state: SettingsHomeUiState, onEvent: (SettingsHomeUiEvent) -> Unit) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+        Text(
+            text = stringResource(R.string.privacy_offline_notice),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
         ToggleRow(
             label = stringResource(R.string.settings_biometric_lock),
             checked = state.biometricLock,

@@ -3,7 +3,9 @@
 
 -- No máximo uma entrada por data local (entry_date = epoch day). O UNIQUE vale também para
 -- tombstones: registrar de novo numa data apagada reaproveita a linha (upsert no repositório).
--- tags é um array JSON de strings livres.
+-- tags é um array JSON de strings livres. relief, irritability e emotional_intensity (schema v2,
+-- ADR 0012) são sentimentos opcionais 1..5; ficam no fim porque o ALTER TABLE ADD COLUMN da
+-- migração acrescenta colunas no fim, e banco novo e banco migrado precisam da mesma ordem.
 CREATE TABLE mood_log (
     id TEXT NOT NULL PRIMARY KEY,
     entry_date INTEGER NOT NULL UNIQUE,
@@ -16,7 +18,10 @@ CREATE TABLE mood_log (
     tags TEXT NOT NULL,
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL,
-    deleted_at INTEGER
+    deleted_at INTEGER,
+    relief INTEGER CHECK (relief IS NULL OR relief BETWEEN 1 AND 5),
+    irritability INTEGER CHECK (irritability IS NULL OR irritability BETWEEN 1 AND 5),
+    emotional_intensity INTEGER CHECK (emotional_intensity IS NULL OR emotional_intensity BETWEEN 1 AND 5)
 );
 
 selectById:
@@ -43,6 +48,9 @@ UPDATE mood_log SET
     energy = :energy,
     anxiety = :anxiety,
     dysphoria = :dysphoria,
+    relief = :relief,
+    irritability = :irritability,
+    emotional_intensity = :emotionalIntensity,
     sleep_hours = :sleepHours,
     note = :note,
     tags = :tags,

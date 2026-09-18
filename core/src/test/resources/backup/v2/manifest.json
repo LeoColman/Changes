@@ -1,0 +1,51 @@
+{
+    "format": "changes-backup",
+    "formatVersion": 1,
+    "schemaVersion": 2,
+    "appVersion": "test",
+    "exportedAt": "2026-09-12T12:00:00Z",
+    "counts": {
+        "profile": 1,
+        "medication": 11,
+        "regimen": 2,
+        "dose_log": 5,
+        "body_change_type": 16,
+        "body_change_entry": 5,
+        "media_attachment": 7,
+        "measurement": 2,
+        "exercise_session": 2,
+        "health_condition": 3,
+        "lab_analyte": 25,
+        "lab_result": 1,
+        "mood_log": 4,
+        "calendar_event": 3
+    },
+    "dataSha256": "f1f8289768be39d4070a950a22c2a4946d7e5ec4249fe0e694c80ac74e434647",
+    "media": [
+        {
+            "path": "61f9afb2-7178-4577-b6e7-36149f888014.jpg",
+            "sha256": "80518805068859788387b8060064160f995727b59da480edfedd753d80b6d648",
+            "size": 306
+        },
+        {
+            "path": "8f371677-c529-488e-b385-abf2a0f09684.jpg",
+            "sha256": "a329080469ed7220ac127a031149fc2cd03e03d53353a83959770e4768e86090",
+            "size": 415
+        },
+        {
+            "path": "a34d5a9e-ab82-4c86-94ff-3673da5b1238.png",
+            "sha256": "a852d050cbc4ee4cbbf389802246a1bf467f25170ca8bd5e584049299d9bc3c2",
+            "size": 1412
+        },
+        {
+            "path": "d65496d7-71a3-442e-abdd-97adec9d6fb0.png",
+            "sha256": "cb171a41552a54cdcced2f2d7c2f9298a489e382a0eefaeaeebbacb44e58c44c",
+            "size": 1343
+        },
+        {
+            "path": "fd6aa380-130e-4ddb-9ccd-af6bc7493393.png",
+            "sha256": "206632e2352e6643ce0253a0451fcc807edceac31e40ec1463c5de60d83dc93f",
+            "size": 1471
+        }
+    ]
+}

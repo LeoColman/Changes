@@ -3,7 +3,10 @@
 
 package br.com.colman.changes.core.db
 
+import app.cash.sqldelight.db.QueryResult
+import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import br.com.colman.changes.core.db.sql.ChangesDatabase
 import br.com.colman.changes.core.testing.inMemoryDriver
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
@@ -33,6 +36,16 @@ class SchemaHistorySpec : FunSpec({
         SchemaHistory.ddlOf(driver) shouldBe SchemaHistory.snapshot(CURRENT_SCHEMA_VERSION)
     }
 
+    test("migrating every frozen version to the current one gives the same columns as a fresh install") {
+        val fresh = columnsOf(inMemoryDriver())
+        for (version in 1 until CURRENT_SCHEMA_VERSION) {
+            val migrated = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+            SchemaHistory.create(migrated, version)
+            ChangesDatabase.Schema.migrate(migrated, version, CURRENT_SCHEMA_VERSION)
+            columnsOf(migrated) shouldBe fresh
+        }
+    }
+
     test("a version that was never frozen has no snapshot and cannot be created") {
         SchemaHistory.snapshot(0).shouldBeNull()
         shouldThrow<IllegalStateException> { SchemaHistory.create(JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY), 0) }
@@ -44,3 +57,40 @@ class SchemaHistorySpec : FunSpec({
         SchemaHistory.normalize("CREATE TABLE a (\n    x INTEGER,\n\ty TEXT\n)  ") shouldBe "CREATE TABLE a ( x INTEGER, y TEXT )"
     }
 })
+
+/**
+ * Colunas de cada tabela, na ordem física (nome, tipo, not null, default, pk). O DDL de um banco migrado
+ * difere em texto do de um banco novo (o `ALTER TABLE` reescreve o `CREATE`), mas as colunas não podem.
+ */
+private fun columnsOf(driver: SqlDriver): Map<String, List<String>> {
+    val tables = driver.executeQuery(
+        identifier = null,
+        sql = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name",
+        mapper = { cursor ->
+            val names = mutableListOf<String>()
+            while (cursor.next().value) names += cursor.getString(0)!!
+            QueryResult.Value(names)
+        },
+        parameters = 0,
+    ).value
+    return tables.associateWith { table ->
+        driver.executeQuery(
+            identifier = null,
+            sql = "SELECT name, type, \"notnull\", dflt_value, pk FROM pragma_table_info('$table')",
+            mapper = { cursor ->
+                val columns = mutableListOf<String>()
+                while (cursor.next().value) {
+                    columns += listOf(
+                        cursor.getString(0),
+                        cursor.getString(1),
+                        cursor.getLong(2),
+                        cursor.getString(3),
+                        cursor.getLong(4),
+                    ).joinToString("|")
+                }
+                QueryResult.Value(columns)
+            },
+            parameters = 0,
+        ).value
+    }
+}

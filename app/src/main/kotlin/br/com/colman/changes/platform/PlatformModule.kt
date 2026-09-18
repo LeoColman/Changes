@@ -29,6 +29,8 @@ val platformModule: Module = module {
     single<SqlDriver> { androidDriver(androidContext()) }
     single<MediaStorage> { AndroidMediaStorage(File(androidContext().filesDir, MEDIA_DIR), get(IoDispatcher)) }
     single { PhotoSanitizer(androidContext(), get(IoDispatcher)) }
+    single<VoiceRecorder> { AndroidVoiceRecorder(androidContext()) }
+    single<VoicePlayer> { AndroidVoicePlayer(File(androidContext().filesDir, MEDIA_DIR)) }
     single<DocumentStreams> { AndroidDocumentStreams(androidContext(), get(IoDispatcher)) }
     single<ScratchDriverFactory> { AndroidScratchDriverFactory(androidContext()) }
     single { AppInfo(BuildConfig.VERSION_NAME) }

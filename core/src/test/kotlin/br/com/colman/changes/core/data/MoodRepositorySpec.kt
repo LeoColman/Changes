@@ -84,6 +84,47 @@ class MoodRepositorySpec : FunSpec({
         repository.upsert(defaultMood.copy(dysphoria = 0)).errorOrNull() shouldBe DomainError.Invalid("dysphoria", DomainError.Reason.OUT_OF_RANGE)
     }
 
+    test("the check-in feelings (ADR 0012) are stored on insert and on overwrite, each one optional") {
+        val clock = FixedClock()
+        val database = testDatabase(clock)
+        val repository = MoodRepository(database, io, clock, FixedTimeZoneProvider())
+        val feelings = defaultMood.copy(anxiety = 3, relief = 4, irritability = 2, emotionalIntensity = 5)
+
+        val created = repository.upsert(feelings).getOrNull().shouldNotBeNull()
+        val row = database.moodQueries.selectById(created.id.toString()).executeAsOne()
+        row.relief shouldBe 4L
+        row.irritability shouldBe 2L
+        row.emotional_intensity shouldBe 5L
+        row.toModel() shouldEqual created
+
+        repository.upsert(feelings.copy(relief = 1, irritability = null, emotionalIntensity = 3)).isSuccess shouldBe true
+        val overwritten = database.moodQueries.selectById(created.id.toString()).executeAsOne()
+        overwritten.relief shouldBe 1L
+        overwritten.irritability.shouldBeNull()
+        overwritten.emotional_intensity shouldBe 3L
+    }
+
+    test("each check-in feeling accepts 1 to 5 and rejects anything outside") {
+        val clock = FixedClock()
+        val database = testDatabase(clock)
+        val repository = MoodRepository(database, io, clock, FixedTimeZoneProvider())
+
+        repository.upsert(defaultMood.copy(relief = 1, irritability = 5, emotionalIntensity = 1)).isSuccess shouldBe true
+        repository.upsert(defaultMood.copy(relief = 5, irritability = 1, emotionalIntensity = 5)).isSuccess shouldBe true
+        repository.upsert(defaultMood.copy(relief = 0)).errorOrNull() shouldBe
+            DomainError.Invalid("relief", DomainError.Reason.OUT_OF_RANGE)
+        repository.upsert(defaultMood.copy(relief = 6)).errorOrNull() shouldBe
+            DomainError.Invalid("relief", DomainError.Reason.OUT_OF_RANGE)
+        repository.upsert(defaultMood.copy(irritability = 0)).errorOrNull() shouldBe
+            DomainError.Invalid("irritability", DomainError.Reason.OUT_OF_RANGE)
+        repository.upsert(defaultMood.copy(irritability = 6)).errorOrNull() shouldBe
+            DomainError.Invalid("irritability", DomainError.Reason.OUT_OF_RANGE)
+        repository.upsert(defaultMood.copy(emotionalIntensity = 0)).errorOrNull() shouldBe
+            DomainError.Invalid("emotionalIntensity", DomainError.Reason.OUT_OF_RANGE)
+        repository.upsert(defaultMood.copy(emotionalIntensity = 6)).errorOrNull() shouldBe
+            DomainError.Invalid("emotionalIntensity", DomainError.Reason.OUT_OF_RANGE)
+    }
+
     test("sleepHours must be within 0..24") {
         val clock = FixedClock()
         val database = testDatabase(clock)

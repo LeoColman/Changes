@@ -3,6 +3,8 @@
 <resources>
     <string name="sensitive_disclaimer">Changes records what you and whoever supports your care have decided. It does not give medical advice, does not suggest doses and does not replace professional care.</string>
 
+    <string name="privacy_offline_notice">Changes works fully offline. Everything you record stays on this device only: the app has no internet access and does not send, sync or share your data with anyone, in any way. Data only leaves this device if you export a backup yourself.</string>
+
     <string name="expected_title">Changes described in the literature</string>
     <string name="expected_disclaimer">Ranges observed in population studies. Individual variation is large, and being outside a range does not indicate a problem. Talk to whoever supports your care.</string>
     <string name="expected_status_not_yet">Not expected yet</string>
@@ -74,8 +76,17 @@
     <string name="mood_intro">One entry per day. Fill in what makes sense; optional fields can stay empty.</string>
     <string name="mood_mood">Mood</string>
     <string name="mood_energy">Energy</string>
-    <string name="mood_anxiety">Anxiety (optional)</string>
+    <string name="mood_anxiety">Anxiety</string>
     <string name="mood_dysphoria">Dysphoria (optional)</string>
+    <string name="mood_feelings_section">Feelings (optional)</string>
+    <string name="mood_feelings_intro">Feelings that are common early on testosterone. If you want, mark today\'s intensity.</string>
+    <string name="mood_relief">Relief and well-being</string>
+    <string name="mood_relief_description">Less dysphoria and more alignment with your own identity.</string>
+    <string name="mood_irritability">Irritability and impatience</string>
+    <string name="mood_irritability_description">Quicker reactions and less patience than usual.</string>
+    <string name="mood_emotional_intensity">Emotional intensity</string>
+    <string name="mood_emotional_intensity_description">Emotions closer to the surface, or crying more easily.</string>
+    <string name="mood_anxiety_description">Worry about the changes in your body and social life.</string>
     <string name="mood_sleep">Hours of sleep (optional)</string>
     <string name="mood_note">Note (optional)</string>
     <string name="mood_note_private">Only you see this note. The app does not read, classify or analyze what you write.</string>

@@ -470,6 +470,9 @@ internal class StateBuilder(private val r: Random) {
             created_at = created,
             updated_at = updated,
             deleted_at = deleted(),
+            relief = (1L + r.nextInt(5)).takeIf { maybe() },
+            irritability = (1L + r.nextInt(5)).takeIf { maybe() },
+            emotional_intensity = (1L + r.nextInt(5)).takeIf { maybe() },
         )
     }
 

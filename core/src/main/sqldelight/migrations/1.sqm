@@ -1,0 +1,7 @@
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- SPDX-FileCopyrightText: 2026 Leonardo Colman Lopes
+
+-- Schema 1 -> 2 (ADR 0012): três sentimentos opcionais no check-in diário, escalas 1..5.
+ALTER TABLE mood_log ADD COLUMN relief INTEGER CHECK (relief IS NULL OR relief BETWEEN 1 AND 5);
+ALTER TABLE mood_log ADD COLUMN irritability INTEGER CHECK (irritability IS NULL OR irritability BETWEEN 1 AND 5);
+ALTER TABLE mood_log ADD COLUMN emotional_intensity INTEGER CHECK (emotional_intensity IS NULL OR emotional_intensity BETWEEN 1 AND 5);

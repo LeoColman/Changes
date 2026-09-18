@@ -61,14 +61,20 @@ public data class MediaAttachment(
     val capturedAt: RecordedTime?,
     val checksumSha256: String,
     val caption: String?,
-)
+) {
+    /** Gravação de voz (ADR 0013) em vez de foto: nunca é decodificada como imagem. */
+    public val isAudio: Boolean get() = mimeType.lowercase().startsWith("audio/")
+}
 
 /** Regras de nome de arquivo de mídia. Nada de subdiretórios nem `..`: protege contra zip slip no import. */
 public object MediaPaths {
-    private val FINAL =
-        Regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(jpg|jpeg|png|webp|heic|heif)$")
+    /** Formato da gravação de voz (ADR 0013): AAC em MPEG-4. */
+    public const val VOICE_MIME_TYPE: String = "audio/mp4"
 
-    public val EXTENSIONS: Set<String> = setOf("jpg", "jpeg", "png", "webp", "heic", "heif")
+    private val FINAL =
+        Regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(jpg|jpeg|png|webp|heic|heif|m4a)$")
+
+    public val EXTENSIONS: Set<String> = setOf("jpg", "jpeg", "png", "webp", "heic", "heif", "m4a")
 
     public fun isValid(relativePath: String): Boolean = FINAL.matches(relativePath)
 
@@ -79,6 +85,7 @@ public object MediaPaths {
         "image/webp" -> "webp"
         "image/heic" -> "heic"
         "image/heif" -> "heif"
+        VOICE_MIME_TYPE -> "m4a"
         else -> "jpg"
     }
 }

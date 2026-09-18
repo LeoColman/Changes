@@ -73,7 +73,7 @@ class MapperEdgeCasesSpec : FunSpec({
     }
 
     test("corrupted tags are reported with the mood log id") {
-        val row = Mood_log(id, 0L, 3L, 3L, null, null, null, null, "not json", 1L, 1L, null)
+        val row = Mood_log(id, 0L, 3L, 3L, null, null, null, null, "not json", 1L, 1L, null, null, null, null)
         shouldThrow<IllegalStateException> { row.toModel() }.message shouldContain id
     }
 

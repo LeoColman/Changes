@@ -24,17 +24,10 @@ import java.util.Base64
  * Gerar de novo (só ao congelar uma versão): `./gradlew :core:test --tests '*BackupFixtureSpec' -Dchanges.writeFixtures=true`.
  */
 class BackupFixtureSpec : FunSpec({
-    test("the v1 export fixture imports into a clean install with every row and file") {
-        runTest {
-            val entries = fixtureEntries(1)
-            val manifest = entries.manifest()
-            val target = device()
-            val summary = target.import(zipOf(entries), ImportMode.REPLACE)
-            summary.tables.associate { it.table to it.inserted } shouldBe
-                manifest.getValue("counts").jsonObject.mapValues { it.value.jsonPrimitive.int }
-            target.mediaChecksums() shouldBe manifest.getValue("media").jsonArray.associate {
-                it.jsonObject.getValue("path").jsonPrimitive.content to it.jsonObject.getValue("sha256").jsonPrimitive.content
-            }
+    // Cada versão congelada continua provando o import de um backup antigo (a v1 passa pela migração).
+    for (version in 1..CURRENT_SCHEMA_VERSION.toInt()) {
+        test("the v$version export fixture imports into a clean install with every row and file") {
+            importsCompletely(version)
         }
     }
 
@@ -47,6 +40,19 @@ class BackupFixtureSpec : FunSpec({
         }
     }
 })
+
+/** Importa a fixture de [version] num aparelho limpo e confere cada tabela e cada arquivo de mídia. */
+private fun importsCompletely(version: Int) = runTest {
+    val entries = fixtureEntries(version)
+    val manifest = entries.manifest()
+    val target = device()
+    val summary = target.import(zipOf(entries), ImportMode.REPLACE)
+    summary.tables.associate { it.table to it.inserted } shouldBe
+        manifest.getValue("counts").jsonObject.mapValues { it.value.jsonPrimitive.int }
+    target.mediaChecksums() shouldBe manifest.getValue("media").jsonArray.associate {
+        it.jsonObject.getValue("path").jsonPrimitive.content to it.jsonObject.getValue("sha256").jsonPrimitive.content
+    }
+}
 
 private val pretty = Json { prettyPrint = true }
 
