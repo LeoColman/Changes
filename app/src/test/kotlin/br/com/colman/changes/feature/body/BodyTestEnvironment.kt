@@ -39,6 +39,14 @@ class BodyTestEnvironment(
     val mediaRepository = MediaRepository(database, io, clock, timeZones, FileMediaStorage(mediaDir))
     val profileRepository = ProfileRepository(database, io, clock)
     val bodyLabels = BodyLabels(profileRepository, testLabels)
+    val voiceRecorder = FakeVoiceRecorder()
+    val voicePlayer = FakeVoicePlayer()
+
+    /** Repositórios agrupados, prontos para `BodyEntryEditViewModel` (ver `BodyVoiceControls` a seguir). */
+    val repositories = BodyEntryEditRepositories(bodyChangeRepository, mediaRepository, bodyLabels)
+
+    /** Controles de voz com os fakes acima; um teste que precise de um microfone indisponível monta o seu. */
+    val voiceControls = BodyVoiceControls(voiceRecorder, voicePlayer, clock)
 
     suspend fun typeByCode(code: String): BodyChangeType =
         bodyChangeRepository.observeAllTypes().first().first { it.code == code }

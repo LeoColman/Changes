@@ -150,8 +150,9 @@ class BodyHomeViewModel(
         )
     }
 
+    /** Nunca uma gravação de voz (ADR 0013): a miniatura da tela inicial não tenta decodificar áudio. */
     private suspend fun firstPhoto(entryId: Uuid) =
-        mediaRepository.observeByOwner(MediaOwnerType.BODY_CHANGE_ENTRY, entryId).first().firstOrNull()
+        mediaRepository.observeByOwner(MediaOwnerType.BODY_CHANGE_ENTRY, entryId).first().firstOrNull { !it.isAudio }
 
     private companion object {
         const val STOP_TIMEOUT_MILLIS = 5_000L

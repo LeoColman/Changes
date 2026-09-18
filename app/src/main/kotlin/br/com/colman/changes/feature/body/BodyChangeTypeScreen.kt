@@ -30,7 +30,12 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.ImageBitmap
@@ -125,9 +130,12 @@ private fun BodyChangeTypeContent(
         )
         else -> LazyColumn(modifier) {
             item { ComparisonSection(state.comparison, onEvent, loadThumbnail) }
+            if (state.isVoiceCategory) {
+                item { VoiceCompareSection(state.entries, state.playingEntryId, onEvent) }
+            }
             item { SectionHeader(stringResource(R.string.body_type_timeline_title)) }
             items(state.entries, key = { it.entryId }) { entry ->
-                EntryRow(entry, state.measurementUnit, loadThumbnail, onEvent) {
+                EntryRow(entry, state.measurementUnit, state.playingEntryId, loadThumbnail, onEvent) {
                     onNavigate(BodyChangeTypeNavigation.EditEntry(entry.entryId))
                 }
             }
@@ -155,6 +163,7 @@ private fun TypeActions(state: BodyChangeTypeUiState, onEvent: (BodyChangeTypeUi
 private fun EntryRow(
     entry: BodyEntrySummary,
     unit: BodyMeasurementUnit?,
+    playingEntryId: String?,
     loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
     onEvent: (BodyChangeTypeUiEvent) -> Unit,
     onClick: () -> Unit,
@@ -175,6 +184,9 @@ private fun EntryRow(
             ) { loadThumbnail(photo) }
         }
         EntryRowText(entry, unit, Modifier.weight(1f))
+        if (entry.voice != null) {
+            EntryVoiceButton(entry, playingEntryId == entry.entryId, onEvent)
+        }
         IconButton(onClick = { onEvent(BodyChangeTypeUiEvent.DeleteEntry(entry.entryId)) }) {
             Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete))
         }
@@ -246,6 +258,10 @@ private fun ComparisonPickers(
     }
 }
 
+/**
+ * Slider de comparação com um único olho para as duas fotos (ADR 0013): a revelação vale para o par
+ * escolhido, e reseta se a pessoa trocar uma das duas entradas comparadas.
+ */
 @Composable
 private fun ComparisonSlider(
     left: BodyEntrySummary,
@@ -254,13 +270,23 @@ private fun ComparisonSlider(
     loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
     onPositionChange: (Float) -> Unit,
 ) {
+    var revealed by rememberSaveable(left.entryId, right.entryId) { mutableStateOf(false) }
     val description = stringResource(
         R.string.body_type_comparison_slider_description,
         Formatters.recorded(left.observedAt),
         Formatters.recorded(right.observedAt),
     )
     Column {
-        ComparisonPhotos(left, right, position, description, loadThumbnail)
+        Box {
+            ComparisonPhotos(left, right, position, revealed, description, loadThumbnail)
+            RevealButton(
+                revealed = revealed,
+                showLabel = stringResource(R.string.body_photos_show),
+                hideLabel = stringResource(R.string.body_photo_hide),
+                onToggle = { revealed = !revealed },
+                modifier = Modifier.align(Alignment.TopEnd),
+            )
+        }
         Slider(
             value = position,
             onValueChange = onPositionChange,
@@ -274,6 +300,7 @@ private fun ComparisonPhotos(
     left: BodyEntrySummary,
     right: BodyEntrySummary,
     position: Float,
+    revealed: Boolean,
     description: String,
     loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
 ) {
@@ -285,13 +312,15 @@ private fun ComparisonPhotos(
     ) {
         val leftPhoto = requireNotNull(left.photo)
         val rightPhoto = requireNotNull(right.photo)
-        BodyThumbnailImage(
+        CensoredImage(
             key = leftPhoto.id to leftPhoto.checksumSha256,
+            revealed = revealed,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
         ) { loadThumbnail(leftPhoto) }
-        BodyThumbnailImage(
+        CensoredImage(
             key = rightPhoto.id to rightPhoto.checksumSha256,
+            revealed = revealed,
             contentDescription = null,
             modifier = Modifier.fillMaxSize().drawWithContent {
                 clipRect(left = 0f, top = 0f, right = size.width * position, bottom = size.height) {

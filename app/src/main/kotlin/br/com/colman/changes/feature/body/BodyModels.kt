@@ -24,7 +24,10 @@ data class BodyTypeSummary(
 @Immutable
 data class BodyCategorySection(val category: BodyChangeCategory, val types: List<BodyTypeSummary>)
 
-/** Resumo de uma entrada na linha do tempo de um tipo. */
+/**
+ * Resumo de uma entrada na linha do tempo de um tipo. [photo] e [voice] nunca se confundem: o
+ * primeiro filtra `!isAudio`, o segundo filtra `isAudio` (ADR 0013).
+ */
 @Immutable
 data class BodyEntrySummary(
     val entryId: String,
@@ -34,4 +37,5 @@ data class BodyEntrySummary(
     val measurementUnit: BodyMeasurementUnit?,
     val notes: String?,
     val photo: MediaAttachment?,
+    val voice: MediaAttachment?,
 )

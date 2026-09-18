@@ -86,4 +86,22 @@
     <string name="body_error_builtin_immutable">Tipos do catálogo não podem ser alterados dessa forma.</string>
     <string name="body_error_not_found">Não foi possível encontrar o registro.</string>
     <string name="body_error_unknown">Não foi possível salvar. Tente novamente.</string>
+
+    <string name="body_photo_censored">Foto censurada</string>
+    <string name="body_photo_show">Mostrar foto</string>
+    <string name="body_photo_hide">Esconder foto</string>
+    <string name="body_photos_show">Mostrar as fotos</string>
+
+    <string name="body_voice_section">Gravação de voz</string>
+    <string name="body_voice_instructions">Leia em voz alta, no seu tom de fala de sempre. Gravar sempre a mesma frase, no mesmo lugar e à mesma distância do celular, ajuda a comparar.</string>
+    <string name="body_voice_phrase">Hoje o céu está limpo e o vento sopra devagar. Um, dois, três, quatro, cinco.</string>
+    <string name="body_voice_record">Gravar</string>
+    <string name="body_voice_stop">Parar</string>
+    <string name="body_voice_play">Ouvir</string>
+    <string name="body_voice_delete">Apagar gravação</string>
+    <string name="body_voice_recording">Gravando: %1$d s</string>
+    <string name="body_voice_permission_denied">Para gravar, o Changes precisa do microfone. A gravação fica só neste aparelho.</string>
+    <string name="body_voice_play_first">Ouvir a primeira</string>
+    <string name="body_voice_play_latest">Ouvir a mais recente</string>
+    <string name="body_voice_play_entry">Ouvir a gravação de %1$s</string>
 </resources>
