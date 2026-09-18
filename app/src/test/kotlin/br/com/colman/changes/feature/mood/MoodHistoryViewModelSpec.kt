@@ -13,6 +13,7 @@ import br.com.colman.changes.core.testing.TestZones
 import br.com.colman.changes.core.testing.testDatabase
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.datetime.DateTimeUnit
@@ -124,6 +125,34 @@ class MoodHistoryViewModelSpec : FunSpec({
         fixture.viewModel.state.test {
             val state = awaitItem()
             state.entries shouldHaveSize 2
+        }
+    }
+
+    test("histórico expõe os sentimentos preenchidos de cada registro (ADR 0012)") {
+        val fixture = MoodHistoryFixture()
+        fixture.moods.upsert(
+            MoodLog(
+                id = Uuid.random(),
+                date = fixture.today,
+                mood = 3,
+                energy = 3,
+                anxiety = 2,
+                dysphoria = null,
+                sleepHours = null,
+                note = null,
+                tags = emptyList(),
+                relief = 4,
+                irritability = null,
+                emotionalIntensity = 5,
+            ),
+        )
+
+        fixture.viewModel.state.test {
+            val entry = awaitItem().entries.single()
+            entry.relief shouldBe 4
+            entry.irritability.shouldBeNull()
+            entry.emotionalIntensity shouldBe 5
+            entry.anxiety shouldBe 2
         }
     }
 

@@ -35,9 +35,21 @@ data class MoodHistoryUiState(
 @Immutable
 data class MoodHeatmapDayUiState(val date: LocalDate, val mood: Int?)
 
-/** Uma linha da lista de registros. */
+/**
+ * Uma linha da lista de registros. Os sentimentos (ADR 0012) só aparecem quando preenchidos: `null`
+ * é "não respondido", nunca um valor a ser comparado ou ordenado (critério 7.7.2).
+ */
 @Immutable
-data class MoodEntryUiState(val id: Uuid, val date: LocalDate, val mood: Int, val energy: Int)
+data class MoodEntryUiState(
+    val id: Uuid,
+    val date: LocalDate,
+    val mood: Int,
+    val energy: Int,
+    val relief: Int? = null,
+    val irritability: Int? = null,
+    val emotionalIntensity: Int? = null,
+    val anxiety: Int? = null,
+)
 
 /** Navegação entre meses do calendário de calor (Seção 7.7). */
 sealed interface MoodHistoryUiEvent {

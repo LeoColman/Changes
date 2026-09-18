@@ -49,8 +49,7 @@ class MoodCheckInViewModel(
             is MoodCheckInUiEvent.Load -> load(event.epochDay)
             is MoodCheckInUiEvent.MoodChanged -> _state.update { it.copy(mood = event.value, moodError = false) }
             is MoodCheckInUiEvent.EnergyChanged -> _state.update { it.copy(energy = event.value, energyError = false) }
-            is MoodCheckInUiEvent.AnxietyChanged -> _state.update { it.copy(anxiety = event.value) }
-            is MoodCheckInUiEvent.DysphoriaChanged -> _state.update { it.copy(dysphoria = event.value) }
+            is MoodCheckInUiEvent.FeelingChanged -> updateFeeling(event)
             is MoodCheckInUiEvent.SleepHoursChanged -> updateSleepHours(event.text)
             is MoodCheckInUiEvent.NoteChanged -> _state.update { it.copy(note = event.text) }
             is MoodCheckInUiEvent.TagsChanged -> _state.update { it.copy(tagsText = event.text) }
@@ -60,6 +59,18 @@ class MoodCheckInViewModel(
 
     private fun updateSleepHours(text: String) {
         _state.update { it.copy(sleepHoursText = text, sleepHoursError = false) }
+    }
+
+    private fun updateFeeling(event: MoodCheckInUiEvent.FeelingChanged) {
+        _state.update {
+            when (event) {
+                is MoodCheckInUiEvent.ReliefChanged -> it.copy(relief = event.value)
+                is MoodCheckInUiEvent.IrritabilityChanged -> it.copy(irritability = event.value)
+                is MoodCheckInUiEvent.EmotionalIntensityChanged -> it.copy(emotionalIntensity = event.value)
+                is MoodCheckInUiEvent.AnxietyChanged -> it.copy(anxiety = event.value)
+                is MoodCheckInUiEvent.DysphoriaChanged -> it.copy(dysphoria = event.value)
+            }
+        }
     }
 
     private fun load(epochDay: Long?) = viewModelScope.launch {
@@ -76,6 +87,9 @@ class MoodCheckInViewModel(
         date = date,
         mood = this?.mood,
         energy = this?.energy,
+        relief = this?.relief,
+        irritability = this?.irritability,
+        emotionalIntensity = this?.emotionalIntensity,
         anxiety = this?.anxiety,
         dysphoria = this?.dysphoria,
         sleepHoursText = this?.sleepHours?.let { Formatters.number(it) }.orEmpty(),
@@ -105,6 +119,9 @@ class MoodCheckInViewModel(
                 date = current.date,
                 mood = mood,
                 energy = energy,
+                relief = current.relief,
+                irritability = current.irritability,
+                emotionalIntensity = current.emotionalIntensity,
                 anxiety = current.anxiety,
                 dysphoria = current.dysphoria,
                 sleepHours = sleepHours,

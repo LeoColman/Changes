@@ -38,6 +38,7 @@ import br.com.colman.changes.ui.components.ChangesScreen
 import br.com.colman.changes.ui.components.FormColumn
 import br.com.colman.changes.ui.components.LoadingState
 import br.com.colman.changes.ui.components.NumberField
+import br.com.colman.changes.ui.components.SectionHeader
 
 private const val SCALE_OPTIONS = 5
 private val SCALE_TARGET_SIZE = 48.dp
@@ -76,7 +77,15 @@ private fun MoodCheckInForm(state: MoodCheckInUiState, onEvent: (MoodCheckInUiEv
     FormColumn {
         Text(stringResource(R.string.mood_intro))
         MoodRequiredScales(state, onEvent)
-        MoodOptionalScales(state, onEvent)
+        HorizontalDivider()
+        MoodFeelingsSection(state, onEvent)
+        HorizontalDivider()
+        MoodScaleField(
+            label = MoodScaleLabel(stringResource(R.string.mood_dysphoria)),
+            value = state.dysphoria,
+            onSelect = { onEvent(MoodCheckInUiEvent.DysphoriaChanged(it)) },
+            allowClear = true,
+        )
         NumberField(
             value = state.sleepHoursText,
             onValueChange = { onEvent(MoodCheckInUiEvent.SleepHoursChanged(it)) },
@@ -101,14 +110,14 @@ private fun MoodCheckInForm(state: MoodCheckInUiState, onEvent: (MoodCheckInUiEv
 @Composable
 private fun MoodRequiredScales(state: MoodCheckInUiState, onEvent: (MoodCheckInUiEvent) -> Unit) {
     MoodScaleField(
-        label = stringResource(R.string.mood_mood),
+        label = MoodScaleLabel(stringResource(R.string.mood_mood)),
         value = state.mood,
         onSelect = { onEvent(MoodCheckInUiEvent.MoodChanged(it)) },
         allowClear = false,
         isError = state.moodError,
     )
     MoodScaleField(
-        label = stringResource(R.string.mood_energy),
+        label = MoodScaleLabel(stringResource(R.string.mood_energy)),
         value = state.energy,
         onSelect = { onEvent(MoodCheckInUiEvent.EnergyChanged(it)) },
         allowClear = false,
@@ -116,18 +125,39 @@ private fun MoodRequiredScales(state: MoodCheckInUiState, onEvent: (MoodCheckInU
     )
 }
 
+/**
+ * Sentimentos comuns no início da testosterona (ADR 0012): quatro escalas opcionais, cada uma com o
+ * rótulo e a descrição de `strings_sensitive.xml` logo abaixo. Nenhum valor aqui é combinado, comparado
+ * ou usado para tirar conclusão (critério 7.7.2).
+ */
 @Composable
-private fun MoodOptionalScales(state: MoodCheckInUiState, onEvent: (MoodCheckInUiEvent) -> Unit) {
-    MoodScaleField(
-        label = stringResource(R.string.mood_anxiety),
-        value = state.anxiety,
-        onSelect = { onEvent(MoodCheckInUiEvent.AnxietyChanged(it)) },
-        allowClear = true,
+private fun MoodFeelingsSection(state: MoodCheckInUiState, onEvent: (MoodCheckInUiEvent) -> Unit) {
+    SectionHeader(stringResource(R.string.mood_feelings_section))
+    Text(stringResource(R.string.mood_feelings_intro))
+    FeelingScale(R.string.mood_relief, R.string.mood_relief_description, state.relief) {
+        onEvent(MoodCheckInUiEvent.ReliefChanged(it))
+    }
+    FeelingScale(R.string.mood_irritability, R.string.mood_irritability_description, state.irritability) {
+        onEvent(MoodCheckInUiEvent.IrritabilityChanged(it))
+    }
+    FeelingScale(
+        labelRes = R.string.mood_emotional_intensity,
+        descriptionRes = R.string.mood_emotional_intensity_description,
+        value = state.emotionalIntensity,
+        onSelect = { onEvent(MoodCheckInUiEvent.EmotionalIntensityChanged(it)) },
     )
+    FeelingScale(R.string.mood_anxiety, R.string.mood_anxiety_description, state.anxiety) {
+        onEvent(MoodCheckInUiEvent.AnxietyChanged(it))
+    }
+}
+
+/** Uma escala da seção de sentimentos (Seção 7.7): sempre opcional, com rótulo e descrição. */
+@Composable
+private fun FeelingScale(labelRes: Int, descriptionRes: Int, value: Int?, onSelect: (Int?) -> Unit) {
     MoodScaleField(
-        label = stringResource(R.string.mood_dysphoria),
-        value = state.dysphoria,
-        onSelect = { onEvent(MoodCheckInUiEvent.DysphoriaChanged(it)) },
+        label = MoodScaleLabel(text = stringResource(labelRes), description = stringResource(descriptionRes)),
+        value = value,
+        onSelect = onSelect,
         allowClear = true,
     )
 }
@@ -146,19 +176,48 @@ private fun MoodNoteField(note: String, onEvent: (MoodCheckInUiEvent) -> Unit) {
 }
 
 /**
+ * Rótulo de uma escala e sua descrição opcional (Seção 7.7), agrupados para não passar do limite de
+ * parâmetros de [MoodScaleField]. A descrição descreve, não interpreta (ADR 0012).
+ */
+private data class MoodScaleLabel(val text: String, val description: String? = null)
+
+/**
  * Escala de 1 a 5 (Seção 7.7): cada opção é um alvo de toque >= 48dp com rótulo lido pelo TalkBack
  * (`mood_scale_1..5`). Campos opcionais ([allowClear] = true) voltam a ficar em branco ao tocar de
- * novo na opção já selecionada.
+ * novo na opção já selecionada. [label] pode trazer uma descrição curta, mostrada logo abaixo do rótulo.
  */
 @Composable
 private fun MoodScaleField(
-    label: String,
+    label: MoodScaleLabel,
     value: Int?,
     onSelect: (Int?) -> Unit,
     allowClear: Boolean,
     modifier: Modifier = Modifier,
     isError: Boolean = false,
 ) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(label.text, style = MaterialTheme.typography.bodyLarge)
+        if (label.description != null) {
+            Text(
+                label.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        MoodScaleOptionsRow(value = value, allowClear = allowClear, onSelect = onSelect)
+        if (isError) {
+            Text(
+                stringResource(R.string.mood_scale_required_error),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+    }
+}
+
+/** Linha com as cinco opções da escala (Seção 7.7), cada uma um alvo de toque >= 48dp. */
+@Composable
+private fun MoodScaleOptionsRow(value: Int?, allowClear: Boolean, onSelect: (Int?) -> Unit) {
     val optionLabels = listOf(
         stringResource(R.string.mood_scale_1),
         stringResource(R.string.mood_scale_2),
@@ -166,27 +225,17 @@ private fun MoodScaleField(
         stringResource(R.string.mood_scale_4),
         stringResource(R.string.mood_scale_5),
     )
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(label, style = MaterialTheme.typography.bodyLarge)
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth().selectableGroup(),
-        ) {
-            for (index in 0 until SCALE_OPTIONS) {
-                val scaleValue = index + 1
-                MoodScaleOption(
-                    scaleValue = scaleValue,
-                    label = optionLabels[index],
-                    selected = value == scaleValue,
-                    onClick = { onSelect(if (allowClear && value == scaleValue) null else scaleValue) },
-                )
-            }
-        }
-        if (isError) {
-            Text(
-                stringResource(R.string.mood_scale_required_error),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().selectableGroup(),
+    ) {
+        for (index in 0 until SCALE_OPTIONS) {
+            val scaleValue = index + 1
+            MoodScaleOption(
+                scaleValue = scaleValue,
+                label = optionLabels[index],
+                selected = value == scaleValue,
+                onClick = { onSelect(if (allowClear && value == scaleValue) null else scaleValue) },
             )
         }
     }

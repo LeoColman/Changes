@@ -10,4 +10,5 @@
     <string name="mood_scale_required_error">Escolha um valor de 1 a 5</string>
     <string name="mood_sleep_hours_error">Digite um número entre 0 e 24</string>
     <string name="mood_entry_summary">%1$s: humor %2$s, energia %3$s</string>
+    <string name="mood_feeling_value">%1$s: %2$s</string>
 </resources>

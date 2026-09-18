@@ -87,11 +87,65 @@ class MoodCheckInViewModelSpec : FunSpec({
         }
 
         val saved = fixture.moods.observe(fixture.today).first().shouldNotBeNull()
+        saved.relief.shouldBeNull()
+        saved.irritability.shouldBeNull()
+        saved.emotionalIntensity.shouldBeNull()
         saved.anxiety.shouldBeNull()
         saved.dysphoria.shouldBeNull()
         saved.sleepHours.shouldBeNull()
         saved.note.shouldBeNull()
         saved.tags.shouldHaveSize(0)
+    }
+
+    test("salvar grava os sentimentos (ADR 0012): alívio, irritabilidade, intensidade emocional e ansiedade") {
+        val fixture = MoodCheckInFixture()
+        fixture.viewModel.effects.test {
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.Load(null))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.MoodChanged(3))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.EnergyChanged(3))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.ReliefChanged(4))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.IrritabilityChanged(2))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.EmotionalIntensityChanged(5))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.AnxietyChanged(1))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.Save)
+            awaitItem() shouldBe MoodCheckInEffect.Saved
+        }
+
+        val saved = fixture.moods.observe(fixture.today).first().shouldNotBeNull()
+        saved.relief shouldBe 4
+        saved.irritability shouldBe 2
+        saved.emotionalIntensity shouldBe 5
+        saved.anxiety shouldBe 1
+    }
+
+    test("limpar uma escala de sentimento já preenchida grava vazio") {
+        val fixture = MoodCheckInFixture()
+        fixture.viewModel.effects.test {
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.Load(null))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.MoodChanged(3))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.EnergyChanged(3))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.ReliefChanged(4))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.Save)
+            awaitItem() shouldBe MoodCheckInEffect.Saved
+
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.ReliefChanged(null))
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.Save)
+            awaitItem() shouldBe MoodCheckInEffect.Saved
+        }
+
+        val saved = fixture.moods.observe(fixture.today).first().shouldNotBeNull()
+        saved.relief.shouldBeNull()
+    }
+
+    test("um sentimento fora de 1..5 nunca sai da tela: o registro não é gravado") {
+        val fixture = MoodCheckInFixture()
+        fixture.viewModel.onEvent(MoodCheckInUiEvent.Load(null))
+        fixture.viewModel.onEvent(MoodCheckInUiEvent.MoodChanged(3))
+        fixture.viewModel.onEvent(MoodCheckInUiEvent.EnergyChanged(3))
+        fixture.viewModel.onEvent(MoodCheckInUiEvent.IrritabilityChanged(6))
+        fixture.viewModel.onEvent(MoodCheckInUiEvent.Save)
+
+        fixture.moods.observe(fixture.today).first().shouldBeNull()
     }
 
     test("etiquetas digitadas com espaço e repetidas saem normalizadas") {
@@ -134,6 +188,9 @@ class MoodCheckInViewModelSpec : FunSpec({
                 sleepHours = 7.5,
                 note = "registro anterior",
                 tags = listOf("trabalho"),
+                relief = 5,
+                irritability = 2,
+                emotionalIntensity = 4,
             ),
         )
 
@@ -142,6 +199,9 @@ class MoodCheckInViewModelSpec : FunSpec({
         val state = fixture.viewModel.state.value
         state.mood shouldBe 4
         state.energy shouldBe 2
+        state.relief shouldBe 5
+        state.irritability shouldBe 2
+        state.emotionalIntensity shouldBe 4
         state.anxiety shouldBe 3
         state.dysphoria.shouldBeNull()
         state.note shouldBe "registro anterior"
