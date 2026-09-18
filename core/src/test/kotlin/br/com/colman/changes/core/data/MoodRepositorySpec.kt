@@ -102,6 +102,12 @@ class MoodRepositorySpec : FunSpec({
         overwritten.relief shouldBe 1L
         overwritten.irritability.shouldBeNull()
         overwritten.emotional_intensity shouldBe 3L
+
+        repository.upsert(feelings.copy(anxiety = 2, dysphoria = 4, irritability = 4)).isSuccess shouldBe true
+        val again = database.moodQueries.selectById(created.id.toString()).executeAsOne()
+        again.anxiety shouldBe 2L
+        again.dysphoria shouldBe 4L
+        again.irritability shouldBe 4L
     }
 
     test("each check-in feeling accepts 1 to 5 and rejects anything outside") {
