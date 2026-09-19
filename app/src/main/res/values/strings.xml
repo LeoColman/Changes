@@ -16,6 +16,10 @@
     <string name="action_edit">Editar</string>
     <string name="action_add">Adicionar</string>
     <string name="action_ok">OK</string>
+    <string name="action_discard">Descartar</string>
+    <string name="action_keep_editing">Continuar editando</string>
+    <string name="unsaved_changes_title">Descartar alterações?</string>
+    <string name="unsaved_changes_body">Você mudou algo neste formulário e ainda não salvou. Sair agora descarta essas mudanças.</string>
     <string name="field_pick_date">Escolher data</string>
     <string name="field_pick_time">Escolher hora</string>
     <string name="confirm_type_label">Digite %1$s para confirmar</string>
