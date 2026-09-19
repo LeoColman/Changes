@@ -220,3 +220,110 @@ androidComponents {
         tasks.named("check") { dependsOn(verify) }
     }
 }
+
+// ---------------------------------------------------------------------------------------------
+// Teste de mutação da lógica do :app que roda na JVM, sem Android (ADR 0005). O plugin do Pitest
+// espera o source set `test` do plugin `java`, que o AGP não expõe, então a rodada chama a linha de
+// comando do Pitest com o classpath do `testDebugUnitTest`. Só as classes da lista entram: o resto
+// do módulo é Compose e plataforma, que a JVM não executa.
+// ---------------------------------------------------------------------------------------------
+
+val pitestCli: Configuration by configurations.creating
+
+dependencies {
+    pitestCli(libs.pitest.command.line)
+    pitestCli(libs.kotest.extensions.pitest)
+}
+
+/** Piso do score de mutação do :app (ADR 0005). */
+val appPitestFloor = 60
+
+/** Rodada rápida durante o desenvolvimento: `-Ppitest.classes=br.com.colman.changes.ui.format.*`. */
+val pitestClassesOverride: String? = providers.gradleProperty("pitest.classes").orNull
+
+/** Classes do :app que não tocam em Android e têm spec de JVM. */
+val pitestTargetClasses = listOf(
+    "br.com.colman.changes.ui.format.*",
+    "br.com.colman.changes.platform.reminders.PlannedUpcomingReminders*",
+    "br.com.colman.changes.platform.reminders.SettingsUpcomingReminders*",
+    "br.com.colman.changes.platform.reminders.ReminderResyncer*",
+    "br.com.colman.changes.platform.reminders.ReminderSync*",
+    "br.com.colman.changes.feature.medication.RegimenScheduleFormKt",
+    "br.com.colman.changes.feature.medication.MedicationDisplayNames",
+    "br.com.colman.changes.feature.settings.HeightInputKt",
+    "br.com.colman.changes.feature.settings.VocabularyStateBuilderKt",
+    "br.com.colman.changes.feature.body.PhotoBlurKt",
+    "br.com.colman.changes.feature.body.BodyLabels",
+    "br.com.colman.changes.feature.trash.TrashCategoryKt",
+)
+
+val appPitest by tasks.registering(JavaExec::class) {
+    group = "verification"
+    description = "Mutation testing for the JVM-only logic of :app (ADR 0005)."
+    val unitTest = tasks.named<Test>("testDebugUnitTest")
+    dependsOn(unitTest)
+    val reportDir = layout.buildDirectory.dir("reports/pitest")
+    outputs.dir(reportDir)
+    classpath(pitestCli)
+    mainClass.set("org.pitest.mutationtest.commandline.MutationCoverageReport")
+    argumentProviders.add(
+        CommandLineArgumentProvider {
+            val test = unitTest.get()
+            val classpathFiles = test.classpath.files + pitestCli.files
+            // O AGP entrega as classes do app num jar; é ele que o Pitest pode mutar.
+            val mutableCode = test.classpath.files.filter { it.name == "classes.jar" }
+            listOf(
+                "--classPath", classpathFiles.joinToString(",") { it.path },
+                "--mutableCodePaths", mutableCode.joinToString(",") { it.path },
+                "--sourceDirs", file("src/main/kotlin").path,
+                "--targetClasses", (pitestClassesOverride ?: pitestTargetClasses.joinToString(",")),
+                "--targetTests", "br.com.colman.changes.*",
+                "--reportDir", reportDir.get().asFile.path,
+                "--outputFormats", "XML,HTML",
+                "--timestampedReports", "false",
+                "--threads", Runtime.getRuntime().availableProcessors().toString(),
+                "--excludedMethods", "equals,hashCode,toString,copy,copy\$default,component*,<clinit>",
+                "--jvmArgs",
+                listOf(
+                    "-Dkotest.framework.config.fqn=br.com.colman.changes.core.KotestProjectConfig",
+                    "-Dchanges.pitest=true",
+                ).joinToString(","),
+            )
+        },
+    )
+}
+
+
+/**
+ * Gate do :app (ADR 0005): o score do módulo não desce do piso. Numa rodada com `-Ppitest.classes`
+ * o gate não roda: o recorte não representa o módulo.
+ */
+val appPitestGate by tasks.registering {
+    group = "verification"
+    description = "Verifies the :app mutation score against the floor in ADR 0005."
+    val mutationsFile = layout.buildDirectory.file("reports/pitest/mutations.xml")
+    val scoped = pitestClassesOverride != null
+    onlyIf { !scoped && mutationsFile.get().asFile.exists() }
+    doLast {
+        val nodes = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+            .parse(mutationsFile.get().asFile)
+            .getElementsByTagName("mutation")
+        val total = nodes.length
+        val detected = (0 until total).count { (nodes.item(it) as Element).getAttribute("detected") == "true" }
+        val score = if (total == 0) 100.0 else detected * 100.0 / total
+        val table = listOf(
+            "| Module | Mutants | Detected | Score | Floor |",
+            "|---|---:|---:|---:|---:|",
+            "| :app (JVM-only) | $total | $detected | ${"%.1f".format(score)}% | $appPitestFloor% |",
+        )
+        layout.buildDirectory.file("reports/pitest/module-score.md").get().asFile
+            .apply { parentFile.mkdirs() }
+            .writeText(table.joinToString("\n") + "\n")
+        logger.lifecycle(table.joinToString("\n"))
+        if (score < appPitestFloor) {
+            throw GradleException(":app mutation score ${"%.1f".format(score)}% < $appPitestFloor%")
+        }
+    }
+}
+
+appPitest { finalizedBy(appPitestGate) }

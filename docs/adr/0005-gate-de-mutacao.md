@@ -40,8 +40,22 @@ e pisos por pacote verificados por script.
   tanto do Pitest quanto do Kover. O que sobra em `core.db` é código escrito à mão.
 - Property tests rodam com 50 iterações dentro do Pitest (`-Dkotest.proptest.default.iteration.count`)
   e `-Dchanges.pitest=true` permite reduzir iterações explícitas pesadas. No `check` e no CI valem
-  as iterações completas.
+  as iterações completas. As chamadas com número fixo passam por `propertyIterations(n)` (testFixtures),
+  que devolve no máximo 40 numa rodada de mutação; o round-trip de backup já caía para 20.
+- **`:app` também tem rodada de mutação**, só na lógica que roda na JVM: formatação, mapeamento de
+  agenda do regime, altura, vocabulário, rótulos do corpo, categorias da lixeira, borrão da foto e os
+  planejadores de lembrete. O plugin do Pitest depende do source set `test` do plugin `java`, que o AGP
+  não expõe, então `:app:appPitest` chama a linha de comando do Pitest com o classpath do
+  `testDebugUnitTest` e muta o jar de classes do app. Compose, Activity, Route e tudo que precisa de
+  aparelho ficam de fora: não é código que a JVM executa.
+- Piso do `:app`: 60% no módulo, verificado por `:app:appPitestGate`. É o nível medido quando a rodada
+  entrou; subir o piso é o trabalho seguinte, não um ajuste de configuração.
+- **Recorte para desenvolver.** `-Ppitest.classes=<globs>` troca o alvo dos dois módulos
+  (ex.: `./gradlew :core:pitest -Ppitest.classes=br.com.colman.changes.core.model.*`, segundos em vez de
+  minutos). Numa rodada recortada os gates não rodam: o recorte não representa o módulo.
 
 ## Consequências
 
-`./gradlew :core:pitest` (ou `pitestAll`) é o gate. Baixar piso ou suprimir mutante exige ADR.
+`./gradlew pitestAll` roda os dois gates (`:core:pitest` e `:app:appPitest`). A rodada inteira do
+`:core` leva cerca de 5 minutos em 24 núcleos (2900 mutantes, cada um reexecutando as specs que o
+cobrem) e a do `:app`, cerca de 20 segundos. Baixar piso ou suprimir mutante exige ADR.

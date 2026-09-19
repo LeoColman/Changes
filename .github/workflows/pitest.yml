@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'core/**'
+      - 'app/**'
       - 'gradle/libs.versions.toml'
   schedule:
     - cron: '0 3 * * *'
@@ -22,13 +23,18 @@ jobs:
             17
             21
       - uses: gradle/actions/setup-gradle@v4
-      - name: Pitest with per-package gate
-        run: ./gradlew :core:pitest
-      - name: Publish per-package scores
+      - name: Pitest with per-package gates (:core and the JVM-only logic of :app)
+        run: ./gradlew pitestAll
+      - name: Publish the scores
         if: always()
-        run: cat core/build/reports/pitest/package-scores.md >> "$GITHUB_STEP_SUMMARY" || true
+        run: |
+          cat core/build/reports/pitest/package-scores.md >> "$GITHUB_STEP_SUMMARY" || true
+          echo >> "$GITHUB_STEP_SUMMARY"
+          cat app/build/reports/pitest/module-score.md >> "$GITHUB_STEP_SUMMARY" || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: pitest-report
-          path: core/build/reports/pitest/
+          path: |
+            core/build/reports/pitest/
+            app/build/reports/pitest/

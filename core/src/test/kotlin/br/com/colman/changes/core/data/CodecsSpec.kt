@@ -11,6 +11,7 @@ import br.com.colman.changes.core.model.ScheduleType
 import br.com.colman.changes.core.model.VocabularyChoice
 import br.com.colman.changes.core.model.getOrNull
 import br.com.colman.changes.core.model.isSuccess
+import br.com.colman.changes.core.testing.propertyIterations
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -102,7 +103,7 @@ class CodecsSpec : FunSpec({
 
     context("tags") {
         test("round-trips arbitrary strings, including empty and unicode ones") {
-            checkAll(500, Arb.list(Arb.string(0..20), 0..6)) { tags ->
+            checkAll(propertyIterations(500), Arb.list(Arb.string(0..20), 0..6)) { tags ->
                 Codecs.decodeTags(Codecs.encodeTags(tags)).getOrNull() shouldBe tags
             }
             Codecs.encodeTags(emptyList()) shouldBe "[]"

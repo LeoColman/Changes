@@ -4,6 +4,7 @@
 package br.com.colman.changes.core.model
 
 import br.com.colman.changes.core.testing.FixedClock
+import br.com.colman.changes.core.testing.propertyIterations
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.doubles.shouldBeLessThan
@@ -26,7 +27,7 @@ class BmiSpec : FunSpec({
     }
 
     test("BMI is strictly increasing in weight for a fixed height") {
-        checkAll(1000, weights, weights, heights) { a, b, height ->
+        checkAll(propertyIterations(1000), weights, weights, heights) { a, b, height ->
             if (a != b) {
                 val (low, high) = if (a < b) a to b else b to a
                 val bmiLow = Bmi.calculate(low, height).getOrNull().shouldNotBeNull()
@@ -37,7 +38,7 @@ class BmiSpec : FunSpec({
     }
 
     test("zero or negative height is a failure, never an exception") {
-        checkAll(1000, weights, Arb.double(max = 0.0)) { weight, height ->
+        checkAll(propertyIterations(1000), weights, Arb.double(max = 0.0)) { weight, height ->
             val error = Bmi.calculate(weight, height).errorOrNull()
             if (height.isFinite()) {
                 error shouldBe DomainError.Invalid("heightCm", DomainError.Reason.NOT_POSITIVE)

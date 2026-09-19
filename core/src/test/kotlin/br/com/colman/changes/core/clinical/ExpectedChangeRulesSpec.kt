@@ -7,6 +7,7 @@ import br.com.colman.changes.core.clinical.ExpectedChangeStatus.NOT_YET_EXPECTED
 import br.com.colman.changes.core.clinical.ExpectedChangeStatus.PAST_ONSET_WINDOW
 import br.com.colman.changes.core.clinical.ExpectedChangeStatus.WITHIN_ONSET_WINDOW
 import br.com.colman.changes.core.model.TreatmentProtocol
+import br.com.colman.changes.core.testing.propertyIterations
 import br.com.colman.changes.core.testing.testDataset
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -81,7 +82,7 @@ class ExpectedChangeRulesSpec : BehaviorSpec({
         val rows = Arb.element(testDataset.expectedChanges)
 
         Then("the computed onset dates agree with the status rule to the day") {
-            checkAll(1000, rows, starts) { row, start ->
+            checkAll(propertyIterations(1000), rows, starts) { row, start ->
                 val first = ExpectedChangeRules.onsetStart(row, start)
                 ExpectedChangeRules.status(row, ExpectedChangeRules.monthsBetween(start, first)) shouldBe WITHIN_ONSET_WINDOW
                 val dayBefore = first.minus(1, DateTimeUnit.DAY)

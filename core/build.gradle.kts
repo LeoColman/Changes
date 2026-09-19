@@ -107,7 +107,11 @@ tasks.named("check") {
 
 pitest {
     pitestVersion.set(libs.versions.pitest)
-    targetClasses.set(listOf("br.com.colman.changes.core.*"))
+    // Rodada rápida durante o desenvolvimento: `-Ppitest.classes=br.com.colman.changes.core.model.*`.
+    targetClasses.set(
+        providers.gradleProperty("pitest.classes").map { it.split(",") }
+            .orElse(listOf("br.com.colman.changes.core.*")),
+    )
     targetTests.set(listOf("br.com.colman.changes.core.*"))
     threads.set(Runtime.getRuntime().availableProcessors())
     outputFormats.set(listOf("XML", "HTML"))
@@ -208,7 +212,9 @@ val pitestPackageGate by tasks.registering {
     val suppressionsFile = layout.projectDirectory.file("pitest-suppressions.xml")
     val summaryFile = layout.buildDirectory.file("reports/pitest/package-scores.md")
     // Se o Pitest falhar antes de gerar o relatório, a falha dele é a que importa.
-    onlyIf { mutationsFile.get().asFile.exists() }
+    // Num recorte (`-Ppitest.classes`) os pisos por pacote não valem: o gate só roda na rodada inteira.
+    val scoped = providers.gradleProperty("pitest.classes").isPresent
+    onlyIf { !scoped && mutationsFile.get().asFile.exists() }
     doLast {
         val all = readPitMutants(mutationsFile.get().asFile)
         val suppressions = readPitSuppressions(suppressionsFile.asFile)

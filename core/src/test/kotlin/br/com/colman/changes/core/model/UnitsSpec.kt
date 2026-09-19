@@ -3,6 +3,7 @@
 
 package br.com.colman.changes.core.model
 
+import br.com.colman.changes.core.testing.propertyIterations
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.doubles.plusOrMinus
@@ -23,14 +24,14 @@ class UnitsSpec : FunSpec({
     fun relativeTolerance(value: Double) = maxOf(1e-9, value * 1e-12)
 
     test("kg to lb and back preserves the value") {
-        checkAll(1000, realistic) { kg ->
+        checkAll(propertyIterations(1000), realistic) { kg ->
             val lb = Units.convert(kg, MeasurementUnit.KG, MeasurementUnit.LB).getOrNull().shouldNotBeNull()
             Units.convert(lb, MeasurementUnit.LB, MeasurementUnit.KG).getOrNull() shouldBe (kg plusOrMinus relativeTolerance(kg))
         }
     }
 
     test("cm to in and back preserves the value") {
-        checkAll(1000, realistic) { cm ->
+        checkAll(propertyIterations(1000), realistic) { cm ->
             val inches = Units.convert(cm, MeasurementUnit.CM, MeasurementUnit.IN).getOrNull().shouldNotBeNull()
             Units.convert(inches, MeasurementUnit.IN, MeasurementUnit.CM).getOrNull() shouldBe (cm plusOrMinus relativeTolerance(cm))
         }
@@ -38,7 +39,7 @@ class UnitsSpec : FunSpec({
 
     test("mg to mL and back preserves the value for any positive mg/mL concentration") {
         val concentrations = Arb.numericDouble(0.001, 1000.0)
-        checkAll(1000, Arb.numericDouble(0.0, 10_000.0), concentrations) { mg, c ->
+        checkAll(propertyIterations(1000), Arb.numericDouble(0.0, 10_000.0), concentrations) { mg, c ->
             val concentration = Concentration(c, ConcentrationUnit.MG_PER_ML)
             val ml = Units.mgToMl(mg, concentration).getOrNull().shouldNotBeNull()
             Units.mlToMg(ml, concentration).getOrNull() shouldBe (mg plusOrMinus maxOf(1e-9, mg * 1e-12))
@@ -57,13 +58,13 @@ class UnitsSpec : FunSpec({
     }
 
     test("conversion never produces NaN or Infinity, for any input") {
-        checkAll(2000, anyDouble, units, units) { value, from, to ->
+        checkAll(propertyIterations(2000), anyDouble, units, units) { value, from, to ->
             val result = Units.convert(value, from, to)
             val converted = result.getOrNull()
             if (converted != null) converted.isFinite().shouldBeTrue()
             if (!value.isFinite()) result.errorOrNull() shouldBe DomainError.Invalid("value", DomainError.Reason.NOT_FINITE)
         }
-        checkAll(2000, anyDouble, anyDouble) { dose, c ->
+        checkAll(propertyIterations(2000), anyDouble, anyDouble) { dose, c ->
             val concentration = Concentration(c, ConcentrationUnit.MG_PER_ML)
             Units.mgToMl(dose, concentration).getOrNull()?.isFinite()?.shouldBeTrue()
             Units.mlToMg(dose, concentration).getOrNull()?.isFinite()?.shouldBeTrue()

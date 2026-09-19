@@ -4,6 +4,7 @@
 package br.com.colman.changes.core.model
 
 import br.com.colman.changes.core.testing.TestZones
+import br.com.colman.changes.core.testing.propertyIterations
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
@@ -89,7 +90,7 @@ class DoseScheduleSpec : BehaviorSpec({
     Given("property 11.2.3: any INTERVAL_DAYS regimen and any window") {
         Then("occurrences are exactly the congruent local days inside the bounds, at constant spacing in any zone") {
             checkAll(
-                1000,
+                propertyIterations(1000),
                 dates,
                 Arb.int(1, 60),
                 Arb.int(-400, 400),
@@ -112,7 +113,7 @@ class DoseScheduleSpec : BehaviorSpec({
         }
 
         Then("the planned instant always falls on the planned local day, for every zone and time") {
-            checkAll(1000, dates, times, zones) { date, time, zone ->
+            checkAll(propertyIterations(1000), dates, times, zones) { date, time, zone ->
                 DoseSchedule.instantOf(date, time, zone)!!.toLocalDateTime(zone).date shouldBe date
             }
         }
@@ -122,7 +123,12 @@ class DoseScheduleSpec : BehaviorSpec({
         val twice = Schedule.Weekly(setOf(DayOfWeek.MONDAY, DayOfWeek.THURSDAY))
 
         Then("doses fall only on the chosen weekdays") {
-            checkAll(300, dates, Arb.set(Arb.element(DayOfWeek.entries), 1..7), Arb.int(1, 4)) { start, days, every ->
+            checkAll(
+                propertyIterations(300),
+                dates,
+                Arb.set(Arb.element(DayOfWeek.entries), 1..7),
+                Arb.int(1, 4)
+            ) { start, days, every ->
                 val result = DoseSchedule.occurrences(
                     Schedule.Weekly(days, every),
                     start,
@@ -206,7 +212,7 @@ class DoseScheduleSpec : BehaviorSpec({
 
         Then("occurrences match a dose-by-dose expansion for any steps, continuation and window") {
             checkAll(
-                500,
+                propertyIterations(500),
                 dates,
                 Arb.int(0, 120),
                 Arb.list(Arb.int(1, 120), 0..5),

@@ -61,6 +61,6 @@ tasks.named("check") {
 
 tasks.register("pitestAll") {
     group = "verification"
-    description = "Runs mutation testing with per-package gates (alias for :core:pitest)."
-    dependsOn(":core:pitest")
+    description = "Runs mutation testing with gates on :core and on the JVM-only logic of :app."
+    dependsOn(":core:pitest", ":app:appPitest")
 }

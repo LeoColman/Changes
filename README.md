@@ -48,7 +48,10 @@ regras para quem contribui em [`docs/app-guidelines.md`](docs/app-guidelines.md)
 ```bash
 ./gradlew check          # compilação, Detekt, lint, testes JVM, teste de estresse do backup com heap
                          # de 128 MB, Kover (80% no :core), verificação do manifesto
-./gradlew :core:pitest   # teste de mutação com pisos por pacote (lento, fora do check)
+./gradlew pitestAll      # teste de mutação com pisos: :core inteiro e a lógica de JVM do :app
+./gradlew :core:pitest   # só o :core, com pisos por pacote (cerca de 5 min, fora do check)
+./gradlew :app:appPitest # só a lógica de JVM do :app (cerca de 20 s)
+./gradlew :core:pitest -Ppitest.classes='br.com.colman.changes.core.model.*'   # recorte rápido, sem gate
 ./gradlew :core:test -Dchanges.roundtrip.iterations=1000   # property tests de backup com N iterações
 ./gradlew :core:test --tests '*BackupFixtureSpec' -Dchanges.writeFixtures=true   # só ao congelar uma versão do schema
 ./gradlew detektFormat   # aplica correções automáticas do ktlint

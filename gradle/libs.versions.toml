@@ -74,6 +74,7 @@ kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref 
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-extensions-pitest = { module = "io.kotest:kotest-extensions-pitest", version.ref = "kotest" }
+pitest-command-line = { module = "org.pitest:pitest-command-line", version.ref = "pitest" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatform" }
 konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
