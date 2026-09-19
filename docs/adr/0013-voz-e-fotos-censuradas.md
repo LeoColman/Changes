@@ -16,6 +16,11 @@ ver; no engrossamento da voz, gravar o áudio de uma frase para perceber a mudan
   mancha de cor, sem contorno nem detalhe. Funciona em qualquer versão do Android (o `Modifier.blur`
   só existe a partir do Android 12). A primeira versão (0.2.0) pixelava a 12 pixels e escurecia; a
   silhueta continuava reconhecível, e o dono do produto pediu o borrão.
+- **Tela cheia.** Tocar numa foto abre ela em tela cheia, com zoom por pinça e arraste. A tela cheia
+  abre no mesmo estado da miniatura: foto censurada continua censurada, com o mesmo olho, e o zoom
+  nunca revela o que está borrado. Fechar volta ao estado anterior.
+- **Remover foto.** O "x" da foto pede confirmação antes de tirar a foto da entrada: é uma ação de
+  dado sensível sem desfazer imediato, e a foto já salva só some de verdade ao salvar a entrada.
 - **Voz.** A entrada de uma mudança da categoria `VOICE` (hoje `VOICE_DEEPENING`) pode ter a gravação
   de uma frase fixa, a mesma sempre, para que as gravações sejam comparáveis. AAC em MPEG-4
   (`audio/mp4`, `.m4a`), mono, até 60 segundos, gravada no cache e anexada como mídia da entrada ao
