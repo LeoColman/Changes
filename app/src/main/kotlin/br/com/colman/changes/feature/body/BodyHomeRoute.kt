@@ -37,6 +37,6 @@ fun BodyHomeRoute(
                 is BodyHomeNavigation.ChangeType -> onOpenChangeType(navigation.typeId)
             }
         },
-        loadThumbnail = { photo -> loadBodyThumbnail(mediaRepository, photo, io) },
+        loadThumbnail = { photo, fullSize -> loadBodyPhoto(mediaRepository, photo, io, fullSize) },
     )
 }

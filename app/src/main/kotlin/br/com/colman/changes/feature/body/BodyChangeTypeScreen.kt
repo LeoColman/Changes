@@ -60,7 +60,7 @@ fun BodyChangeTypeScreen(
     state: BodyChangeTypeUiState,
     onEvent: (BodyChangeTypeUiEvent) -> Unit,
     onNavigate: (BodyChangeTypeNavigation) -> Unit,
-    loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
+    loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -118,7 +118,7 @@ private fun BodyChangeTypeContent(
     state: BodyChangeTypeUiState,
     onEvent: (BodyChangeTypeUiEvent) -> Unit,
     onNavigate: (BodyChangeTypeNavigation) -> Unit,
-    loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
+    loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
     modifier: Modifier,
 ) {
     when {
@@ -164,7 +164,7 @@ private fun EntryRow(
     entry: BodyEntrySummary,
     unit: BodyMeasurementUnit?,
     playingEntryId: String?,
-    loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
+    loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
     onEvent: (BodyChangeTypeUiEvent) -> Unit,
     onClick: () -> Unit,
 ) {
@@ -181,7 +181,7 @@ private fun EntryRow(
                     Formatters.recorded(entry.observedAt),
                 ),
                 modifier = Modifier.size(56.dp).aspectRatio(1f),
-            ) { loadThumbnail(photo) }
+            ) { fullSize -> loadThumbnail(photo, fullSize) }
         }
         EntryRowText(entry, unit, Modifier.weight(1f))
         if (entry.voice != null) {
@@ -213,7 +213,7 @@ private fun EntryRowText(entry: BodyEntrySummary, unit: BodyMeasurementUnit?, mo
 private fun ComparisonSection(
     comparison: ComparisonState,
     onEvent: (BodyChangeTypeUiEvent) -> Unit,
-    loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
+    loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
 ) {
     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         SectionHeader(stringResource(R.string.body_type_comparison_title))
@@ -229,7 +229,7 @@ private fun ComparisonSection(
 private fun ComparisonPickers(
     comparison: ComparisonState,
     onEvent: (BodyChangeTypeUiEvent) -> Unit,
-    loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
+    loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
 ) {
     val left = comparison.candidates.find { it.entryId == comparison.leftEntryId }
     val right = comparison.candidates.find { it.entryId == comparison.rightEntryId }
@@ -267,7 +267,7 @@ private fun ComparisonSlider(
     left: BodyEntrySummary,
     right: BodyEntrySummary,
     position: Float,
-    loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
+    loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
     onPositionChange: (Float) -> Unit,
 ) {
     var revealed by rememberSaveable(left.entryId, right.entryId) { mutableStateOf(false) }
@@ -302,7 +302,7 @@ private fun ComparisonPhotos(
     position: Float,
     revealed: Boolean,
     description: String,
-    loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
+    loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
 ) {
     Box(
         Modifier
@@ -317,7 +317,7 @@ private fun ComparisonPhotos(
             revealed = revealed,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
-        ) { loadThumbnail(leftPhoto) }
+        ) { loadThumbnail(leftPhoto, false) }
         CensoredImage(
             key = rightPhoto.id to rightPhoto.checksumSha256,
             revealed = revealed,
@@ -327,6 +327,6 @@ private fun ComparisonPhotos(
                     this@drawWithContent.drawContent()
                 }
             },
-        ) { loadThumbnail(rightPhoto) }
+        ) { loadThumbnail(rightPhoto, false) }
     }
 }

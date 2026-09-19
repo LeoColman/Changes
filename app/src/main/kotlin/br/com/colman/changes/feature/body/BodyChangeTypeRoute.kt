@@ -36,6 +36,6 @@ fun BodyChangeTypeRoute(
                 is BodyChangeTypeNavigation.EditEntry -> onEditEntry(typeId, navigation.entryId)
             }
         },
-        loadThumbnail = { photo -> loadBodyThumbnail(mediaRepository, photo, io) },
+        loadThumbnail = { photo, fullSize -> loadBodyPhoto(mediaRepository, photo, io, fullSize) },
     )
 }

@@ -62,7 +62,7 @@ fun BodyEntryEditRoute(typeId: String?, entryId: String?, onSaved: () -> Unit, o
         onEvent = viewModel::onEvent,
         actions = BodyEntryEditActions(
             onBack = onBack,
-            loadPhoto = { photo -> loadEntryPhoto(mediaRepository, io, photo) },
+            loadPhoto = { photo, fullSize -> loadEntryPhoto(mediaRepository, io, photo, fullSize) },
             onPickPhoto = onPickPhoto,
             onRecordRequested = { recordPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO) },
         ),
@@ -109,11 +109,15 @@ private fun rememberPhotoPickHandler(
     }
 }
 
-private suspend fun loadEntryPhoto(mediaRepository: MediaRepository, io: CoroutineDispatcher, photo: EntryPhoto) =
-    when (photo) {
-        is EntryPhoto.Attached -> loadBodyThumbnail(mediaRepository, photo.media, io)
-        is EntryPhoto.Pending -> loadLocalThumbnail(photo.filePath, io)
-    }
+private suspend fun loadEntryPhoto(
+    mediaRepository: MediaRepository,
+    io: CoroutineDispatcher,
+    photo: EntryPhoto,
+    fullSize: Boolean,
+) = when (photo) {
+    is EntryPhoto.Attached -> loadBodyPhoto(mediaRepository, photo.media, io, fullSize)
+    is EntryPhoto.Pending -> loadLocalPhoto(photo.filePath, io, fullSize)
+}
 
 /** Implementação real de [BodyPhotoIntake], apoiada no [PhotoSanitizer] da plataforma. */
 private fun realPhotoIntake(sanitizer: PhotoSanitizer, io: CoroutineDispatcher): BodyPhotoIntake =

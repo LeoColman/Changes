@@ -36,6 +36,9 @@ import java.io.File
 
 private const val THUMBNAIL_MAX_EDGE = 512
 
+/** Tela cheia: decodifica maior, para o zoom ter detalhe, com teto para não estourar a memória. */
+private const val VIEWER_MAX_EDGE = 2048
+
 /**
  * Miniatura de uma foto de mudança corporal, sempre censurada por padrão (ADR 0013): fortemente
  * borrada ([blurredCopy]), com um botão de olho por cima para mostrar. A revelação vale só enquanto a tela está
@@ -52,7 +55,7 @@ fun BodyThumbnailImage(
     key: Any,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    load: suspend () -> ImageBitmap?,
+    load: suspend (fullSize: Boolean) -> ImageBitmap?,
 ) {
     var revealed by rememberSaveable(key) { mutableStateOf(false) }
     var viewerOpen by rememberSaveable(key) { mutableStateOf(false) }
@@ -63,8 +66,7 @@ fun BodyThumbnailImage(
             revealed,
             contentDescription,
             Modifier.matchParentSize().clickable(onClickLabel = openLabel) { viewerOpen = true },
-            load,
-        )
+        ) { load(false) }
         // No canto inferior esquerdo: o canto superior direito é do botão de remover na tira de fotos.
         RevealButton(
             revealed = revealed,
@@ -75,11 +77,12 @@ fun BodyThumbnailImage(
         )
     }
     if (viewerOpen) {
+        // A tela cheia carrega a foto maior: o zoom mostra detalhe, não a miniatura ampliada.
         BodyPhotoViewerDialog(
             key = key,
             contentDescription = contentDescription,
             initialRevealed = revealed,
-            load = load,
+            load = { load(true) },
             onDismiss = { viewerOpen = false },
         )
     }
@@ -134,33 +137,41 @@ fun RevealButton(
     }
 }
 
-/** Lê e decodifica a miniatura de uma foto já anexada; `null` se o arquivo sumiu ou não decodifica. */
-suspend fun loadBodyThumbnail(
+/**
+ * Lê e decodifica uma foto já anexada; `null` se o arquivo sumiu ou não decodifica. Com [fullSize], a
+ * decodificação vai até [VIEWER_MAX_EDGE] (tela cheia); sem ele, até [THUMBNAIL_MAX_EDGE] (listas).
+ */
+suspend fun loadBodyPhoto(
     mediaRepository: MediaRepository,
     photo: MediaAttachment,
     io: CoroutineDispatcher,
+    fullSize: Boolean,
 ): ImageBitmap? = withContext(io) {
     val bytes = mediaRepository.openRead(photo)?.use { it.readBytes() } ?: return@withContext null
-    decodeSampled(bytes)
+    decodeSampled(bytes, maxEdgeFor(fullSize))
 }
 
-/** Lê e decodifica a miniatura de um arquivo local ainda não anexado (foto pendente de salvar). */
-suspend fun loadLocalThumbnail(path: String, io: CoroutineDispatcher): ImageBitmap? = withContext(io) {
+/** O mesmo para um arquivo local ainda não anexado (foto pendente de salvar). */
+suspend fun loadLocalPhoto(path: String, io: CoroutineDispatcher, fullSize: Boolean): ImageBitmap? = withContext(io) {
     val file = File(path)
     if (!file.isFile) return@withContext null
-    decodeSampled(file.readBytes())
+    decodeSampled(file.readBytes(), maxEdgeFor(fullSize))
 }
 
-private fun decodeSampled(bytes: ByteArray): ImageBitmap? {
+private fun maxEdgeFor(fullSize: Boolean): Int = if (fullSize) VIEWER_MAX_EDGE else THUMBNAIL_MAX_EDGE
+
+private fun decodeSampled(bytes: ByteArray, maxEdge: Int): ImageBitmap? {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
-    val options = BitmapFactory.Options().apply { inSampleSize = sampleSizeFor(bounds.outWidth, bounds.outHeight) }
+    val options = BitmapFactory.Options().apply {
+        inSampleSize = sampleSizeFor(bounds.outWidth, bounds.outHeight, maxEdge)
+    }
     return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)?.asImageBitmap()
 }
 
-/** Maior potência de 2 que mantém o lado maior acima de [THUMBNAIL_MAX_EDGE]. */
-private fun sampleSizeFor(width: Int, height: Int): Int {
+/** Maior potência de 2 que mantém o lado maior acima de [maxEdge]. */
+private fun sampleSizeFor(width: Int, height: Int, maxEdge: Int): Int {
     var sample = 1
-    while (maxOf(width, height) / (sample * 2) >= THUMBNAIL_MAX_EDGE) sample *= 2
+    while (maxOf(width, height) / (sample * 2) >= maxEdge) sample *= 2
     return sample
 }

@@ -149,7 +149,7 @@ private fun BodyEntryEditFields(state: BodyEntryEditUiState, onEvent: (BodyEntry
 @Composable
 private fun PhotoPicker(
     photos: List<EntryPhoto>,
-    loadPhoto: suspend (EntryPhoto) -> ImageBitmap?,
+    loadPhoto: suspend (EntryPhoto, Boolean) -> ImageBitmap?,
     onPickPhoto: (BodyPhotoPickSource) -> Unit,
     onEvent: (BodyEntryEditUiEvent) -> Unit,
 ) {
@@ -171,7 +171,7 @@ private fun PhotoPicker(
 @Composable
 private fun PhotoStrip(
     photos: List<EntryPhoto>,
-    loadPhoto: suspend (EntryPhoto) -> ImageBitmap?,
+    loadPhoto: suspend (EntryPhoto, Boolean) -> ImageBitmap?,
     onEvent: (BodyEntryEditUiEvent) -> Unit,
 ) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -181,7 +181,7 @@ private fun PhotoStrip(
                     key = photo.key,
                     contentDescription = photoDescription(photo),
                     modifier = Modifier.aspectRatio(1f),
-                ) { loadPhoto(photo) }
+                ) { fullSize -> loadPhoto(photo, fullSize) }
                 IconButton(onClick = { onEvent(BodyEntryEditUiEvent.RequestRemovePhoto(photo.key)) }) {
                     Icon(
                         Icons.Filled.Close,

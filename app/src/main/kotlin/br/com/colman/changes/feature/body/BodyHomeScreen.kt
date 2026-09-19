@@ -55,7 +55,7 @@ fun BodyHomeScreen(
     state: BodyHomeUiState,
     onEvent: (BodyHomeUiEvent) -> Unit,
     onNavigate: (BodyHomeNavigation) -> Unit,
-    loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
+    loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -85,7 +85,7 @@ fun BodyHomeScreen(
 private fun BodyHomeContent(
     state: BodyHomeUiState,
     onNavigate: (BodyHomeNavigation) -> Unit,
-    loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
+    loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
     modifier: Modifier,
 ) {
     when {
@@ -125,7 +125,7 @@ private fun ShortcutsRow(onNavigate: (BodyHomeNavigation) -> Unit) {
 @Composable
 private fun BodyTypeRow(
     type: BodyTypeSummary,
-    loadThumbnail: suspend (MediaAttachment) -> ImageBitmap?,
+    loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
     onClick: () -> Unit,
 ) {
     Row(
@@ -146,7 +146,7 @@ private fun BodyTypeRow(
                     key = photo.id to photo.checksumSha256,
                     contentDescription = stringResource(R.string.body_home_thumbnail_description, type.label),
                     modifier = Modifier.aspectRatio(1f),
-                ) { loadThumbnail(photo) }
+                ) { fullSize -> loadThumbnail(photo, fullSize) }
             }
         }
         BodyTypeRowText(type)
