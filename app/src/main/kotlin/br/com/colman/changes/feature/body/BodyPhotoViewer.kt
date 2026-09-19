@@ -42,7 +42,7 @@ private const val DOUBLE_TAP_SCALE = 2.5f
 private val VIEWER_BUTTON_PADDING = 16.dp
 
 /**
- * Foto de mudança corporal em tela cheia (T19): tocar em qualquer foto do corpo abre esta tela, no
+ * Foto de mudança corporal em tela cheia (ADR 0013): tocar em qualquer foto do corpo abre esta tela, no
  * mesmo estado de censura da miniatura que foi tocada ([initialRevealed]). O olho aqui dentro é
  * próprio desta tela e independente da miniatura por trás: fechar não muda o estado de volta lá.
  * Fecha pelo botão de fechar ou pelo botão voltar do sistema (`dismissOnBackPress`, o padrão de
@@ -98,7 +98,7 @@ private fun SecureViewerWindow() {
 /**
  * A mesma imagem de [CensoredImage] (nunca a original quando censurada, só a cópia borrada), com
  * zoom por pinça de [MIN_SCALE] a [MAX_SCALE], arraste quando ampliada, e toque duplo alternando 1x e
- * [DOUBLE_TAP_SCALE]x (T19). `ContentScale` padrão (`Fit`) já centraliza a foto sem cortar.
+ * [DOUBLE_TAP_SCALE]x (ADR 0013). `ContentScale` padrão (`Fit`) já centraliza a foto sem cortar.
  */
 @Composable
 private fun ZoomableCensoredImage(

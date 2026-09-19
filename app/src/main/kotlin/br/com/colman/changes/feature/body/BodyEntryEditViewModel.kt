@@ -110,7 +110,7 @@ data class BodyEntryEditUiState(
     val measurementText: String = "",
     val notes: String = "",
     val photos: List<EntryPhoto> = emptyList(),
-    /** Chave da foto que o "x" pediu para remover, aguardando confirmação (T19). `null` sem pedido. */
+    /** Chave da foto que o "x" pediu para remover, aguardando confirmação (ADR 0013). `null` sem pedido. */
     val photoPendingRemoval: String? = null,
     /** Categoria `VOICE` (ADR 0013), hoje só `VOICE_DEEPENING`: oferece a seção de gravação. */
     val supportsVoiceRecording: Boolean = false,
@@ -135,7 +135,7 @@ sealed interface BodyEntryEditUiEvent {
 
     data class PhotoSelected(val raw: RawBodyPhoto) : BodyEntryEditUiEvent
 
-    /** O "x" da foto pede confirmação em vez de remover na hora (T19, ADR 0013). */
+    /** O "x" da foto pede confirmação em vez de remover na hora (ADR 0013). */
     data class RequestRemovePhoto(val photoKey: String) : BodyEntryEditUiEvent
 
     data object ConfirmRemovePhoto : BodyEntryEditUiEvent
@@ -303,7 +303,7 @@ class BodyEntryEditViewModel(
         }
     }
 
-    /** Confirmar o pedido do "x" (T19): remove a foto pendente marcada, do mesmo jeito que antes. */
+    /** Confirmar o pedido do "x" (ADR 0013): remove a foto pendente marcada, do mesmo jeito que antes. */
     private fun confirmRemovePhoto() {
         val photoKey = draft.value.photoPendingRemoval ?: return
         removePhoto(photoKey)

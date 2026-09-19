@@ -47,7 +47,7 @@ private const val VIEWER_MAX_EDGE = 2048
  * principal, e `produceState` guarda o resultado em memória por [key] enquanto o composable
  * permanece na composição, que é o cache simples por id. Nunca grava miniatura em disco.
  *
- * Tocar na foto (fora do olho) abre a tela cheia (T19), no mesmo estado de censura desta miniatura;
+ * Tocar na foto (fora do olho) abre a tela cheia (ADR 0013), no mesmo estado de censura desta miniatura;
  * o "x" da tira de fotos é um botão irmão por cima, então continua consumindo o toque dele antes.
  */
 @Composable

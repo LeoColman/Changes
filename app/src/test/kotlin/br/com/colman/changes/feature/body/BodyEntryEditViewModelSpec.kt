@@ -479,7 +479,7 @@ class BodyEntryEditViewModelSpec : FunSpec({
         }
     }
 
-    test("aceite T19: tocar no x marca a foto pendente de confirmação sem remover nada") {
+    test("aceite: tocar no x marca a foto pendente de confirmação sem remover nada") {
         val env = BodyTestEnvironment()
         val type = env.typeByCode("SKIN_OILINESS_ACNE")
         val tempFile = Files.createTempFile("body-test-photo", ".jpg").toFile()
@@ -512,7 +512,7 @@ class BodyEntryEditViewModelSpec : FunSpec({
         tempFile.exists() shouldBe true
     }
 
-    test("aceite T19: cancelar a remoção deixa a foto na entrada") {
+    test("aceite: cancelar a remoção deixa a foto na entrada") {
         val env = BodyTestEnvironment()
         val type = env.typeByCode("SKIN_OILINESS_ACNE")
         val tempFile = Files.createTempFile("body-test-photo", ".jpg").toFile()
@@ -548,7 +548,7 @@ class BodyEntryEditViewModelSpec : FunSpec({
         tempFile.exists() shouldBe true
     }
 
-    test("aceite T19: confirmar remove a foto pendente, apaga o arquivo do cache, e salvar deixa a entrada sem foto") {
+    test("aceite: confirmar remove a foto pendente, apaga o arquivo do cache, e salvar deixa a entrada sem foto") {
         val env = BodyTestEnvironment()
         val type = env.typeByCode("SKIN_OILINESS_ACNE")
         val tempFile = Files.createTempFile("body-test-photo", ".jpg").toFile()
@@ -598,7 +598,7 @@ class BodyEntryEditViewModelSpec : FunSpec({
         env.mediaRepository.observeByOwner(MediaOwnerType.BODY_CHANGE_ENTRY, entry.id).first().shouldBeEmpty()
     }
 
-    test("aceite T19: confirmar marca uma foto já anexada para sair só ao salvar, como antes") {
+    test("aceite: confirmar marca uma foto já anexada para sair só ao salvar, como antes") {
         val env = BodyTestEnvironment()
         val type = env.typeByCode("SKIN_OILINESS_ACNE")
         val entry = (
