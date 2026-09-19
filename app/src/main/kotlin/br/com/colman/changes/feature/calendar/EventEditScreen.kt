@@ -33,6 +33,7 @@ import br.com.colman.changes.ui.components.DropdownField
 import br.com.colman.changes.ui.components.FormColumn
 import br.com.colman.changes.ui.components.LoadingState
 import br.com.colman.changes.ui.components.SectionHeader
+import br.com.colman.changes.ui.components.WithUnsavedChangesGuard
 
 /** Ação de campo simples de formulário: aplica uma transformação ao estado atual. */
 internal typealias Change = ((EventEditUiState) -> EventEditUiState) -> Unit
@@ -48,34 +49,39 @@ fun EventEditScreen(
     val title = stringResource(
         if (state.isNew) R.string.calendar_event_title_new else R.string.calendar_event_title_edit,
     )
-    Box(modifier) {
-        ChangesScreen(
-            title = title,
-            onBack = { onEvent(EventEditUiEvent.Back) },
-            snackbarHostState = snackbarHostState,
-            actions = {
-                if (!state.isNew) {
-                    IconButton(onClick = { onEvent(EventEditUiEvent.RequestDelete) }) {
-                        Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
+    WithUnsavedChangesGuard(
+        hasUnsavedChanges = state.hasUnsavedChanges,
+        onLeave = { onEvent(EventEditUiEvent.Back) },
+    ) { requestLeave ->
+        Box(modifier) {
+            ChangesScreen(
+                title = title,
+                onBack = requestLeave,
+                snackbarHostState = snackbarHostState,
+                actions = {
+                    if (!state.isNew) {
+                        IconButton(onClick = { onEvent(EventEditUiEvent.RequestDelete) }) {
+                            Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
+                        }
                     }
+                },
+            ) { padding ->
+                if (state.isLoading) {
+                    LoadingState(Modifier.padding(padding))
+                } else {
+                    EventEditForm(state, onEvent, Modifier.padding(padding).verticalScroll(rememberScrollState()))
                 }
-            },
-        ) { padding ->
-            if (state.isLoading) {
-                LoadingState(Modifier.padding(padding))
-            } else {
-                EventEditForm(state, onEvent, Modifier.padding(padding).verticalScroll(rememberScrollState()))
             }
         }
-    }
-    if (state.showDeleteConfirm) {
-        ConfirmDialog(
-            title = stringResource(R.string.calendar_delete_confirm_title),
-            text = stringResource(R.string.calendar_delete_confirm_body),
-            confirmLabel = stringResource(R.string.action_delete),
-            onConfirm = { onEvent(EventEditUiEvent.ConfirmDelete) },
-            onDismiss = { onEvent(EventEditUiEvent.CancelDelete) },
-        )
+        if (state.showDeleteConfirm) {
+            ConfirmDialog(
+                title = stringResource(R.string.calendar_delete_confirm_title),
+                text = stringResource(R.string.calendar_delete_confirm_body),
+                confirmLabel = stringResource(R.string.action_delete),
+                onConfirm = { onEvent(EventEditUiEvent.ConfirmDelete) },
+                onDismiss = { onEvent(EventEditUiEvent.CancelDelete) },
+            )
+        }
     }
 }
 

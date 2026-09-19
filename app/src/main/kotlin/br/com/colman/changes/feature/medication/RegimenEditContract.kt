@@ -57,6 +57,8 @@ data class RegimenEditUiState(
     val showDeleteConfirm: Boolean = false,
     /** Próximas doses previstas pela agenda do formulário (até 4), para conferir antes de salvar. */
     val nextDoses: List<LocalDate> = emptyList(),
+    /** Seção 9: `true` quando o formulário difere do que foi carregado, ou do inicial numa entrada nova. */
+    val hasUnsavedChanges: Boolean = false,
 )
 
 sealed interface RegimenEditUiEvent {

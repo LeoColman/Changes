@@ -52,6 +52,8 @@ data class EventEditUiState(
     val isCompleted: Boolean = false,
     val error: DomainError? = null,
     val showDeleteConfirm: Boolean = false,
+    /** Seção 9: `true` quando o formulário difere do que foi carregado, ou do inicial numa entrada nova. */
+    val hasUnsavedChanges: Boolean = false,
 )
 
 sealed interface EventEditUiEvent {

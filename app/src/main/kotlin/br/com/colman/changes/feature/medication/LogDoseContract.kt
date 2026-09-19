@@ -31,6 +31,8 @@ data class LogDoseUiState(
     val notes: String = "",
     val error: DomainError? = null,
     val showDeleteConfirm: Boolean = false,
+    /** Seção 9: `true` quando o formulário difere do que foi carregado, ou do inicial numa entrada nova. */
+    val hasUnsavedChanges: Boolean = false,
 ) {
     val medicationEditable: Boolean get() = regimenId == null
 }

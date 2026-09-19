@@ -39,6 +39,7 @@ import br.com.colman.changes.ui.components.FormColumn
 import br.com.colman.changes.ui.components.LoadingState
 import br.com.colman.changes.ui.components.NumberField
 import br.com.colman.changes.ui.components.SectionHeader
+import br.com.colman.changes.ui.components.WithUnsavedChangesGuard
 
 private const val SCALE_OPTIONS = 5
 private val SCALE_TARGET_SIZE = 48.dp
@@ -57,16 +58,18 @@ fun MoodCheckInScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val title = stringResource(R.string.mood_title)
-    ChangesScreen(title = title, onBack = onBack, snackbarHostState = snackbarHostState) { padding ->
-        if (state.isLoading) {
-            LoadingState(modifier = modifier.padding(padding))
-        } else {
-            Column(modifier = modifier.padding(padding).fillMaxSize()) {
-                Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-                    MoodCheckInForm(state, onEvent)
+    WithUnsavedChangesGuard(hasUnsavedChanges = state.hasUnsavedChanges, onLeave = onBack) { requestLeave ->
+        ChangesScreen(title = title, onBack = requestLeave, snackbarHostState = snackbarHostState) { padding ->
+            if (state.isLoading) {
+                LoadingState(modifier = modifier.padding(padding))
+            } else {
+                Column(modifier = modifier.padding(padding).fillMaxSize()) {
+                    Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                        MoodCheckInForm(state, onEvent)
+                    }
+                    HorizontalDivider()
+                    MoodSupportFooter(onOpenSupport)
                 }
-                HorizontalDivider()
-                MoodSupportFooter(onOpenSupport)
             }
         }
     }

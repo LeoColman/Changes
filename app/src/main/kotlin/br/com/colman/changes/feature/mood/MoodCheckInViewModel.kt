@@ -44,21 +44,26 @@ class MoodCheckInViewModel(
 
     private var existingId: Uuid? = null
 
+    /** Seção 9: instantâneo do formulário no último carregamento ou salvamento, para comparar contra o atual. */
+    private var loadedSnapshot: MoodCheckInUiState? = null
+
     fun onEvent(event: MoodCheckInUiEvent) {
         when (event) {
             is MoodCheckInUiEvent.Load -> load(event.epochDay)
-            is MoodCheckInUiEvent.MoodChanged -> _state.update { it.copy(mood = event.value, moodError = false) }
-            is MoodCheckInUiEvent.EnergyChanged -> _state.update { it.copy(energy = event.value, energyError = false) }
+            is MoodCheckInUiEvent.MoodChanged ->
+                _state.update { it.copy(mood = event.value, moodError = false).withUnsavedFlag() }
+            is MoodCheckInUiEvent.EnergyChanged ->
+                _state.update { it.copy(energy = event.value, energyError = false).withUnsavedFlag() }
             is MoodCheckInUiEvent.FeelingChanged -> updateFeeling(event)
             is MoodCheckInUiEvent.SleepHoursChanged -> updateSleepHours(event.text)
-            is MoodCheckInUiEvent.NoteChanged -> _state.update { it.copy(note = event.text) }
-            is MoodCheckInUiEvent.TagsChanged -> _state.update { it.copy(tagsText = event.text) }
+            is MoodCheckInUiEvent.NoteChanged -> _state.update { it.copy(note = event.text).withUnsavedFlag() }
+            is MoodCheckInUiEvent.TagsChanged -> _state.update { it.copy(tagsText = event.text).withUnsavedFlag() }
             MoodCheckInUiEvent.Save -> save()
         }
     }
 
     private fun updateSleepHours(text: String) {
-        _state.update { it.copy(sleepHoursText = text, sleepHoursError = false) }
+        _state.update { it.copy(sleepHoursText = text, sleepHoursError = false).withUnsavedFlag() }
     }
 
     private fun updateFeeling(event: MoodCheckInUiEvent.FeelingChanged) {
@@ -69,7 +74,7 @@ class MoodCheckInViewModel(
                 is MoodCheckInUiEvent.EmotionalIntensityChanged -> it.copy(emotionalIntensity = event.value)
                 is MoodCheckInUiEvent.AnxietyChanged -> it.copy(anxiety = event.value)
                 is MoodCheckInUiEvent.DysphoriaChanged -> it.copy(dysphoria = event.value)
-            }
+            }.withUnsavedFlag()
         }
     }
 
@@ -78,6 +83,27 @@ class MoodCheckInViewModel(
         val existing = moodRepository.observe(date).first()
         existingId = existing?.id
         _state.value = existing.toUiState(date)
+        captureBaseline()
+    }
+
+    /** Seção 9: o formulário recém carregado (ou salvo) passa a ser a referência sem alteração pendente. */
+    private fun captureBaseline() {
+        loadedSnapshot = _state.value.formSnapshot()
+        _state.update { it.copy(hasUnsavedChanges = false) }
+    }
+
+    /** Só os campos do formulário importam para detectar alteração pendente (Seção 9). */
+    private fun MoodCheckInUiState.formSnapshot(): MoodCheckInUiState = copy(
+        isLoading = false,
+        moodError = false,
+        energyError = false,
+        sleepHoursError = false,
+        hasUnsavedChanges = false,
+    )
+
+    private fun MoodCheckInUiState.withUnsavedFlag(): MoodCheckInUiState {
+        val loaded = loadedSnapshot ?: return copy(hasUnsavedChanges = false)
+        return copy(hasUnsavedChanges = formSnapshot() != loaded)
     }
 
     private fun today(): LocalDate = clock.now().toLocalDateTime(timeZones.current()).date
@@ -131,6 +157,7 @@ class MoodCheckInViewModel(
             when (val result = moodRepository.upsert(draft)) {
                 is Result.Success -> {
                     existingId = result.value.id
+                    captureBaseline()
                     effectsChannel.send(MoodCheckInEffect.Saved)
                 }
                 is Result.Failure -> _state.update { it.copy(sleepHoursError = true) }

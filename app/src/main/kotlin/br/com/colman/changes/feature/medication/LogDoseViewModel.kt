@@ -49,6 +49,9 @@ class LogDoseViewModel(
 
     private var doseLogId: Uuid? = null
 
+    /** Seção 9: instantâneo do formulário no último carregamento ou salvamento, para comparar contra o atual. */
+    private var loadedSnapshot: LogDoseUiState? = null
+
     init {
         viewModelScope.launch {
             medicationRepository.observeVisible().collect { medications ->
@@ -66,7 +69,7 @@ class LogDoseViewModel(
     fun onEvent(event: LogDoseUiEvent) {
         when (event) {
             is LogDoseUiEvent.Load -> load(event.regimenId, event.plannedEpochDay, event.doseLogId)
-            is LogDoseUiEvent.FieldChanged -> _state.update(event.apply)
+            is LogDoseUiEvent.FieldChanged -> _state.update { event.apply(it).withUnsavedFlag() }
             LogDoseUiEvent.Save -> save()
             LogDoseUiEvent.RequestDelete -> _state.update { it.copy(showDeleteConfirm = true) }
             LogDoseUiEvent.ConfirmDelete -> delete()
@@ -83,6 +86,27 @@ class LogDoseViewModel(
             regimenId != null -> loadFromRegimen(Uuid.parse(regimenId), plannedEpochDay)
             else -> _state.update { it.copy(isLoading = false) }
         }
+        captureBaseline()
+    }
+
+    /** Seção 9: o formulário recém carregado (ou salvo) passa a ser a referência sem alteração pendente. */
+    private fun captureBaseline() {
+        loadedSnapshot = _state.value.formSnapshot()
+        _state.update { it.copy(hasUnsavedChanges = false) }
+    }
+
+    /** Só os campos do formulário importam para detectar alteração pendente (Seção 9), não a lista de opções. */
+    private fun LogDoseUiState.formSnapshot(): LogDoseUiState = copy(
+        isLoading = false,
+        availableMedications = emptyList(),
+        error = null,
+        showDeleteConfirm = false,
+        hasUnsavedChanges = false,
+    )
+
+    private fun LogDoseUiState.withUnsavedFlag(): LogDoseUiState {
+        val loaded = loadedSnapshot ?: return copy(hasUnsavedChanges = false)
+        return copy(hasUnsavedChanges = formSnapshot() != loaded)
     }
 
     private suspend fun loadExistingLog(id: Uuid) {
@@ -151,7 +175,10 @@ class LogDoseViewModel(
             doseLogRepository.update(existingLog(id, newLog))
         }
         when (result) {
-            is Result.Success -> effectsChannel.send(LogDoseEffect.NavigateBack)
+            is Result.Success -> {
+                captureBaseline()
+                effectsChannel.send(LogDoseEffect.NavigateBack)
+            }
             is Result.Failure -> _state.update { it.copy(error = result.error) }
         }
     }

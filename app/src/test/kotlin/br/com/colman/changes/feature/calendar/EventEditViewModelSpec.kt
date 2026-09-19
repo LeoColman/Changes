@@ -200,6 +200,43 @@ class EventEditViewModelSpec : FunSpec({
         repository.get(created.id)?.completedAt.shouldNotBeNull()
     }
 
+    test(
+        "hasUnsavedChanges is false right after loading, true after a field changes, and false again after saving"
+    ) {
+        val clock = FixedClock()
+        val timeZones = FixedTimeZoneProvider()
+        val repository = repository(clock, timeZones)
+        val created = repository.create(
+            NewCalendarEvent("Consulta", null, clock.now, null, false, CalendarCategory.APPOINTMENT, null, null),
+        ).getOrNull().shouldNotBeNull()
+        val viewModel = EventEditViewModel(repository, clock, timeZones)
+
+        viewModel.onEvent(EventEditUiEvent.Load(created.id.toString(), null))
+        viewModel.state.value.hasUnsavedChanges shouldBe false
+
+        viewModel.onEvent(EventEditUiEvent.FieldChanged { it.copy(title = "Consulta remarcada") })
+        viewModel.state.value.hasUnsavedChanges shouldBe true
+
+        viewModel.effects.test {
+            viewModel.onEvent(EventEditUiEvent.Save)
+            awaitItem() shouldBe EventEditEffect.NavigateBack
+        }
+        viewModel.state.value.hasUnsavedChanges shouldBe false
+    }
+
+    test("on a new event hasUnsavedChanges is false untouched, and true once the first field is filled") {
+        val clock = FixedClock()
+        val timeZones = FixedTimeZoneProvider()
+        val repository = repository(clock, timeZones)
+        val viewModel = EventEditViewModel(repository, clock, timeZones)
+
+        viewModel.onEvent(EventEditUiEvent.Load(null, null))
+        viewModel.state.value.hasUnsavedChanges shouldBe false
+
+        viewModel.onEvent(EventEditUiEvent.FieldChanged { it.copy(title = "Fisioterapia") })
+        viewModel.state.value.hasUnsavedChanges shouldBe true
+    }
+
     test("a weekly recurrence built in the editor produces occurrences on the correct dates") {
         val clock = FixedClock()
         val timeZones = FixedTimeZoneProvider()

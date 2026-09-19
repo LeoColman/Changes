@@ -53,6 +53,9 @@ class RegimenEditViewModel(
     private var regimenId: Uuid? = null
     private var loadedSchedule: Schedule? = null
 
+    /** Seção 9: instantâneo do formulário no último carregamento ou salvamento, para comparar contra o atual. */
+    private var loadedSnapshot: RegimenEditUiState? = null
+
     init {
         viewModelScope.launch {
             medicationRepository.observeVisible().collect { medications ->
@@ -65,7 +68,7 @@ class RegimenEditViewModel(
     fun onEvent(event: RegimenEditUiEvent) {
         when (event) {
             is RegimenEditUiEvent.Load -> load(event.regimenId)
-            is RegimenEditUiEvent.FieldChanged -> _state.update { withPreview(event.apply(it)) }
+            is RegimenEditUiEvent.FieldChanged -> _state.update { withPreview(event.apply(it)).withUnsavedFlag() }
             RegimenEditUiEvent.StartCreatingMedication -> _state.update { it.copy(isCreatingMedication = true) }
             RegimenEditUiEvent.CancelCreatingMedication -> _state.update { it.copy(isCreatingMedication = false) }
             RegimenEditUiEvent.ConfirmNewMedication -> confirmNewMedication()
@@ -91,6 +94,28 @@ class RegimenEditViewModel(
                 _state.update { withPreview(populatedFrom(it, regimen)) }
             }
         }
+        captureBaseline()
+    }
+
+    /** Seção 9: o formulário recém carregado (ou salvo) passa a ser a referência sem alteração pendente. */
+    private fun captureBaseline() {
+        loadedSnapshot = _state.value.formSnapshot()
+        _state.update { it.copy(hasUnsavedChanges = false) }
+    }
+
+    /** Só os campos do formulário importam para detectar alteração pendente (Seção 9), não a lista de opções. */
+    private fun RegimenEditUiState.formSnapshot(): RegimenEditUiState = copy(
+        isLoading = false,
+        availableMedications = emptyList(),
+        error = null,
+        showDeleteConfirm = false,
+        nextDoses = emptyList(),
+        hasUnsavedChanges = false,
+    )
+
+    private fun RegimenEditUiState.withUnsavedFlag(): RegimenEditUiState {
+        val loaded = loadedSnapshot ?: return copy(hasUnsavedChanges = false)
+        return copy(hasUnsavedChanges = formSnapshot() != loaded)
     }
 
     private fun populatedFrom(current: RegimenEditUiState, regimen: Regimen): RegimenEditUiState = current.copy(
@@ -143,7 +168,7 @@ class RegimenEditViewModel(
                     newMedicationRoute = null,
                     newMedicationConcentrationValue = "",
                     error = null,
-                )
+                ).withUnsavedFlag()
             }
             is Result.Failure -> _state.update { it.copy(error = result.error) }
         }
@@ -158,7 +183,10 @@ class RegimenEditViewModel(
         }
         val result = persist(medicationId, current)
         when (result) {
-            is Result.Success -> effectsChannel.send(RegimenEditEffect.NavigateBack)
+            is Result.Success -> {
+                captureBaseline()
+                effectsChannel.send(RegimenEditEffect.NavigateBack)
+            }
             is Result.Failure -> _state.update { it.copy(error = result.error) }
         }
     }
