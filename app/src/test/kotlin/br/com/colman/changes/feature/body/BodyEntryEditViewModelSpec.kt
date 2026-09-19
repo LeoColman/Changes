@@ -442,6 +442,177 @@ class BodyEntryEditViewModelSpec : FunSpec({
         }
     }
 
+    test("aceite T19: tocar no x marca a foto pendente de confirmação sem remover nada") {
+        val env = BodyTestEnvironment()
+        val type = env.typeByCode("SKIN_OILINESS_ACNE")
+        val tempFile = Files.createTempFile("body-test-photo", ".jpg").toFile()
+        tempFile.writeBytes(fakePhotoBytes())
+        val viewModel = BodyEntryEditViewModel(
+            env.repositories,
+            FakePhotoIntake(),
+            env.timeZones,
+            env.voiceControls,
+            BodyEntryEditArgs(typeId = type.id.toString(), entryId = null),
+        )
+
+        viewModel.state.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+
+            viewModel.onEvent(BodyEntryEditUiEvent.PhotoSelected(RawBodyPhoto.Camera(tempFile)))
+            var withPhoto = awaitItem()
+            while (withPhoto.photos.isEmpty()) withPhoto = awaitItem()
+            val photoKey = withPhoto.photos.single().key
+
+            viewModel.onEvent(BodyEntryEditUiEvent.RequestRemovePhoto(photoKey))
+            var pending = withPhoto
+            while (pending.photoPendingRemoval == null) pending = awaitItem()
+            pending.photoPendingRemoval shouldBe photoKey
+            pending.photos.single().key shouldBe photoKey
+
+            cancelAndIgnoreRemainingEvents()
+        }
+        tempFile.exists() shouldBe true
+    }
+
+    test("aceite T19: cancelar a remoção deixa a foto na entrada") {
+        val env = BodyTestEnvironment()
+        val type = env.typeByCode("SKIN_OILINESS_ACNE")
+        val tempFile = Files.createTempFile("body-test-photo", ".jpg").toFile()
+        tempFile.writeBytes(fakePhotoBytes())
+        val viewModel = BodyEntryEditViewModel(
+            env.repositories,
+            FakePhotoIntake(),
+            env.timeZones,
+            env.voiceControls,
+            BodyEntryEditArgs(typeId = type.id.toString(), entryId = null),
+        )
+
+        viewModel.state.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+
+            viewModel.onEvent(BodyEntryEditUiEvent.PhotoSelected(RawBodyPhoto.Camera(tempFile)))
+            var withPhoto = awaitItem()
+            while (withPhoto.photos.isEmpty()) withPhoto = awaitItem()
+            val photoKey = withPhoto.photos.single().key
+
+            viewModel.onEvent(BodyEntryEditUiEvent.RequestRemovePhoto(photoKey))
+            var pending = withPhoto
+            while (pending.photoPendingRemoval == null) pending = awaitItem()
+
+            viewModel.onEvent(BodyEntryEditUiEvent.CancelRemovePhoto)
+            var cancelled = pending
+            while (cancelled.photoPendingRemoval != null) cancelled = awaitItem()
+            cancelled.photos.single().key shouldBe photoKey
+
+            cancelAndIgnoreRemainingEvents()
+        }
+        tempFile.exists() shouldBe true
+    }
+
+    test("aceite T19: confirmar remove a foto pendente, apaga o arquivo do cache, e salvar deixa a entrada sem foto") {
+        val env = BodyTestEnvironment()
+        val type = env.typeByCode("SKIN_OILINESS_ACNE")
+        val tempFile = Files.createTempFile("body-test-photo", ".jpg").toFile()
+        tempFile.writeBytes(fakePhotoBytes())
+        val viewModel = BodyEntryEditViewModel(
+            env.repositories,
+            FakePhotoIntake(),
+            env.timeZones,
+            env.voiceControls,
+            BodyEntryEditArgs(typeId = type.id.toString(), entryId = null),
+        )
+
+        turbineScope {
+            val stateTurbine = viewModel.state.testIn(this)
+            val effects = viewModel.effects.testIn(this)
+
+            var state = stateTurbine.awaitItem()
+            while (state.isLoading) state = stateTurbine.awaitItem()
+
+            viewModel.onEvent(BodyEntryEditUiEvent.PhotoSelected(RawBodyPhoto.Camera(tempFile)))
+            var withPhoto = stateTurbine.awaitItem()
+            while (withPhoto.photos.isEmpty()) withPhoto = stateTurbine.awaitItem()
+            val photoKey = withPhoto.photos.single().key
+
+            viewModel.onEvent(BodyEntryEditUiEvent.RequestRemovePhoto(photoKey))
+            var pending = withPhoto
+            while (pending.photoPendingRemoval == null) pending = stateTurbine.awaitItem()
+
+            viewModel.onEvent(BodyEntryEditUiEvent.ConfirmRemovePhoto)
+            var confirmed = pending
+            while (confirmed.photoPendingRemoval != null || confirmed.photos.isNotEmpty()) {
+                confirmed = stateTurbine.awaitItem()
+            }
+            confirmed.photos.shouldBeEmpty()
+
+            viewModel.onEvent(BodyEntryEditUiEvent.DateChanged(pastDate))
+            viewModel.onEvent(BodyEntryEditUiEvent.TimeChanged(pastTime))
+            viewModel.onEvent(BodyEntryEditUiEvent.Save)
+
+            effects.awaitItem() shouldBe BodyEntryEditEffect.Saved
+            stateTurbine.cancelAndIgnoreRemainingEvents()
+            effects.cancelAndIgnoreRemainingEvents()
+        }
+
+        tempFile.exists() shouldBe false
+        val entry = env.bodyChangeRepository.observeAllEntries().first().single()
+        env.mediaRepository.observeByOwner(MediaOwnerType.BODY_CHANGE_ENTRY, entry.id).first().shouldBeEmpty()
+    }
+
+    test("aceite T19: confirmar marca uma foto já anexada para sair só ao salvar, como antes") {
+        val env = BodyTestEnvironment()
+        val type = env.typeByCode("SKIN_OILINESS_ACNE")
+        val entry = (
+            env.bodyChangeRepository.createEntry(type.id, env.clock.now, null, null, null) as Result.Success
+            ).value
+        env.mediaRepository.attach(
+            MediaOwnerType.BODY_CHANGE_ENTRY,
+            entry.id,
+            fakePhotoBytes().inputStream(),
+            "image/jpeg",
+            null,
+        )
+
+        val viewModel = BodyEntryEditViewModel(
+            env.repositories,
+            FakePhotoIntake(),
+            env.timeZones,
+            env.voiceControls,
+            BodyEntryEditArgs(typeId = null, entryId = entry.id.toString()),
+        )
+
+        turbineScope {
+            val stateTurbine = viewModel.state.testIn(this)
+            val effects = viewModel.effects.testIn(this)
+
+            var state = stateTurbine.awaitItem()
+            while (state.photos.isEmpty()) state = stateTurbine.awaitItem()
+            val photoKey = state.photos.single().key
+            state.photos.single().shouldBeInstanceOf<EntryPhoto.Attached>()
+
+            viewModel.onEvent(BodyEntryEditUiEvent.RequestRemovePhoto(photoKey))
+            var pending = state
+            while (pending.photoPendingRemoval == null) pending = stateTurbine.awaitItem()
+            pending.photos.single().key shouldBe photoKey
+
+            viewModel.onEvent(BodyEntryEditUiEvent.ConfirmRemovePhoto)
+            var confirmed = pending
+            while (confirmed.photoPendingRemoval != null || confirmed.photos.isNotEmpty()) {
+                confirmed = stateTurbine.awaitItem()
+            }
+
+            viewModel.onEvent(BodyEntryEditUiEvent.Save)
+            effects.awaitItem() shouldBe BodyEntryEditEffect.Saved
+
+            stateTurbine.cancelAndIgnoreRemainingEvents()
+            effects.cancelAndIgnoreRemainingEvents()
+        }
+
+        env.mediaRepository.observeByOwner(MediaOwnerType.BODY_CHANGE_ENTRY, entry.id).first().shouldBeEmpty()
+    }
+
     test("aceite: microfone indisponível (start nulo) mostra o erro e não quebra") {
         val env = BodyTestEnvironment()
         val type = env.typeByCode("VOICE_DEEPENING")

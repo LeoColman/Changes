@@ -91,6 +91,11 @@
     <string name="body_photo_show">Show photo</string>
     <string name="body_photo_hide">Hide photo</string>
     <string name="body_photos_show">Show the photos</string>
+    <string name="body_photo_open">Open photo full screen</string>
+    <string name="body_photo_close">Close photo</string>
+    <string name="body_photo_remove_confirm_title">Remove this photo?</string>
+    <string name="body_photo_remove_confirm_body">The photo leaves this entry when you save. It does not go to the trash.</string>
+    <string name="body_photo_remove_confirm_action">Remove</string>
 
     <string name="body_voice_section">Voice recording</string>
     <string name="body_voice_instructions">Read aloud in your usual speaking voice. Recording the same sentence, in the same place and at the same distance from the phone, makes it easier to compare.</string>
