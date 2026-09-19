@@ -9,10 +9,13 @@ ver; no engrossamento da voz, gravar o áudio de uma frase para perceber a mudan
 
 ## Decisão
 
-- **Fotos.** Toda foto do corpo aparece censurada por padrão (pixelada e escurecida), com um botão de
-  olho para mostrar. A revelação vale para aquela foto enquanto a tela está aberta; sair da tela
-  censura de novo. A versão censurada é desenhada a partir de uma cópia reduzida a poucos pixels, que
-  funciona em qualquer versão do Android (o `Modifier.blur` só existe a partir do Android 12).
+- **Fotos.** Toda foto do corpo aparece censurada por padrão, fortemente borrada, com um botão de olho
+  para mostrar. A revelação vale para aquela foto enquanto a tela está aberta; sair da tela censura de
+  novo. O borrão é feito numa cópia reduzida a 20 pixels de largura, com três passadas de box blur de
+  raio 4 em cada direção (aproxima um blur gaussiano largo), ampliada com filtro bilinear: sobra só uma
+  mancha de cor, sem contorno nem detalhe. Funciona em qualquer versão do Android (o `Modifier.blur`
+  só existe a partir do Android 12). A primeira versão (0.2.0) pixelava a 12 pixels e escurecia; a
+  silhueta continuava reconhecível, e o dono do produto pediu o borrão.
 - **Voz.** A entrada de uma mudança da categoria `VOICE` (hoje `VOICE_DEEPENING`) pode ter a gravação
   de uma frase fixa, a mesma sempre, para que as gravações sejam comparáveis. AAC em MPEG-4
   (`audio/mp4`, `.m4a`), mono, até 60 segundos, gravada no cache e anexada como mídia da entrada ao

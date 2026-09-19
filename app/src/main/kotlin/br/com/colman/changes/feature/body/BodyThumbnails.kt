@@ -3,15 +3,14 @@
 
 package br.com.colman.changes.feature.body
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,9 +20,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -39,13 +35,9 @@ import java.io.File
 
 private const val THUMBNAIL_MAX_EDGE = 512
 
-/** Largura da cópia pixelada (ADR 0013): poucos pixels, ampliados com [FilterQuality.None]. */
-private const val PIXELATION_WIDTH = 12
-private const val DARKEN_ALPHA = 0.55f
-
 /**
- * Miniatura de uma foto de mudança corporal, sempre censurada por padrão (ADR 0013): pixelada e
- * escurecida, com um botão de olho por cima para mostrar. A revelação vale só enquanto a tela está
+ * Miniatura de uma foto de mudança corporal, sempre censurada por padrão (ADR 0013): fortemente
+ * borrada ([blurredCopy]), com um botão de olho por cima para mostrar. A revelação vale só enquanto a tela está
  * aberta (`rememberSaveable` por [key]) e só para esta foto; usada em `BodyHomeScreen`,
  * `BodyChangeTypeScreen` e `BodyEntryEditScreen`. A decodificação de [load] roda fora da thread
  * principal, e `produceState` guarda o resultado em memória por [key] enquanto o composable
@@ -90,22 +82,20 @@ fun CensoredImage(
         Image(bitmap = loaded, contentDescription = contentDescription, modifier = modifier)
     } else {
         val censoredDescription = stringResource(R.string.body_photo_censored)
-        val pixelated = remember(loaded) { pixelatedCopy(loaded) }
+        val blurred = remember(loaded) { blurredCopy(loaded.asAndroidBitmap()).asImageBitmap() }
+        // Ampliada com o filtro bilinear padrão: o borrão fica liso, sem blocos nem contorno.
         Image(
-            bitmap = pixelated,
+            bitmap = blurred,
             contentDescription = null,
-            modifier = modifier
-                .semantics { this.contentDescription = censoredDescription }
-                .drawWithContent {
-                    drawContent()
-                    drawRect(color = Color.Black, alpha = DARKEN_ALPHA)
-                },
-            filterQuality = FilterQuality.None,
+            modifier = modifier.semantics { this.contentDescription = censoredDescription },
         )
     }
 }
 
-/** Botão de olho (ADR 0013): [Icons.Outlined.Visibility] mostra, [Icons.Outlined.VisibilityOff] censura de novo. */
+/**
+ * Botão de olho (ADR 0013): [Icons.Outlined.Visibility] mostra, [Icons.Outlined.VisibilityOff] censura de
+ * novo. Com fundo próprio, para aparecer sobre qualquer foto borrada.
+ */
 @Composable
 fun RevealButton(
     revealed: Boolean,
@@ -114,21 +104,13 @@ fun RevealButton(
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    IconButton(onClick = onToggle, modifier = modifier) {
+    FilledTonalIconButton(onClick = onToggle, modifier = modifier) {
         if (revealed) {
             Icon(Icons.Outlined.VisibilityOff, contentDescription = hideLabel)
         } else {
             Icon(Icons.Outlined.Visibility, contentDescription = showLabel)
         }
     }
-}
-
-/** Reduz [bitmap] a poucos pixels de largura; ampliada com `FilterQuality.None` dá o efeito pixelado. */
-private fun pixelatedCopy(bitmap: ImageBitmap): ImageBitmap {
-    val source = bitmap.asAndroidBitmap()
-    val width = PIXELATION_WIDTH.coerceAtMost(source.width).coerceAtLeast(1)
-    val height = (source.height * width / source.width).coerceAtLeast(1)
-    return Bitmap.createScaledBitmap(source, width, height, false).asImageBitmap()
 }
 
 /** Lê e decodifica a miniatura de uma foto já anexada; `null` se o arquivo sumiu ou não decodifica. */
