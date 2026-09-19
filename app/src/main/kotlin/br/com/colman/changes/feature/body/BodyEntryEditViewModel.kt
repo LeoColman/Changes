@@ -110,6 +110,8 @@ data class BodyEntryEditUiState(
     val measurementText: String = "",
     val notes: String = "",
     val photos: List<EntryPhoto> = emptyList(),
+    /** Chave da foto que o "x" pediu para remover, aguardando confirmação (T19). `null` sem pedido. */
+    val photoPendingRemoval: String? = null,
     /** Categoria `VOICE` (ADR 0013), hoje só `VOICE_DEEPENING`: oferece a seção de gravação. */
     val supportsVoiceRecording: Boolean = false,
     val voiceState: VoiceRecordingUiState = VoiceRecordingUiState.None,
@@ -131,7 +133,12 @@ sealed interface BodyEntryEditUiEvent {
 
     data class PhotoSelected(val raw: RawBodyPhoto) : BodyEntryEditUiEvent
 
-    data class RemovePhoto(val photoKey: String) : BodyEntryEditUiEvent
+    /** O "x" da foto pede confirmação em vez de remover na hora (T19, ADR 0013). */
+    data class RequestRemovePhoto(val photoKey: String) : BodyEntryEditUiEvent
+
+    data object ConfirmRemovePhoto : BodyEntryEditUiEvent
+
+    data object CancelRemovePhoto : BodyEntryEditUiEvent
 
     /** Disparado pela Route depois que a permissão do microfone foi concedida. */
     data object StartRecordingVoice : BodyEntryEditUiEvent
@@ -212,7 +219,10 @@ class BodyEntryEditViewModel(
             is BodyEntryEditUiEvent.MeasurementChanged -> draft.update { it.copy(measurementText = event.text) }
             is BodyEntryEditUiEvent.NotesChanged -> draft.update { it.copy(notes = event.text) }
             is BodyEntryEditUiEvent.PhotoSelected -> addPhoto(event.raw)
-            is BodyEntryEditUiEvent.RemovePhoto -> removePhoto(event.photoKey)
+            is BodyEntryEditUiEvent.RequestRemovePhoto ->
+                draft.update { it.copy(photoPendingRemoval = event.photoKey) }
+            BodyEntryEditUiEvent.ConfirmRemovePhoto -> confirmRemovePhoto()
+            BodyEntryEditUiEvent.CancelRemovePhoto -> draft.update { it.copy(photoPendingRemoval = null) }
             else -> return false
         }
         return true
@@ -269,6 +279,13 @@ class BodyEntryEditViewModel(
             val file = photoIntake.sanitize(raw)
             draft.update { it.copy(pendingPhotos = it.pendingPhotos + PendingPhoto(Uuid.random().toString(), file)) }
         }
+    }
+
+    /** Confirmar o pedido do "x" (T19): remove a foto pendente marcada, do mesmo jeito que antes. */
+    private fun confirmRemovePhoto() {
+        val photoKey = draft.value.photoPendingRemoval ?: return
+        removePhoto(photoKey)
+        draft.update { it.copy(photoPendingRemoval = null) }
     }
 
     private fun removePhoto(photoKey: String) {
@@ -461,6 +478,7 @@ class BodyEntryEditViewModel(
             measurementText = measurementText,
             notes = notes,
             photos = photos,
+            photoPendingRemoval = photoPendingRemoval,
             supportsVoiceRecording = type?.category == BodyChangeCategory.VOICE,
             voiceState = voiceStateOf(voiceRecording),
             voiceRecording = voiceRecording,
@@ -492,6 +510,7 @@ class BodyEntryEditViewModel(
         val notes: String = "",
         val removedAttachedIds: Set<String> = emptySet(),
         val pendingPhotos: List<PendingPhoto> = emptyList(),
+        val photoPendingRemoval: String? = null,
         val recordingFile: File? = null,
         val recordingElapsedSeconds: Int = 0,
         val pendingVoiceFile: File? = null,

@@ -91,6 +91,11 @@
     <string name="body_photo_show">Mostrar foto</string>
     <string name="body_photo_hide">Esconder foto</string>
     <string name="body_photos_show">Mostrar as fotos</string>
+    <string name="body_photo_open">Abrir foto em tela cheia</string>
+    <string name="body_photo_close">Fechar foto</string>
+    <string name="body_photo_remove_confirm_title">Remover esta foto?</string>
+    <string name="body_photo_remove_confirm_body">A foto sai desta entrada quando você salvar. Ela não vai para a lixeira.</string>
+    <string name="body_photo_remove_confirm_action">Remover</string>
 
     <string name="body_voice_section">Gravação de voz</string>
     <string name="body_voice_instructions">Leia em voz alta, no seu tom de fala de sempre. Gravar sempre a mesma frase, no mesmo lugar e à mesma distância do celular, ajuda a comparar.</string>

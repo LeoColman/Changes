@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import br.com.colman.changes.R
 import br.com.colman.changes.core.model.Intensity
 import br.com.colman.changes.ui.components.ChangesScreen
+import br.com.colman.changes.ui.components.ConfirmDialog
 import br.com.colman.changes.ui.components.DateField
 import br.com.colman.changes.ui.components.DropdownField
 import br.com.colman.changes.ui.components.FormColumn
@@ -75,6 +76,16 @@ fun BodyEntryEditScreen(
         },
     ) { padding ->
         BodyEntryEditContent(state, onEvent, actions, modifier.padding(padding))
+    }
+
+    if (state.photoPendingRemoval != null) {
+        ConfirmDialog(
+            title = stringResource(R.string.body_photo_remove_confirm_title),
+            text = stringResource(R.string.body_photo_remove_confirm_body),
+            confirmLabel = stringResource(R.string.body_photo_remove_confirm_action),
+            onConfirm = { onEvent(BodyEntryEditUiEvent.ConfirmRemovePhoto) },
+            onDismiss = { onEvent(BodyEntryEditUiEvent.CancelRemovePhoto) },
+        )
     }
 }
 
@@ -171,7 +182,7 @@ private fun PhotoStrip(
                     contentDescription = photoDescription(photo),
                     modifier = Modifier.aspectRatio(1f),
                 ) { loadPhoto(photo) }
-                IconButton(onClick = { onEvent(BodyEntryEditUiEvent.RemovePhoto(photo.key)) }) {
+                IconButton(onClick = { onEvent(BodyEntryEditUiEvent.RequestRemovePhoto(photo.key)) }) {
                     Icon(
                         Icons.Filled.Close,
                         contentDescription = stringResource(R.string.body_entry_edit_remove_photo_action),

@@ -5,6 +5,7 @@ package br.com.colman.changes.feature.body
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
@@ -42,6 +43,9 @@ private const val THUMBNAIL_MAX_EDGE = 512
  * `BodyChangeTypeScreen` e `BodyEntryEditScreen`. A decodificação de [load] roda fora da thread
  * principal, e `produceState` guarda o resultado em memória por [key] enquanto o composable
  * permanece na composição, que é o cache simples por id. Nunca grava miniatura em disco.
+ *
+ * Tocar na foto (fora do olho) abre a tela cheia (T19), no mesmo estado de censura desta miniatura;
+ * o "x" da tira de fotos é um botão irmão por cima, então continua consumindo o toque dele antes.
  */
 @Composable
 fun BodyThumbnailImage(
@@ -51,8 +55,16 @@ fun BodyThumbnailImage(
     load: suspend () -> ImageBitmap?,
 ) {
     var revealed by rememberSaveable(key) { mutableStateOf(false) }
+    var viewerOpen by rememberSaveable(key) { mutableStateOf(false) }
+    val openLabel = stringResource(R.string.body_photo_open)
     Box(modifier, contentAlignment = Alignment.Center) {
-        CensoredImage(key, revealed, contentDescription, Modifier.matchParentSize(), load)
+        CensoredImage(
+            key,
+            revealed,
+            contentDescription,
+            Modifier.matchParentSize().clickable(onClickLabel = openLabel) { viewerOpen = true },
+            load,
+        )
         // No canto inferior esquerdo: o canto superior direito é do botão de remover na tira de fotos.
         RevealButton(
             revealed = revealed,
@@ -60,6 +72,15 @@ fun BodyThumbnailImage(
             hideLabel = stringResource(R.string.body_photo_hide),
             onToggle = { revealed = !revealed },
             modifier = Modifier.align(Alignment.BottomStart),
+        )
+    }
+    if (viewerOpen) {
+        BodyPhotoViewerDialog(
+            key = key,
+            contentDescription = contentDescription,
+            initialRevealed = revealed,
+            load = load,
+            onDismiss = { viewerOpen = false },
         )
     }
 }
