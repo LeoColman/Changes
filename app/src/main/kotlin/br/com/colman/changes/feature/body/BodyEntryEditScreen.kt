@@ -46,6 +46,7 @@ import br.com.colman.changes.ui.components.LoadingState
 import br.com.colman.changes.ui.components.NumberField
 import br.com.colman.changes.ui.components.SectionHeader
 import br.com.colman.changes.ui.components.TimeField
+import br.com.colman.changes.ui.components.WithUnsavedChangesGuard
 import br.com.colman.changes.ui.format.Formatters
 
 @Composable
@@ -63,19 +64,21 @@ fun BodyEntryEditScreen(
         onEvent(BodyEntryEditUiEvent.ErrorMessageShown)
     }
 
-    ChangesScreen(
-        title = stringResource(
-            if (state.isNew) R.string.body_entry_edit_new_title else R.string.body_entry_edit_edit_title,
-        ),
-        onBack = actions.onBack,
-        snackbarHostState = snackbarHostState,
-        actions = {
-            TextButton(onClick = { onEvent(BodyEntryEditUiEvent.Save) }) {
-                Text(stringResource(R.string.action_save))
-            }
-        },
-    ) { padding ->
-        BodyEntryEditContent(state, onEvent, actions, modifier.padding(padding))
+    WithUnsavedChangesGuard(hasUnsavedChanges = state.hasUnsavedChanges, onLeave = actions.onBack) { requestLeave ->
+        ChangesScreen(
+            title = stringResource(
+                if (state.isNew) R.string.body_entry_edit_new_title else R.string.body_entry_edit_edit_title,
+            ),
+            onBack = requestLeave,
+            snackbarHostState = snackbarHostState,
+            actions = {
+                TextButton(onClick = { onEvent(BodyEntryEditUiEvent.Save) }) {
+                    Text(stringResource(R.string.action_save))
+                }
+            },
+        ) { padding ->
+            BodyEntryEditContent(state, onEvent, actions, modifier.padding(padding))
+        }
     }
 
     if (state.photoPendingRemoval != null) {

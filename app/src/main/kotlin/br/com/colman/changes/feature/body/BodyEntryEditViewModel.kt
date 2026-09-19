@@ -117,6 +117,8 @@ data class BodyEntryEditUiState(
     val voiceState: VoiceRecordingUiState = VoiceRecordingUiState.None,
     val voiceRecording: EntryVoiceRecording? = null,
     val microphoneUnavailable: Boolean = false,
+    /** Seção 9: há edição ainda não salva, então voltar pergunta antes de descartar. */
+    val hasUnsavedChanges: Boolean = false,
     val errorMessage: BodyErrorMessage? = null,
 )
 
@@ -183,6 +185,9 @@ class BodyEntryEditViewModel(
      * primeiro Salvar cria a linha, para que as fotos anexadas na sequência apareçam no formulário.
      */
     private val currentEntryId = MutableStateFlow(args.entryId?.let { Uuid.parse(it) })
+
+    /** Seção 9: instantâneo do formulário no último carregamento ou salvamento, para comparar com o atual. */
+    private var loadedSnapshot: Draft? = null
 
     private val attachedMedia: Flow<List<MediaAttachment>> = currentEntryId.flatMapLatest { id ->
         if (id != null) mediaRepository.observeByOwner(MediaOwnerType.BODY_CHANGE_ENTRY, id) else flowOf(emptyList())
@@ -272,7 +277,24 @@ class BodyEntryEditViewModel(
                 notes = entry?.notes.orEmpty(),
             )
         }
+        captureBaseline()
     }
+
+    /** O formulário recém carregado (ou salvo) passa a ser a referência sem alteração pendente. */
+    private fun captureBaseline() {
+        loadedSnapshot = draft.value.formSnapshot()
+    }
+
+    /** Só o conteúdo do formulário conta como alteração: aviso, gravação em curso e erro ficam de fora. */
+    private fun Draft.formSnapshot(): Draft = copy(
+        isLoading = false,
+        photoPendingRemoval = null,
+        recordingFile = null,
+        recordingElapsedSeconds = 0,
+        isPlayingVoice = false,
+        microphoneUnavailable = false,
+        errorMessage = null,
+    )
 
     private fun addPhoto(raw: RawBodyPhoto) {
         viewModelScope.launch {
@@ -443,6 +465,7 @@ class BodyEntryEditViewModel(
         draft.update {
             it.copy(pendingPhotos = emptyList(), removedAttachedIds = emptySet(), pendingVoiceFile = null)
         }
+        captureBaseline()
         effectChannel.send(BodyEntryEditEffect.Saved)
     }
 
@@ -483,6 +506,7 @@ class BodyEntryEditViewModel(
             voiceState = voiceStateOf(voiceRecording),
             voiceRecording = voiceRecording,
             microphoneUnavailable = microphoneUnavailable,
+            hasUnsavedChanges = loadedSnapshot?.let { formSnapshot() != it } == true,
             errorMessage = errorMessage,
         )
     }

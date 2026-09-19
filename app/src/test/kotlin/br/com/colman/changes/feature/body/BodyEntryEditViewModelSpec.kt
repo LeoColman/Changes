@@ -209,6 +209,43 @@ class BodyEntryEditViewModelSpec : FunSpec({
         env.bodyChangeRepository.getEntry(entry.id)?.notes shouldBe "nota editada"
     }
 
+    test("Seção 9: sem alteração não há aviso ao voltar; editar marca pendente; salvar limpa") {
+        val env = BodyTestEnvironment()
+        val type = env.typeByCode("SKIN_OILINESS_ACNE")
+        val viewModel = BodyEntryEditViewModel(
+            env.repositories,
+            FakePhotoIntake(),
+            env.timeZones,
+            env.voiceControls,
+            BodyEntryEditArgs(typeId = type.id.toString(), entryId = null),
+        )
+
+        turbineScope {
+            val stateTurbine = viewModel.state.testIn(this)
+            val effects = viewModel.effects.testIn(this)
+
+            var state = stateTurbine.awaitItem()
+            while (state.isLoading) state = stateTurbine.awaitItem()
+            state.hasUnsavedChanges shouldBe false
+
+            viewModel.onEvent(BodyEntryEditUiEvent.NotesChanged("anotação"))
+            var edited = stateTurbine.awaitItem()
+            while (!edited.hasUnsavedChanges) edited = stateTurbine.awaitItem()
+
+            viewModel.onEvent(BodyEntryEditUiEvent.DateChanged(pastDate))
+            viewModel.onEvent(BodyEntryEditUiEvent.TimeChanged(pastTime))
+            viewModel.onEvent(BodyEntryEditUiEvent.Save)
+
+            effects.awaitItem() shouldBe BodyEntryEditEffect.Saved
+            var afterSave = stateTurbine.awaitItem()
+            while (afterSave.hasUnsavedChanges) afterSave = stateTurbine.awaitItem()
+            afterSave.hasUnsavedChanges shouldBe false
+
+            stateTurbine.cancelAndIgnoreRemainingEvents()
+            effects.cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     test("aceite: gravar e salvar anexa uma gravação de voz audio/mp4, longe das fotos") {
         val env = BodyTestEnvironment()
         val type = env.typeByCode("VOICE_DEEPENING")
