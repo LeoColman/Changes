@@ -161,6 +161,47 @@ class LogDoseViewModelSpec : FunSpec({
         fromRegimen.state.value.medicationEditable shouldBe false
     }
 
+    test(
+        "hasUnsavedChanges is false right after loading, true after a field changes, and false again after saving"
+    ) {
+        val clock = FixedClock()
+        val database = testDatabase(clock)
+        val regimens = RegimenRepository(database, io, clock)
+        val doseLogs = DoseLogRepository(database, io, clock, FixedTimeZoneProvider())
+        val medications = MedicationRepository(database, io, clock)
+        val created = doseLogs.log(
+            NewDoseLog(null, medicationId(), Dose(1.0, DoseUnit.MG), Route.ORAL, null, clock.now, "original"),
+        ).getOrNull().shouldNotBeNull()
+        val viewModel = newViewModel(doseLogs, regimens, medications, clock, FixedTimeZoneProvider())
+
+        viewModel.onEvent(LogDoseUiEvent.Load(null, null, created.id.toString()))
+        viewModel.state.value.hasUnsavedChanges shouldBe false
+
+        viewModel.onEvent(LogDoseUiEvent.FieldChanged { it.copy(notes = "editado") })
+        viewModel.state.value.hasUnsavedChanges shouldBe true
+
+        viewModel.effects.test {
+            viewModel.onEvent(LogDoseUiEvent.Save)
+            awaitItem() shouldBe LogDoseEffect.NavigateBack
+        }
+        viewModel.state.value.hasUnsavedChanges shouldBe false
+    }
+
+    test("on a new dose log hasUnsavedChanges is false untouched, and true once the first field is filled") {
+        val clock = FixedClock()
+        val database = testDatabase(clock)
+        val regimens = RegimenRepository(database, io, clock)
+        val doseLogs = DoseLogRepository(database, io, clock, FixedTimeZoneProvider())
+        val medications = MedicationRepository(database, io, clock)
+        val viewModel = newViewModel(doseLogs, regimens, medications, clock, FixedTimeZoneProvider())
+
+        viewModel.onEvent(LogDoseUiEvent.Load(null, null, null))
+        viewModel.state.value.hasUnsavedChanges shouldBe false
+
+        viewModel.onEvent(LogDoseUiEvent.FieldChanged { it.copy(doseValue = "1") })
+        viewModel.state.value.hasUnsavedChanges shouldBe true
+    }
+
     test("editing an existing log loads its fields and updates it in place, and can be deleted") {
         val clock = FixedClock()
         val database = testDatabase(clock)

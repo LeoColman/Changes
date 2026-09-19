@@ -337,6 +337,43 @@ class RegimenEditViewModelSpec : FunSpec({
         regimens.observeAll().test { awaitItem() shouldBe listOf(created) }
     }
 
+    test(
+        "hasUnsavedChanges is false right after loading, true after a field changes, and false again after saving"
+    ) {
+        val clock = FixedClock()
+        val database = testDatabase(clock)
+        val regimens = RegimenRepository(database, io, clock)
+        val medications = MedicationRepository(database, io, clock)
+        val created = regimens.create(newRegimen()).getOrNull().shouldNotBeNull()
+        val viewModel = viewModel(regimens, medications, clock)
+
+        viewModel.onEvent(RegimenEditUiEvent.Load(created.id.toString()))
+        viewModel.state.value.hasUnsavedChanges shouldBe false
+
+        viewModel.onEvent(RegimenEditUiEvent.FieldChanged { it.copy(notes = "nova nota") })
+        viewModel.state.value.hasUnsavedChanges shouldBe true
+
+        viewModel.effects.test {
+            viewModel.onEvent(RegimenEditUiEvent.Save)
+            awaitItem() shouldBe RegimenEditEffect.NavigateBack
+        }
+        viewModel.state.value.hasUnsavedChanges shouldBe false
+    }
+
+    test("on a new regimen hasUnsavedChanges is false untouched, and true once the first field is filled") {
+        val clock = FixedClock()
+        val database = testDatabase(clock)
+        val regimens = RegimenRepository(database, io, clock)
+        val medications = MedicationRepository(database, io, clock)
+        val viewModel = viewModel(regimens, medications, clock)
+
+        viewModel.onEvent(RegimenEditUiEvent.Load(null))
+        viewModel.state.value.hasUnsavedChanges shouldBe false
+
+        viewModel.onEvent(RegimenEditUiEvent.FieldChanged { it.copy(doseValue = "10") })
+        viewModel.state.value.hasUnsavedChanges shouldBe true
+    }
+
     test("requesting and confirming delete removes the regimen and navigates back") {
         val clock = FixedClock()
         val database = testDatabase(clock)

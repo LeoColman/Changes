@@ -208,6 +208,48 @@ class MoodCheckInViewModelSpec : FunSpec({
         state.tagsText shouldBe "trabalho"
     }
 
+    test(
+        "hasUnsavedChanges is false right after loading, true after a field changes, and false again after saving"
+    ) {
+        val fixture = MoodCheckInFixture()
+        val date = fixture.today
+        fixture.moods.upsert(
+            MoodLog(
+                id = Uuid.random(),
+                date = date,
+                mood = 3,
+                energy = 3,
+                anxiety = null,
+                dysphoria = null,
+                sleepHours = null,
+                note = null,
+                tags = emptyList(),
+            ),
+        )
+
+        fixture.viewModel.onEvent(MoodCheckInUiEvent.Load(date.toEpochDays()))
+        fixture.viewModel.state.value.hasUnsavedChanges shouldBe false
+
+        fixture.viewModel.onEvent(MoodCheckInUiEvent.MoodChanged(4))
+        fixture.viewModel.state.value.hasUnsavedChanges shouldBe true
+
+        fixture.viewModel.effects.test {
+            fixture.viewModel.onEvent(MoodCheckInUiEvent.Save)
+            awaitItem() shouldBe MoodCheckInEffect.Saved
+        }
+        fixture.viewModel.state.value.hasUnsavedChanges shouldBe false
+    }
+
+    test("on a new check-in hasUnsavedChanges is false untouched, and true once the first field is filled") {
+        val fixture = MoodCheckInFixture()
+
+        fixture.viewModel.onEvent(MoodCheckInUiEvent.Load(null))
+        fixture.viewModel.state.value.hasUnsavedChanges shouldBe false
+
+        fixture.viewModel.onEvent(MoodCheckInUiEvent.MoodChanged(3))
+        fixture.viewModel.state.value.hasUnsavedChanges shouldBe true
+    }
+
     test("editar um dia existente e salvar sobrescreve o mesmo registro (critério 7.7.1)") {
         val fixture = MoodCheckInFixture()
         val date = fixture.today

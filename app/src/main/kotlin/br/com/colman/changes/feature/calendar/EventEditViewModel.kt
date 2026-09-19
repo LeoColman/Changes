@@ -54,11 +54,15 @@ class EventEditViewModel(
     private var eventId: Uuid? = null
     private var loadedCompletedAt: RecordedTime? = null
 
+    /** Seção 9: instantâneo do formulário no último carregamento ou salvamento, para comparar contra o atual. */
+    private var loadedSnapshot: EventEditUiState? = null
+
     fun onEvent(event: EventEditUiEvent) {
         when (event) {
             is EventEditUiEvent.Load -> load(event.eventId, event.epochDay)
-            is EventEditUiEvent.FieldChanged -> _state.update(event.apply)
-            EventEditUiEvent.ToggleCompleted -> _state.update { it.copy(isCompleted = !it.isCompleted) }
+            is EventEditUiEvent.FieldChanged -> _state.update { event.apply(it).withUnsavedFlag() }
+            EventEditUiEvent.ToggleCompleted ->
+                _state.update { it.copy(isCompleted = !it.isCompleted).withUnsavedFlag() }
             EventEditUiEvent.Save -> save()
             EventEditUiEvent.RequestDelete -> _state.update { it.copy(showDeleteConfirm = true) }
             EventEditUiEvent.CancelDelete -> _state.update { it.copy(showDeleteConfirm = false) }
@@ -78,6 +82,22 @@ class EventEditViewModel(
             event == null -> _state.update { populatedForNew(it, epochDay) }
             else -> _state.update { populatedFrom(it, event) }
         }
+        captureBaseline()
+    }
+
+    /** Seção 9: o formulário recém carregado (ou salvo) passa a ser a referência sem alteração pendente. */
+    private fun captureBaseline() {
+        loadedSnapshot = _state.value.formSnapshot()
+        _state.update { it.copy(hasUnsavedChanges = false) }
+    }
+
+    /** Só os campos do formulário importam para detectar alteração pendente (Seção 9). */
+    private fun EventEditUiState.formSnapshot(): EventEditUiState =
+        copy(isLoading = false, error = null, showDeleteConfirm = false, hasUnsavedChanges = false)
+
+    private fun EventEditUiState.withUnsavedFlag(): EventEditUiState {
+        val loaded = loadedSnapshot ?: return copy(hasUnsavedChanges = false)
+        return copy(hasUnsavedChanges = formSnapshot() != loaded)
     }
 
     private fun populatedForNew(current: EventEditUiState, epochDay: Long?): EventEditUiState {
@@ -113,7 +133,10 @@ class EventEditViewModel(
     private fun save() = viewModelScope.launch {
         val result = persist(_state.value)
         when (result) {
-            is Result.Success -> effectsChannel.send(EventEditEffect.NavigateBack)
+            is Result.Success -> {
+                captureBaseline()
+                effectsChannel.send(EventEditEffect.NavigateBack)
+            }
             is Result.Failure -> _state.update { it.copy(error = result.error) }
         }
     }

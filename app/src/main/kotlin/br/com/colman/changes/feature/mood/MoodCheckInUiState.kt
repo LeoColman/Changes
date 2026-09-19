@@ -31,6 +31,8 @@ data class MoodCheckInUiState(
     val moodError: Boolean = false,
     val energyError: Boolean = false,
     val sleepHoursError: Boolean = false,
+    /** Seção 9: `true` quando o formulário difere do que foi carregado, ou do inicial numa entrada nova. */
+    val hasUnsavedChanges: Boolean = false,
 )
 
 /** Ações do check-in. [Load] é disparado uma vez pela `Route` (Seção 5) com o dia da rota. */

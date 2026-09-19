@@ -34,6 +34,7 @@ import br.com.colman.changes.ui.components.FormColumn
 import br.com.colman.changes.ui.components.LoadingState
 import br.com.colman.changes.ui.components.NumberField
 import br.com.colman.changes.ui.components.TimeField
+import br.com.colman.changes.ui.components.WithUnsavedChangesGuard
 
 private typealias LogChange = ((LogDoseUiState) -> LogDoseUiState) -> Unit
 
@@ -41,33 +42,38 @@ private typealias LogChange = ((LogDoseUiState) -> LogDoseUiState) -> Unit
 @Composable
 fun LogDoseScreen(state: LogDoseUiState, onEvent: (LogDoseUiEvent) -> Unit, modifier: Modifier = Modifier) {
     val titleRes = if (state.isEditing) R.string.medication_log_title_edit else R.string.medication_log_title_new
-    Box(modifier) {
-        ChangesScreen(
-            title = stringResource(titleRes),
-            onBack = { onEvent(LogDoseUiEvent.Back) },
-            actions = {
-                if (state.isEditing) {
-                    IconButton(onClick = { onEvent(LogDoseUiEvent.RequestDelete) }) {
-                        Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
+    WithUnsavedChangesGuard(
+        hasUnsavedChanges = state.hasUnsavedChanges,
+        onLeave = { onEvent(LogDoseUiEvent.Back) },
+    ) { requestLeave ->
+        Box(modifier) {
+            ChangesScreen(
+                title = stringResource(titleRes),
+                onBack = requestLeave,
+                actions = {
+                    if (state.isEditing) {
+                        IconButton(onClick = { onEvent(LogDoseUiEvent.RequestDelete) }) {
+                            Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
+                        }
                     }
+                },
+            ) { padding ->
+                if (state.isLoading) {
+                    LoadingState(Modifier.padding(padding))
+                } else {
+                    LogDoseForm(state, onEvent, Modifier.padding(padding).verticalScroll(rememberScrollState()))
                 }
-            },
-        ) { padding ->
-            if (state.isLoading) {
-                LoadingState(Modifier.padding(padding))
-            } else {
-                LogDoseForm(state, onEvent, Modifier.padding(padding).verticalScroll(rememberScrollState()))
             }
         }
-    }
-    if (state.showDeleteConfirm) {
-        ConfirmDialog(
-            title = stringResource(R.string.medication_log_delete_confirm_title),
-            text = stringResource(R.string.medication_log_delete_confirm_body),
-            confirmLabel = stringResource(R.string.action_delete),
-            onConfirm = { onEvent(LogDoseUiEvent.ConfirmDelete) },
-            onDismiss = { onEvent(LogDoseUiEvent.CancelDelete) },
-        )
+        if (state.showDeleteConfirm) {
+            ConfirmDialog(
+                title = stringResource(R.string.medication_log_delete_confirm_title),
+                text = stringResource(R.string.medication_log_delete_confirm_body),
+                confirmLabel = stringResource(R.string.action_delete),
+                onConfirm = { onEvent(LogDoseUiEvent.ConfirmDelete) },
+                onDismiss = { onEvent(LogDoseUiEvent.CancelDelete) },
+            )
+        }
     }
 }
 

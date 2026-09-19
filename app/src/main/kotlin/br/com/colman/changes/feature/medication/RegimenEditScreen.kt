@@ -37,6 +37,7 @@ import br.com.colman.changes.ui.components.FormColumn
 import br.com.colman.changes.ui.components.LoadingState
 import br.com.colman.changes.ui.components.NumberField
 import br.com.colman.changes.ui.components.SectionHeader
+import br.com.colman.changes.ui.components.WithUnsavedChangesGuard
 
 /** Ação de campo simples de formulário: aplica uma transformação ao estado atual. */
 internal typealias Change = ((RegimenEditUiState) -> RegimenEditUiState) -> Unit
@@ -44,35 +45,40 @@ internal typealias Change = ((RegimenEditUiState) -> RegimenEditUiState) -> Unit
 /** Criar/editar regime (Seção 7.1). Stateless: toda mutação sai como [RegimenEditUiEvent]. */
 @Composable
 fun RegimenEditScreen(state: RegimenEditUiState, onEvent: (RegimenEditUiEvent) -> Unit, modifier: Modifier = Modifier) {
-    Box(modifier) {
-        ChangesScreen(
-            title = stringResource(
-                if (state.isNew) R.string.medication_edit_title_new else R.string.medication_edit_title_edit,
-            ),
-            onBack = { onEvent(RegimenEditUiEvent.Back) },
-            actions = {
-                if (!state.isNew) {
-                    IconButton(onClick = { onEvent(RegimenEditUiEvent.RequestDelete) }) {
-                        Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
+    WithUnsavedChangesGuard(
+        hasUnsavedChanges = state.hasUnsavedChanges,
+        onLeave = { onEvent(RegimenEditUiEvent.Back) },
+    ) { requestLeave ->
+        Box(modifier) {
+            ChangesScreen(
+                title = stringResource(
+                    if (state.isNew) R.string.medication_edit_title_new else R.string.medication_edit_title_edit,
+                ),
+                onBack = requestLeave,
+                actions = {
+                    if (!state.isNew) {
+                        IconButton(onClick = { onEvent(RegimenEditUiEvent.RequestDelete) }) {
+                            Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
+                        }
                     }
+                },
+            ) { padding ->
+                if (state.isLoading) {
+                    LoadingState(Modifier.padding(padding))
+                } else {
+                    RegimenEditForm(state, onEvent, Modifier.padding(padding).verticalScroll(rememberScrollState()))
                 }
-            },
-        ) { padding ->
-            if (state.isLoading) {
-                LoadingState(Modifier.padding(padding))
-            } else {
-                RegimenEditForm(state, onEvent, Modifier.padding(padding).verticalScroll(rememberScrollState()))
             }
         }
-    }
-    if (state.showDeleteConfirm) {
-        ConfirmDialog(
-            title = stringResource(R.string.medication_delete_confirm_title),
-            text = stringResource(R.string.medication_delete_confirm_body),
-            confirmLabel = stringResource(R.string.action_delete),
-            onConfirm = { onEvent(RegimenEditUiEvent.ConfirmDelete) },
-            onDismiss = { onEvent(RegimenEditUiEvent.CancelDelete) },
-        )
+        if (state.showDeleteConfirm) {
+            ConfirmDialog(
+                title = stringResource(R.string.medication_delete_confirm_title),
+                text = stringResource(R.string.medication_delete_confirm_body),
+                confirmLabel = stringResource(R.string.action_delete),
+                onConfirm = { onEvent(RegimenEditUiEvent.ConfirmDelete) },
+                onDismiss = { onEvent(RegimenEditUiEvent.CancelDelete) },
+            )
+        }
     }
 }
 
