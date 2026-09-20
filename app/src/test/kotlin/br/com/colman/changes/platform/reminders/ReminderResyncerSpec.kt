@@ -7,6 +7,11 @@ import br.com.colman.changes.platform.AppSettings
 import br.com.colman.changes.platform.SettingsStore
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -17,6 +22,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toInstant
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 /** Seção 7.9: telas só gravam; os alarmes acompanham os dados sozinhos. */
@@ -49,6 +55,56 @@ class ReminderResyncerSpec : FunSpec({
             advanceTimeBy(1.seconds)
             runCurrent()
             syncs shouldBe 3
+        }
+    }
+
+    test("the quiet period is 500ms: changes closer together than that still coalesce into one sync") {
+        runTest {
+            val env = PlanningEnvironment(UnconfinedTestDispatcher(testScheduler))
+            val settings = FakeSettingsStore()
+            var syncs = 0
+            val sync = ReminderSync({
+                syncs++
+                emptyList()
+            }, NoAlarms, NoRegistry, env.clock)
+            ReminderResyncer(env.regimens, env.calendar, settings, sync).start(backgroundScope)
+            advanceTimeBy(1.seconds)
+            runCurrent()
+            syncs shouldBe 1
+
+            settings.update { it.copy(doseRemindersEnabled = false) }
+            advanceTimeBy(400.milliseconds)
+            runCurrent()
+            settings.update { it.copy(moodReminderEnabled = true) }
+            advanceTimeBy(1.seconds)
+            runCurrent()
+
+            syncs shouldBe 2
+        }
+    }
+
+    test("a source that truly fails after suspending cancels the resync job, it isn't swallowed") {
+        runTest {
+            val dispatcher = UnconfinedTestDispatcher(testScheduler)
+            val env = PlanningEnvironment(dispatcher)
+            val settings = FakeSettingsStore()
+            val failingSource = UpcomingReminders {
+                delay(1)
+                error("source unavailable")
+            }
+            val sync = ReminderSync(failingSource, NoAlarms, NoRegistry, env.clock)
+
+            // Job e handler próprios, sem propagar para o teste (diferente de backgroundScope): a
+            // falha é exatamente o que este teste verifica, não um erro do teste em si.
+            var failure: Throwable? = null
+            val handler = CoroutineExceptionHandler { _, throwable -> failure = throwable }
+            val scope = CoroutineScope(dispatcher + SupervisorJob() + handler)
+            val job = ReminderResyncer(env.regimens, env.calendar, settings, sync).start(scope)
+            advanceTimeBy(1.seconds)
+            runCurrent()
+
+            job.isCancelled shouldBe true
+            failure.shouldBeInstanceOf<IllegalStateException>()
         }
     }
 })
