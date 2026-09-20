@@ -12,6 +12,23 @@ private fun argb(alpha: Int, red: Int, green: Int, blue: Int) = (alpha shl 24) o
 
 private fun red(color: Int) = (color shr 16) and 0xFF
 
+/**
+ * Média de janela 9 (raio 4), clampeando na borda: a mesma conta documentada em [averageAround], escrita
+ * de outro jeito para servir de oráculo independente. Só precisa da direção horizontal: com altura 1 a
+ * passada vertical não muda nada (a linha tem um só elemento, a média dele com ele mesmo é ele mesmo).
+ */
+private fun referenceBoxBlur1D(values: IntArray, radius: Int, passes: Int): IntArray {
+    var current = values.copyOf()
+    repeat(passes) {
+        current = IntArray(current.size) { i ->
+            var sum = 0
+            for (offset in -radius..radius) sum += current[(i + offset).coerceIn(0, current.lastIndex)]
+            sum / (2 * radius + 1)
+        }
+    }
+    return current
+}
+
 /** ADR 0013: a foto censurada é um borrão sem contorno, nunca a foto original escurecida. */
 class PhotoBlurSpec : FunSpec({
     test("uma imagem de uma cor só continua exatamente igual") {
@@ -57,5 +74,37 @@ class PhotoBlurSpec : FunSpec({
 
         val alphas = pixels.map { (it ushr 24) and 0xFF }
         alphas.count { it in 1..254 } shouldBeGreaterThan 0
+    }
+
+    test("as 3 passadas de raio 4 seguem a média de janela documentada, canal a canal") {
+        val width = 41
+        val radius = 4
+        val passes = 3
+        val center = width / 2
+        fun spike(peak: Int) = IntArray(width) { i -> if (i == center) peak else 0 }
+        val alpha = referenceBoxBlur1D(spike(200), radius, passes)
+        val redChannel = referenceBoxBlur1D(spike(150), radius, passes)
+        val green = referenceBoxBlur1D(spike(100), radius, passes)
+        val blue = referenceBoxBlur1D(spike(90), radius, passes)
+        val expected = IntArray(width) { i -> argb(alpha[i], redChannel[i], green[i], blue[i]) }
+
+        val pixels = IntArray(width) { i -> if (i == center) argb(200, 150, 100, 90) else argb(0, 0, 0, 0) }
+        blurPixels(pixels, width, 1)
+
+        pixels shouldBe expected
+    }
+
+    test("uma borda vertical também vira uma transição gradual, sem degrau") {
+        val height = 20
+        val width = 4
+        val pixels = IntArray(width * height) { i ->
+            if (i / width < height / 2) argb(255, 0, 0, 0) else argb(255, 255, 255, 255)
+        }
+
+        blurPixels(pixels, width, height)
+
+        val column = (0 until height).map { y -> red(pixels[y * width]) }
+        column.zipWithNext().all { (top, bottom) -> top <= bottom } shouldBe true
+        column.count { it in 1..254 } shouldBeGreaterThan height / 2
     }
 })

@@ -4,9 +4,13 @@
 package br.com.colman.changes.platform.reminders
 
 import br.com.colman.changes.core.testing.FixedClock
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.minutes
 
 class ReminderSyncSpec : FunSpec({
@@ -74,5 +78,19 @@ class ReminderSyncSpec : FunSpec({
         gateway.scheduled.size shouldBe ReminderSync.MAX_ALARMS
         gateway.scheduled.values.maxOf { it.at } shouldBe clock.now + 64.minutes
         gateway.scheduled.values.minOf { it.at } shouldBe clock.now + 1.minutes
+    }
+
+    test("a source that fails after truly suspending is not swallowed; nothing gets scheduled or saved") {
+        val gateway = FakeGateway()
+        val registry = FakeRegistry()
+        val failing = UpcomingReminders {
+            withContext(Dispatchers.Default) {}
+            error("source unavailable")
+        }
+
+        shouldThrow<IllegalStateException> { ReminderSync(failing, gateway, registry, clock).sync() }
+
+        gateway.scheduled.shouldBeEmpty()
+        registry.codes shouldBe emptySet()
     }
 })

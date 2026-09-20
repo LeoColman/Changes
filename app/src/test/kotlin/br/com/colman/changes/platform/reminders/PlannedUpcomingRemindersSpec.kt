@@ -8,6 +8,7 @@ import br.com.colman.changes.core.data.NewCalendarEvent
 import br.com.colman.changes.core.data.NewRegimen
 import br.com.colman.changes.core.data.ProfileRepository
 import br.com.colman.changes.core.data.RegimenRepository
+import br.com.colman.changes.core.db.createDatabase
 import br.com.colman.changes.core.model.CalendarCategory
 import br.com.colman.changes.core.model.Dose
 import br.com.colman.changes.core.model.DoseUnit
@@ -16,9 +17,11 @@ import br.com.colman.changes.core.model.Schedule
 import br.com.colman.changes.core.model.getOrNull
 import br.com.colman.changes.core.testing.FixedClock
 import br.com.colman.changes.core.testing.FixedTimeZoneProvider
+import br.com.colman.changes.core.testing.inMemoryDriver
 import br.com.colman.changes.core.testing.testDatabase
 import br.com.colman.changes.core.testing.testDataset
 import br.com.colman.changes.platform.AppSettings
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -61,6 +64,21 @@ class PlannedUpcomingRemindersSpec : FunSpec({
         val reminders = source.upcoming(env.clock.now())
 
         reminders.map { it.kind } shouldBe listOf(ReminderKind.EVENT)
+    }
+
+    test("if a repository flow truly fails after suspending, upcoming() doesn't swallow it") {
+        val driver = inMemoryDriver()
+        val database = createDatabase(driver)
+        val clock = FixedClock()
+        val zones = FixedTimeZoneProvider()
+        val regimens = RegimenRepository(database, io, clock)
+        val calendar =
+            CalendarRepository(database, io, clock, zones, ProfileRepository(database, io, clock), testDataset)
+        driver.close()
+
+        val source = PlannedUpcomingReminders(regimens, calendar, FakeSettingsStore(), zones)
+
+        shouldThrow<Exception> { source.upcoming(clock.now()) }
     }
 })
 
