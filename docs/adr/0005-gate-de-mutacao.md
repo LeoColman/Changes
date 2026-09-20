@@ -48,8 +48,25 @@ e pisos por pacote verificados por script.
   não expõe, então `:app:appPitest` chama a linha de comando do Pitest com o classpath do
   `testDebugUnitTest` e muta o jar de classes do app. Compose, Activity, Route e tudo que precisa de
   aparelho ficam de fora: não é código que a JVM executa.
-- Piso do `:app`: 60% no módulo, verificado por `:app:appPitestGate`. É o nível medido quando a rodada
-  entrou; subir o piso é o trabalho seguinte, não um ajuste de configuração.
+- Piso do `:app`: 82% no módulo (o mesmo do `:core`), verificado por `:app:appPitestGate`. A rodada
+  entrou medindo 62,3% e os testes de comportamento a levaram para a faixa de 84,8% a 87,7%.
+- **Por que uma faixa, e não um número.** Meia dúzia de mutantes do `:app` vive na máquina de estado das
+  funções `suspend` e morre ou sobrevive conforme o escalonamento das threads da rodada (medido: 173 e
+  179 mortos em duas rodadas do mesmo commit). O piso fica em 82% justamente para caber essa variação;
+  ele não deve ser colado no melhor número já visto.
+- **Onde o `:app` para.** Os mutantes que sobram não têm teste que os mate sem mudar o código de
+  produção, e são de quatro tipos: (1) `Intrinsics.checkNotNullExpressionValue` que o compilador emite
+  depois de chamada Java de tipo plataforma (`DateTimeFormatter.format`, `NumberFormat.format`,
+  `Locale.toLanguageTag`) — a JDK documenta que nenhuma delas devolve nulo; (2) a máquina de estado das
+  funções `suspend` (mutantes de `invokeSuspend`/`throwOnFailure` em caminhos de retomada que já são
+  cobertos pelo `getOrThrow()` seguinte); (3) `blurredCopy`, que só adapta `android.graphics.Bitmap` e
+  fica em `NO_COVERAGE` porque o teste de unidade do módulo usa `isReturnDefaultValues = true` sem
+  Robolectric — o algoritmo de verdade, `blurPixels`, está coberto; (4) seis equivalentes provados um a
+  um (janela simétrica do borrão, `minimumFractionDigits = 0` que repete o padrão do locale, `>` contra
+  `>=` entre índices de dois caracteres distintos, `return emptyList()` mutado para lista vazia).
+- Achado que vale repetir em teste novo: mutante em caminho de retomada de `suspend` só morre se a fonte
+  suspender de verdade antes de falhar (`delay`, `withContext`); uma fonte que lança de imediato nunca
+  chega lá.
 - **Recorte para desenvolver.** `-Ppitest.classes=<globs>` troca o alvo dos dois módulos
   (ex.: `./gradlew :core:pitest -Ppitest.classes=br.com.colman.changes.core.model.*`, segundos em vez de
   minutos). Numa rodada recortada os gates não rodam: o recorte não representa o módulo.

@@ -236,7 +236,7 @@ dependencies {
 }
 
 /** Piso do score de mutação do :app (ADR 0005). */
-val appPitestFloor = 60
+val appPitestFloor = 82
 
 /** Rodada rápida durante o desenvolvimento: `-Ppitest.classes=br.com.colman.changes.ui.format.*`. */
 val pitestClassesOverride: String? = providers.gradleProperty("pitest.classes").orNull
