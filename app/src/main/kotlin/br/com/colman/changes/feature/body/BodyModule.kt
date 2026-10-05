@@ -16,7 +16,7 @@ val bodyModule: Module = module {
     single { BodyLabels(get(), get()) }
     // Agrupam dependências para não estourar o limite de parâmetros do construtor (LongParameterList).
     single { BodyEntryEditRepositories(get(), get(), get()) }
-    single { BodyVoiceControls(get(), get(), get()) }
+    single { BodyVoiceControls(get(), get(), get(), get()) }
     viewModelOf(::BodyHomeViewModel)
     viewModel { (typeId: String) -> BodyChangeTypeViewModel(get(), get(), get(), get(), typeId) }
     viewModel { (args: BodyEntryEditArgs, photoIntake: BodyPhotoIntake) ->

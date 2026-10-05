@@ -9,6 +9,7 @@ import br.com.colman.changes.core.model.MediaOwnerType
 import br.com.colman.changes.core.model.Result
 import br.com.colman.changes.core.testing.MainDispatcherListener
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -177,6 +178,69 @@ class BodyChangeTypeViewModelSpec : FunSpec({
         env.bodyChangeRepository.observeAllTypes().test {
             awaitItem().map { it.id } shouldNotContain created.id
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    fun BodyTestEnvironment.typeViewModel(typeId: Uuid) =
+        BodyChangeTypeViewModel(bodyChangeRepository, mediaRepository, bodyLabels, voicePlayer, typeId.toString())
+
+    test("ADR 0014: o gráfico da voz tem a frequência em Hz de cada entrada, da mais antiga à mais recente") {
+        val env = BodyTestEnvironment()
+        val type = env.typeByCode("VOICE_DEEPENING")
+        val newer = (
+            env.bodyChangeRepository.createEntry(type.id, env.clock.now - 1.hours, null, 148.5, null) as Result.Success
+            ).value
+        env.bodyChangeRepository.createEntry(type.id, env.clock.now - 2.hours, null, null, "sem medida")
+        val older = (
+            env.bodyChangeRepository.createEntry(type.id, env.clock.now - 3.hours, null, 210.0, null) as Result.Success
+            ).value
+
+        env.typeViewModel(type.id).state.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+
+            state.showsVoicePitch shouldBe true
+            state.voicePitchPoints.map { it.entryId to it.hz } shouldContainExactly listOf(
+                older.id.toString() to 210.0,
+                newer.id.toString() to 148.5,
+            )
+            state.voicePitchPoints.first().observedAt shouldBe older.observedAt
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    test("ADR 0014: um tipo de voz ainda sem frequência mostra o gráfico vazio") {
+        val env = BodyTestEnvironment()
+        val type = env.typeByCode("VOICE_DEEPENING")
+        env.bodyChangeRepository.createEntry(type.id, env.clock.now - 1.hours, null, null, null)
+
+        env.typeViewModel(type.id).state.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+            state.showsVoicePitch shouldBe true
+            state.voicePitchPoints.shouldBeEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    test("ADR 0014: só tipo de voz com medida em Hz tem o gráfico da voz") {
+        val env = BodyTestEnvironment()
+        val measured = env.typeByCode("CLITORAL_ENLARGEMENT")
+        env.bodyChangeRepository.createEntry(measured.id, env.clock.now - 1.hours, null, 5.0, null)
+        val voiceWithoutUnit = (
+            env.bodyChangeRepository.createCustomType("Rouquidão", BodyChangeCategory.VOICE, null) as Result.Success
+            ).value
+        env.bodyChangeRepository.createEntry(voiceWithoutUnit.id, env.clock.now - 1.hours, null, null, null)
+
+        for (typeId in listOf(measured.id, voiceWithoutUnit.id)) {
+            env.typeViewModel(typeId).state.test {
+                var state = awaitItem()
+                while (state.isLoading) state = awaitItem()
+                state.entries.size shouldBe 1
+                state.showsVoicePitch shouldBe false
+                state.voicePitchPoints.shouldBeEmpty()
+                cancelAndIgnoreRemainingEvents()
+            }
         }
     }
 })

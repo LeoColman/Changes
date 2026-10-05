@@ -109,4 +109,20 @@
     <string name="body_voice_play_first">Ouvir a primeira</string>
     <string name="body_voice_play_latest">Ouvir a mais recente</string>
     <string name="body_voice_play_entry">Ouvir a gravação de %1$s</string>
+
+    <!-- Frequência da voz (ADR 0014): estimada da gravação, editável, e o gráfico na tela do tipo. -->
+    <string name="body_voice_pitch_explanation">Ao parar a gravação, o app estima a frequência fundamental da voz e preenche a medida em Hz. Quanto mais baixa, mais grave. O valor pode ser corrigido.</string>
+    <string name="body_voice_pitch_estimating">Estimando a frequência da gravação</string>
+    <string name="body_voice_pitch_unavailable">Não foi possível estimar a frequência desta gravação. O valor em Hz pode ser digitado.</string>
+    <string name="body_voice_pitch_estimate">Estimar a frequência da gravação</string>
+    <string name="body_voice_chart_title">Frequência da voz</string>
+    <string name="body_voice_chart_explanation">Frequência fundamental de cada registro, em Hz. Quanto mais baixa a linha, mais grave a voz.</string>
+    <string name="body_voice_chart_empty">O gráfico aparece quando houver registros com a frequência em Hz. Ao gravar a frase, o app estima esse valor. Para uma gravação antiga, abra o registro e toque em Estimar a frequência da gravação.</string>
+    <string name="body_voice_chart_first">Primeiro registro: %1$s Hz, em %2$s</string>
+    <string name="body_voice_chart_latest">Mais recente: %1$s Hz, em %2$s</string>
+    <plurals name="body_voice_chart_summary">
+        <item quantity="one">Frequência da voz: %1$d registro, em %2$s. Valor: %4$s Hz.</item>
+        <item quantity="many">Frequência da voz: %1$d registros, de %2$s a %3$s. Primeiro: %4$s Hz. Mais recente: %5$s Hz.</item>
+        <item quantity="other">Frequência da voz: %1$d registros, de %2$s a %3$s. Primeiro: %4$s Hz. Mais recente: %5$s Hz.</item>
+    </plurals>
 </resources>

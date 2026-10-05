@@ -23,10 +23,12 @@ import br.com.colman.changes.core.model.TimeZoneProvider
 import br.com.colman.changes.core.model.asFailure
 import br.com.colman.changes.core.model.map
 import br.com.colman.changes.platform.AndroidVoiceRecorder
+import br.com.colman.changes.platform.VoicePitchAnalyzer
 import br.com.colman.changes.platform.VoicePlayer
 import br.com.colman.changes.platform.VoiceRecorder
 import br.com.colman.changes.ui.format.Formatters
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +47,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toInstant
 import java.io.File
+import kotlin.math.roundToInt
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -63,8 +66,16 @@ data class BodyEntryEditRepositories(
     val bodyLabels: BodyLabels,
 )
 
-/** Gravador, player e relógio da gravação de voz (ADR 0013), agrupados pelo mesmo motivo. */
-data class BodyVoiceControls(val recorder: VoiceRecorder, val player: VoicePlayer, val clock: Clock)
+/**
+ * Gravador, player e relógio da gravação de voz (ADR 0013), e a estimativa da frequência (ADR 0014),
+ * agrupados pelo mesmo motivo.
+ */
+data class BodyVoiceControls(
+    val recorder: VoiceRecorder,
+    val player: VoicePlayer,
+    val clock: Clock,
+    val pitch: VoicePitchAnalyzer,
+)
 
 /** Uma foto exibida no formulário: já anexada, ou pendente de anexar ao salvar. */
 sealed interface EntryPhoto {
@@ -117,6 +128,11 @@ data class BodyEntryEditUiState(
     val voiceState: VoiceRecordingUiState = VoiceRecordingUiState.None,
     val voiceRecording: EntryVoiceRecording? = null,
     val microphoneUnavailable: Boolean = false,
+    /** ADR 0014: a medida do tipo é em Hz, então a frequência pode ser estimada a partir da gravação. */
+    val supportsPitchEstimate: Boolean = false,
+    val isEstimatingPitch: Boolean = false,
+    /** A última estimativa não achou voz suficiente na gravação; o valor pode ser digitado. */
+    val pitchUnavailable: Boolean = false,
     /** Seção 9: há edição ainda não salva, então voltar pergunta antes de descartar. */
     val hasUnsavedChanges: Boolean = false,
     val errorMessage: BodyErrorMessage? = null,
@@ -155,6 +171,9 @@ sealed interface BodyEntryEditUiEvent {
 
     data object DeleteVoice : BodyEntryEditUiEvent
 
+    /** Estima de novo a frequência da gravação atual e troca o valor do campo de medida (ADR 0014). */
+    data object EstimatePitch : BodyEntryEditUiEvent
+
     data object Save : BodyEntryEditUiEvent
 
     data object ErrorMessageShown : BodyEntryEditUiEvent
@@ -188,6 +207,13 @@ class BodyEntryEditViewModel(
 
     /** Seção 9: instantâneo do formulário no último carregamento ou salvamento, para comparar com o atual. */
     private var loadedSnapshot: Draft? = null
+
+    /**
+     * Estimativa da frequência em curso (ADR 0014): apagar a gravação cancela, salvar espera. Cancela com
+     * `cancel(null)`, não `cancel()`: a rodada de mutação carrega um kotlinx-coroutines mais antigo antes
+     * do app, sem o `Job.cancel$default` que a chamada sem argumento gera.
+     */
+    private var pitchJob: Job? = null
 
     private val attachedMedia: Flow<List<MediaAttachment>> = currentEntryId.flatMapLatest { id ->
         if (id != null) mediaRepository.observeByOwner(MediaOwnerType.BODY_CHANGE_ENTRY, id) else flowOf(emptyList())
@@ -242,6 +268,8 @@ class BodyEntryEditViewModel(
             BodyEntryEditUiEvent.PlayVoice -> playVoice()
             BodyEntryEditUiEvent.StopVoice -> stopVoice()
             BodyEntryEditUiEvent.DeleteVoice -> deleteVoice()
+            BodyEntryEditUiEvent.EstimatePitch ->
+                state.value.voiceRecording?.let { estimatePitch(it, overwrite = true) }
             else -> return false
         }
         return true
@@ -293,6 +321,9 @@ class BodyEntryEditViewModel(
         recordingElapsedSeconds = 0,
         isPlayingVoice = false,
         microphoneUnavailable = false,
+        isEstimatingPitch = false,
+        pitchUnavailable = false,
+        estimatedMeasurementText = null,
         errorMessage = null,
     )
 
@@ -357,8 +388,40 @@ class BodyEntryEditViewModel(
                 recordingElapsedSeconds = 0,
                 pendingVoiceFile = file ?: current.pendingVoiceFile,
                 microphoneUnavailable = current.microphoneUnavailable || file == null,
+                // A gravação nova já aparece com a estimativa em curso, sem um estado intermediário.
+                isEstimatingPitch = file != null && current.supportsPitchEstimate(),
             )
         }
+        if (file != null) estimatePitch(EntryVoiceRecording.Pending(file), overwrite = false)
+    }
+
+    /**
+     * ADR 0014: estima a frequência fundamental de [voice] e preenche a medida em Hz, arredondada. Sem
+     * [overwrite] (gravação recém-feita), só preenche um campo vazio: nunca troca um valor que a pessoa
+     * digitou.
+     */
+    private fun estimatePitch(voice: EntryVoiceRecording, overwrite: Boolean) {
+        if (!draft.value.supportsPitchEstimate()) return
+        pitchJob?.cancel(null)
+        draft.update { it.copy(isEstimatingPitch = true, pitchUnavailable = false) }
+        pitchJob = viewModelScope.launch {
+            val hz = when (voice) {
+                is EntryVoiceRecording.Pending -> voiceControls.pitch.medianPitchHz(voice.file)
+                is EntryVoiceRecording.Attached -> voiceControls.pitch.medianPitchHzOfMedia(voice.media.relativePath)
+            }
+            draft.update { it.withPitchEstimate(hz, overwrite) }
+        }
+    }
+
+    private fun Draft.withPitchEstimate(hz: Double?, overwrite: Boolean): Draft {
+        val text = hz?.let { Formatters.number(it.roundToInt().toDouble()) }
+        val replaces = overwrite || measurementText.isBlank()
+        return copy(
+            isEstimatingPitch = false,
+            pitchUnavailable = text == null,
+            measurementText = if (text != null && replaces) text else measurementText,
+            estimatedMeasurementText = if (text != null && replaces) text else estimatedMeasurementText,
+        )
     }
 
     private fun playVoice() {
@@ -376,9 +439,11 @@ class BodyEntryEditViewModel(
         draft.update { it.copy(isPlayingVoice = false) }
     }
 
+    /** Apagar a gravação leva junto a medida que veio dela, se ninguém mexeu no valor estimado (ADR 0014). */
     private fun deleteVoice() {
         val voice = state.value.voiceRecording ?: return
         voiceControls.player.stop()
+        pitchJob?.cancel(null)
         draft.update { current ->
             val next = when (voice) {
                 is EntryVoiceRecording.Pending -> {
@@ -390,14 +455,28 @@ class BodyEntryEditViewModel(
                     removedAttachedIds = current.removedAttachedIds + voice.media.id.toString(),
                 )
             }
-            next.copy(isPlayingVoice = false)
+            val estimated = next.measurementText == next.estimatedMeasurementText
+            next.copy(
+                isPlayingVoice = false,
+                isEstimatingPitch = false,
+                pitchUnavailable = false,
+                measurementText = if (estimated) "" else next.measurementText,
+                estimatedMeasurementText = null,
+            )
         }
     }
 
     private fun save() {
         // Salvar no meio de uma gravação encerra a gravação e anexa o que foi gravado.
         if (draft.value.recordingFile != null) stopRecordingVoice()
-        val current = draft.value
+        viewModelScope.launch {
+            // A estimativa da gravação recém-parada entra no que vai ser salvo (ADR 0014).
+            pitchJob?.join()
+            saveDraft(draft.value)
+        }
+    }
+
+    private suspend fun saveDraft(current: Draft) {
         val type = current.type ?: return
         val date = current.date
         val time = current.time
@@ -407,15 +486,12 @@ class BodyEntryEditViewModel(
         }
         val measurementValue = Formatters.parseNumber(current.measurementText)
         val observedAt = LocalDateTime(date, time).toInstant(timeZones.current())
-        viewModelScope.launch {
-            val result = submit(type, observedAt, current, measurementValue)
-            when (result) {
-                is Result.Success -> {
-                    currentEntryId.value = result.value
-                    finishSave(result.value, current)
-                }
-                is Result.Failure -> draft.update { it.copy(errorMessage = result.error.toBodyErrorMessage()) }
+        when (val result = submit(type, observedAt, current, measurementValue)) {
+            is Result.Success -> {
+                currentEntryId.value = result.value
+                finishSave(result.value, current)
             }
+            is Result.Failure -> draft.update { it.copy(errorMessage = result.error.toBodyErrorMessage()) }
         }
     }
 
@@ -506,6 +582,9 @@ class BodyEntryEditViewModel(
             voiceState = voiceStateOf(voiceRecording),
             voiceRecording = voiceRecording,
             microphoneUnavailable = microphoneUnavailable,
+            supportsPitchEstimate = supportsPitchEstimate(),
+            isEstimatingPitch = isEstimatingPitch,
+            pitchUnavailable = pitchUnavailable,
             hasUnsavedChanges = loadedSnapshot?.let { formSnapshot() != it } == true,
             errorMessage = errorMessage,
         )
@@ -516,6 +595,10 @@ class BodyEntryEditViewModel(
         pendingVoiceFile != null -> EntryVoiceRecording.Pending(pendingVoiceFile)
         else -> visibleAttached.firstOrNull { it.isAudio }?.let { EntryVoiceRecording.Attached(it) }
     }
+
+    /** Tipo de voz com medida em Hz, como o `VOICE_DEEPENING` (ADR 0014). */
+    private fun Draft.supportsPitchEstimate(): Boolean = type?.category == BodyChangeCategory.VOICE &&
+        type.supportsMeasurement && type.measurementUnit == BodyMeasurementUnit.HZ
 
     private fun Draft.voiceStateOf(voiceRecording: EntryVoiceRecording?): VoiceRecordingUiState = when {
         recordingFile != null -> VoiceRecordingUiState.Recording(recordingElapsedSeconds)
@@ -540,6 +623,10 @@ class BodyEntryEditViewModel(
         val pendingVoiceFile: File? = null,
         val isPlayingVoice: Boolean = false,
         val microphoneUnavailable: Boolean = false,
+        val isEstimatingPitch: Boolean = false,
+        val pitchUnavailable: Boolean = false,
+        /** Texto que a última estimativa pôs no campo de medida; igual ao campo = ninguém mexeu nele. */
+        val estimatedMeasurementText: String? = null,
         val errorMessage: BodyErrorMessage? = null,
     )
 

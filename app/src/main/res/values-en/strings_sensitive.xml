@@ -135,4 +135,8 @@
         <item quantity="other">%1$d of %2$d planned doses recorded in the last %3$d days</item>
     </plurals>
     <string name="adherence_none_expected">No planned doses in the %1$s window</string>
+
+    <!-- Reference band of the voice chart (ADR 0014): neutral color, no goal. -->
+    <string name="voice_reference_band">Shaded band: 90 to 155 Hz, the typical speaking fundamental frequency of young adult men in a population study. Individual variation is large and being outside the band does not indicate a problem.</string>
+    <string name="voice_reference_source">Source: Fitch and Holbrook, Archives of Otolaryngology, 1970, as cited in Baken and Orlikoff, Clinical Measurement of Speech and Voice, 2000.</string>
 </resources>

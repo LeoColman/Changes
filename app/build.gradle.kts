@@ -248,6 +248,7 @@ val pitestTargetClasses = listOf(
     "br.com.colman.changes.platform.reminders.SettingsUpcomingReminders*",
     "br.com.colman.changes.platform.reminders.ReminderResyncer*",
     "br.com.colman.changes.platform.reminders.ReminderSync*",
+    "br.com.colman.changes.platform.VoicePitchKt",
     "br.com.colman.changes.feature.medication.RegimenScheduleFormKt",
     "br.com.colman.changes.feature.medication.MedicationDisplayNames",
     "br.com.colman.changes.feature.settings.HeightInputKt",

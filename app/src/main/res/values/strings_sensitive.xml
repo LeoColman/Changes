@@ -156,4 +156,8 @@
         <item quantity="other">%1$d de %2$d doses previstas registradas nos últimos %3$d dias</item>
     </plurals>
     <string name="adherence_none_expected">Nenhuma dose prevista na janela de %1$s</string>
+
+    <!-- Faixa de referência do gráfico da voz (ADR 0014): cor neutra, sem meta. -->
+    <string name="voice_reference_band">Faixa sombreada: 90 a 155 Hz, frequência fundamental típica da fala de homens adultos jovens num estudo populacional. A variação individual é grande e estar fora da faixa não indica problema.</string>
+    <string name="voice_reference_source">Fonte: Fitch e Holbrook, Archives of Otolaryngology, 1970, conforme Baken e Orlikoff, Clinical Measurement of Speech and Voice, 2000.</string>
 </resources>

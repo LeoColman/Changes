@@ -109,4 +109,19 @@
     <string name="body_voice_play_first">Play the first one</string>
     <string name="body_voice_play_latest">Play the latest one</string>
     <string name="body_voice_play_entry">Play the recording from %1$s</string>
+
+    <!-- Voice frequency (ADR 0014): estimated from the recording, editable, and the chart on the type screen. -->
+    <string name="body_voice_pitch_explanation">When the recording stops, the app estimates the fundamental frequency of the voice and fills in the measurement in Hz. The lower it is, the deeper the voice. The value can be corrected.</string>
+    <string name="body_voice_pitch_estimating">Estimating the frequency of the recording</string>
+    <string name="body_voice_pitch_unavailable">Could not estimate the frequency of this recording. The value in Hz can be typed in.</string>
+    <string name="body_voice_pitch_estimate">Estimate the frequency of the recording</string>
+    <string name="body_voice_chart_title">Voice frequency</string>
+    <string name="body_voice_chart_explanation">Fundamental frequency of each entry, in Hz. The lower the line, the deeper the voice.</string>
+    <string name="body_voice_chart_empty">The chart shows up once there are entries with the frequency in Hz. When the sentence is recorded, the app estimates this value. For an older recording, open the entry and tap Estimate the frequency of the recording.</string>
+    <string name="body_voice_chart_first">First entry: %1$s Hz, on %2$s</string>
+    <string name="body_voice_chart_latest">Latest: %1$s Hz, on %2$s</string>
+    <plurals name="body_voice_chart_summary">
+        <item quantity="one">Voice frequency: %1$d entry, on %2$s. Value: %4$s Hz.</item>
+        <item quantity="other">Voice frequency: %1$d entries, from %2$s to %3$s. First: %4$s Hz. Latest: %5$s Hz.</item>
+    </plurals>
 </resources>

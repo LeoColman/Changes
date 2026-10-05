@@ -3,8 +3,10 @@
 
 package br.com.colman.changes.feature.body
 
+import br.com.colman.changes.platform.VoicePitchAnalyzer
 import br.com.colman.changes.platform.VoicePlayer
 import br.com.colman.changes.platform.VoiceRecorder
+import kotlinx.coroutines.CompletableDeferred
 import java.io.File
 import java.nio.file.Files
 
@@ -40,6 +42,29 @@ class FakeVoiceRecorder(private val startSucceeds: Boolean = true) : VoiceRecord
         cancelled = true
         current?.delete()
         current = null
+    }
+}
+
+/**
+ * Fake de [VoicePitchAnalyzer] (ADR 0014): devolve [result] sem decodificar nada e registra o que foi
+ * analisado. Com [gate], a estimativa só termina quando o teste completar o gate.
+ */
+class FakeVoicePitchAnalyzer(var result: Double? = 142.4) : VoicePitchAnalyzer {
+    var gate: CompletableDeferred<Unit>? = null
+
+    val analyzedFiles = mutableListOf<File>()
+    val analyzedMedia = mutableListOf<String>()
+
+    override suspend fun medianPitchHz(file: File): Double? {
+        analyzedFiles += file
+        gate?.await()
+        return result
+    }
+
+    override suspend fun medianPitchHzOfMedia(relativePath: String): Double? {
+        analyzedMedia += relativePath
+        gate?.await()
+        return result
     }
 }
 

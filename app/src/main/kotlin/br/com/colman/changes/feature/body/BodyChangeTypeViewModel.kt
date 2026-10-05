@@ -41,6 +41,10 @@ data class BodyChangeTypeUiState(
     val isVoiceCategory: Boolean = false,
     /** Id da entrada cuja gravação está tocando agora; um áudio por vez. */
     val playingEntryId: String? = null,
+    /** Tipo de voz com medida em Hz (ADR 0014): mostra o gráfico da frequência ao longo do tempo. */
+    val showsVoicePitch: Boolean = false,
+    /** Entradas com frequência em Hz, da mais antiga à mais recente. */
+    val voicePitchPoints: List<VoicePitchPoint> = emptyList(),
     val pendingDeletionEntryId: String? = null,
     val deleteTypeRequested: Boolean = false,
     val errorMessage: BodyErrorMessage? = null,
@@ -195,6 +199,8 @@ class BodyChangeTypeViewModel(
         val type = types.firstOrNull { it.id == typeUuid }
         val summaries = entries.map { toSummary(it) }
         val candidates = summaries.filter { it.photo != null }
+        val showsVoicePitch = type?.category == BodyChangeCategory.VOICE &&
+            type.measurementUnit == BodyMeasurementUnit.HZ
         return BodyChangeTypeUiState(
             isLoading = false,
             typeLabel = type?.let { bodyLabels.label(it, vocabulary) }.orEmpty(),
@@ -211,11 +217,20 @@ class BodyChangeTypeViewModel(
             ),
             isVoiceCategory = type?.category == BodyChangeCategory.VOICE,
             playingEntryId = localState.playingEntryId,
+            showsVoicePitch = showsVoicePitch,
+            voicePitchPoints = if (showsVoicePitch) voicePitchPoints(summaries) else emptyList(),
             pendingDeletionEntryId = localState.pendingDeletionEntryId,
             deleteTypeRequested = localState.deleteTypeRequested,
             errorMessage = localState.errorMessage,
         )
     }
+
+    /** As entradas já vêm em ordem de `observed_at`; só as que têm medida em Hz viram ponto (ADR 0014). */
+    private fun voicePitchPoints(summaries: List<BodyEntrySummary>): List<VoicePitchPoint> =
+        summaries.mapNotNull { entry ->
+            val hz = entry.measurementValue?.takeIf { entry.measurementUnit == BodyMeasurementUnit.HZ }
+            hz?.let { VoicePitchPoint(entry.entryId, entry.observedAt, it) }
+        }
 
     /** [BodyEntrySummary.photo] nunca é a gravação de voz da entrada, e vice-versa (ADR 0013). */
     private suspend fun toSummary(entry: BodyChangeEntry): BodyEntrySummary {

@@ -18,6 +18,7 @@ import io.kotest.core.spec.Spec
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import java.io.File
 import java.nio.file.Files
 import java.util.Locale
 
@@ -41,12 +42,13 @@ class BodyTestEnvironment(
     val bodyLabels = BodyLabels(profileRepository, testLabels)
     val voiceRecorder = FakeVoiceRecorder()
     val voicePlayer = FakeVoicePlayer()
+    val voicePitch = FakeVoicePitchAnalyzer()
 
     /** Repositórios agrupados, prontos para `BodyEntryEditViewModel` (ver `BodyVoiceControls` a seguir). */
     val repositories = BodyEntryEditRepositories(bodyChangeRepository, mediaRepository, bodyLabels)
 
     /** Controles de voz com os fakes acima; um teste que precise de um microfone indisponível monta o seu. */
-    val voiceControls = BodyVoiceControls(voiceRecorder, voicePlayer, clock)
+    val voiceControls = BodyVoiceControls(voiceRecorder, voicePlayer, clock, voicePitch)
 
     suspend fun typeByCode(code: String): BodyChangeType =
         bodyChangeRepository.observeAllTypes().first().first { it.code == code }
@@ -71,3 +73,8 @@ class PtBrDefaultLocale : BeforeSpecListener, AfterSpecListener {
 
 /** Bytes mínimos usados como "foto" nos testes; `PhotoSanitizer` nunca é exercitado aqui. */
 fun fakePhotoBytes(): ByteArray = byteArrayOf(1, 2, 3, 4)
+
+/** [BodyPhotoIntake] sem `PhotoSanitizer`: a foto da câmera entra como veio. */
+class FakePhotoIntake : BodyPhotoIntake {
+    override suspend fun sanitize(raw: RawBodyPhoto): File = (raw as RawBodyPhoto.Camera).file
+}

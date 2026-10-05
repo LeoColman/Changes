@@ -39,3 +39,7 @@ data class BodyEntrySummary(
     val photo: MediaAttachment?,
     val voice: MediaAttachment?,
 )
+
+/** Um ponto do gráfico da voz (ADR 0014): a frequência em Hz registrada numa entrada. */
+@Immutable
+data class VoicePitchPoint(val entryId: String, val observedAt: RecordedTime, val hz: Double)

@@ -21,10 +21,6 @@ import kotlinx.datetime.LocalTime
 import java.io.File
 import java.nio.file.Files
 
-private class FakePhotoIntake : BodyPhotoIntake {
-    override suspend fun sanitize(raw: RawBodyPhoto): File = (raw as RawBodyPhoto.Camera).file
-}
-
 class BodyEntryEditViewModelSpec : FunSpec({
     extension(MainDispatcherListener())
     extension(PtBrDefaultLocale())
@@ -653,7 +649,12 @@ class BodyEntryEditViewModelSpec : FunSpec({
     test("aceite: microfone indisponível (start nulo) mostra o erro e não quebra") {
         val env = BodyTestEnvironment()
         val type = env.typeByCode("VOICE_DEEPENING")
-        val voiceControls = BodyVoiceControls(FakeVoiceRecorder(startSucceeds = false), FakeVoicePlayer(), env.clock)
+        val voiceControls = BodyVoiceControls(
+            FakeVoiceRecorder(startSucceeds = false),
+            FakeVoicePlayer(),
+            env.clock,
+            FakeVoicePitchAnalyzer(),
+        )
         val viewModel = BodyEntryEditViewModel(
             env.repositories,
             FakePhotoIntake(),

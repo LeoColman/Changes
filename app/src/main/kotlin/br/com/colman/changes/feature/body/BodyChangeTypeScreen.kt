@@ -129,6 +129,9 @@ private fun BodyChangeTypeContent(
             modifier = modifier,
         )
         else -> LazyColumn(modifier) {
+            if (state.showsVoicePitch) {
+                item { VoicePitchSection(state.voicePitchPoints) }
+            }
             item { ComparisonSection(state.comparison, onEvent, loadThumbnail) }
             if (state.isVoiceCategory) {
                 item { VoiceCompareSection(state.entries, state.playingEntryId, onEvent) }

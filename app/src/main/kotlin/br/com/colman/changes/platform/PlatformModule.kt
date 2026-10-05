@@ -31,6 +31,9 @@ val platformModule: Module = module {
     single { PhotoSanitizer(androidContext(), get(IoDispatcher)) }
     single<VoiceRecorder> { AndroidVoiceRecorder(androidContext()) }
     single<VoicePlayer> { AndroidVoicePlayer(File(androidContext().filesDir, MEDIA_DIR)) }
+    single<VoicePitchAnalyzer> {
+        AndroidVoicePitchAnalyzer(File(androidContext().filesDir, MEDIA_DIR), get(IoDispatcher))
+    }
     single<DocumentStreams> { AndroidDocumentStreams(androidContext(), get(IoDispatcher)) }
     single<ScratchDriverFactory> { AndroidScratchDriverFactory(androidContext()) }
     single { AppInfo(BuildConfig.VERSION_NAME) }

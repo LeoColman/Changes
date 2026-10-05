@@ -43,8 +43,8 @@ e pisos por pacote verificados por script.
   as iterações completas. As chamadas com número fixo passam por `propertyIterations(n)` (testFixtures),
   que devolve no máximo 40 numa rodada de mutação; o round-trip de backup já caía para 20.
 - **`:app` também tem rodada de mutação**, só na lógica que roda na JVM: formatação, mapeamento de
-  agenda do regime, altura, vocabulário, rótulos do corpo, categorias da lixeira, borrão da foto e os
-  planejadores de lembrete. O plugin do Pitest depende do source set `test` do plugin `java`, que o AGP
+  agenda do regime, altura, vocabulário, rótulos do corpo, categorias da lixeira, borrão da foto, a
+  estimativa da frequência da voz (ADR 0014) e os planejadores de lembrete. O plugin do Pitest depende do source set `test` do plugin `java`, que o AGP
   não expõe, então `:app:appPitest` chama a linha de comando do Pitest com o classpath do
   `testDebugUnitTest` e muta o jar de classes do app. Compose, Activity, Route e tudo que precisa de
   aparelho ficam de fora: não é código que a JVM executa.
@@ -63,7 +63,8 @@ e pisos por pacote verificados por script.
   fica em `NO_COVERAGE` porque o teste de unidade do módulo usa `isReturnDefaultValues = true` sem
   Robolectric — o algoritmo de verdade, `blurPixels`, está coberto; (4) seis equivalentes provados um a
   um (janela simétrica do borrão, `minimumFractionDigits = 0` que repete o padrão do locale, `>` contra
-  `>=` entre índices de dois caracteres distintos, `return emptyList()` mutado para lista vazia).
+  `>=` entre índices de dois caracteres distintos, `return emptyList()` mutado para lista vazia), mais
+  os cinco da estimativa da voz descritos na ADR 0014.
 - Achado que vale repetir em teste novo: mutante em caminho de retomada de `suspend` só morre se a fonte
   suspender de verdade antes de falhar (`delay`, `withContext`); uma fonte que lança de imediato nunca
   chega lá.

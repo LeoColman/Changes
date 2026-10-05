@@ -220,6 +220,9 @@ private fun VoiceRecordingSection(
         Text(stringResource(R.string.body_voice_permission_denied), color = MaterialTheme.colorScheme.error)
     }
     VoiceRecordingControls(state.voiceState, onEvent, onRecordRequested)
+    if (state.supportsPitchEstimate) {
+        PitchEstimateStatus(state, onEvent)
+    }
 }
 
 @Composable
