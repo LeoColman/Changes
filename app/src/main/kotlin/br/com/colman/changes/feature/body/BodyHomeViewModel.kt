@@ -25,11 +25,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
-/** Tela inicial da aba Corpo: tipos visíveis agrupados por categoria (Seção 7.3, item 1). */
+/**
+ * Tela inicial da aba Corpo: tipos visíveis agrupados por categoria (Seção 7.3, item 1) e, recolhidos no
+ * fim, os ocultos. Esta é a única porta para a tela do tipo, então um tipo oculto precisa continuar
+ * alcançável aqui: sem isso, os registros e as fotos dele ficam inacessíveis.
+ */
 @Immutable
 data class BodyHomeUiState(
     val isLoading: Boolean = true,
     val sections: List<BodyCategorySection> = emptyList(),
+    val hiddenTypes: List<HiddenBodyType> = emptyList(),
+    val hiddenTypesExpanded: Boolean = false,
     val newTypeDialog: NewTypeDialogState? = null,
     val errorMessage: BodyErrorMessage? = null,
 )
@@ -56,6 +62,11 @@ sealed interface BodyHomeUiEvent {
 
     data object ConfirmNewType : BodyHomeUiEvent
 
+    data object ToggleHiddenTypes : BodyHomeUiEvent
+
+    /** Devolve um tipo oculto às seções da tela inicial. */
+    data class ShowType(val typeId: String) : BodyHomeUiEvent
+
     data object ErrorMessageShown : BodyHomeUiEvent
 }
 
@@ -67,17 +78,20 @@ class BodyHomeViewModel(
 
     private val dialog = MutableStateFlow<NewTypeDialogState?>(null)
     private val errorMessage = MutableStateFlow<BodyErrorMessage?>(null)
+    private val hiddenTypesExpanded = MutableStateFlow(false)
 
     val state: StateFlow<BodyHomeUiState> = combine(
-        bodyChangeRepository.observeVisibleTypes(),
+        bodyChangeRepository.observeAllTypes(),
         bodyChangeRepository.observeAllEntries(),
         bodyLabels.observeVocabulary(),
-        dialog,
-        errorMessage,
-    ) { types, entries, vocabulary, dialogState, error ->
+        combine(dialog, errorMessage, hiddenTypesExpanded, ::Triple),
+    ) { types, entries, vocabulary, (dialogState, error, expanded) ->
+        val (hidden, visible) = types.partition { it.isHidden }
         BodyHomeUiState(
             isLoading = false,
-            sections = buildSections(types, entries, vocabulary),
+            sections = buildSections(visible, entries, vocabulary),
+            hiddenTypes = hidden.map { HiddenBodyType(it.id.toString(), bodyLabels.label(it, vocabulary)) },
+            hiddenTypesExpanded = expanded,
             newTypeDialog = dialogState,
             errorMessage = error,
         )
@@ -91,8 +105,14 @@ class BodyHomeViewModel(
             is BodyHomeUiEvent.NewTypeCategoryChanged -> dialog.update { it?.copy(category = event.category) }
             is BodyHomeUiEvent.NewTypeMeasurementUnitChanged -> dialog.update { it?.copy(measurementUnit = event.unit) }
             BodyHomeUiEvent.ConfirmNewType -> confirmNewType()
+            BodyHomeUiEvent.ToggleHiddenTypes -> hiddenTypesExpanded.update { !it }
+            is BodyHomeUiEvent.ShowType -> showType(event.typeId)
             BodyHomeUiEvent.ErrorMessageShown -> errorMessage.value = null
         }
+    }
+
+    private fun showType(typeId: String) {
+        viewModelScope.launch { bodyChangeRepository.setTypeHidden(Uuid.parse(typeId), false) }
     }
 
     private fun confirmNewType() {

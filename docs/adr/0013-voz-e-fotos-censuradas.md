@@ -16,6 +16,11 @@ ver; no engrossamento da voz, gravar o áudio de uma frase para perceber a mudan
   mancha de cor, sem contorno nem detalhe. Funciona em qualquer versão do Android (o `Modifier.blur`
   só existe a partir do Android 12). A primeira versão (0.2.0) pixelava a 12 pixels e escurecia; a
   silhueta continuava reconhecível, e o dono do produto pediu o borrão.
+- **O olho é só da censura.** Nenhuma outra ação usa o ícone de olho nas telas do corpo. "Ocultar tipo"
+  usava o mesmo olho riscado de "Esconder foto", na mesma tela, sem confirmação e sem caminho de volta:
+  quem queria esconder as fotos tirava o tipo inteiro da aba Corpo, e os registros ficavam
+  inalcançáveis. Agora ocultar tem ícone próprio e pede confirmação, e os tipos ocultos ficam recolhidos
+  no fim da aba Corpo, de onde abrem e voltam para a lista.
 - **Tela cheia.** Tocar numa foto abre ela em tela cheia, com zoom por pinça e arraste. A tela cheia
   abre no mesmo estado da miniatura: foto censurada continua censurada, com o mesmo olho, e o zoom
   nunca revela o que está borrado. Fechar volta ao estado anterior.

@@ -14,12 +14,21 @@
     <string name="body_category_other">Outras</string>
 
     <string name="body_home_empty_title">Nenhum tipo visível</string>
-    <string name="body_home_empty_body">Mostre um tipo oculto ou crie um tipo novo para começar a registrar mudanças.</string>
+    <string name="body_home_empty_body">Crie um tipo novo para começar a registrar mudanças.</string>
     <string name="body_home_shortcut_expected_changes">Mudanças esperadas</string>
     <string name="body_home_shortcut_measurements">Medidas</string>
     <string name="body_home_no_entries">Sem registros ainda</string>
     <string name="body_home_thumbnail_description">Última foto de %1$s</string>
     <string name="body_home_last_entry_with_intensity">%1$s, intensidade %2$s</string>
+    <plurals name="body_home_hidden_types_title">
+        <item quantity="one">Tipo oculto (%1$d)</item>
+        <item quantity="many">Tipos ocultos (%1$d)</item>
+        <item quantity="other">Tipos ocultos (%1$d)</item>
+    </plurals>
+    <string name="body_home_hidden_types_expand">Abrir a lista</string>
+    <string name="body_home_hidden_types_collapse">Recolher a lista</string>
+    <string name="body_home_show_type_action">Mostrar</string>
+    <string name="body_home_show_type_description">Mostrar %1$s na lista</string>
 
     <string name="body_new_type_title">Novo tipo de mudança</string>
     <string name="body_new_type_name_label">Nome</string>
@@ -52,6 +61,9 @@
 
     <string name="body_type_hide_action">Ocultar tipo</string>
     <string name="body_type_show_action">Mostrar tipo</string>
+    <string name="body_type_hide_confirm_title">Ocultar este tipo da lista?</string>
+    <string name="body_type_hide_confirm_text">Os registros e as fotos continuam guardados. O tipo sai da lista da aba Corpo e fica em Tipos ocultos, no fim dela, de onde pode voltar. Isso não censura as fotos: elas já ficam borradas até você tocar no olho.</string>
+    <string name="body_type_hide_confirm_action">Ocultar</string>
     <string name="body_type_delete_action">Excluir tipo</string>
     <string name="body_type_delete_confirm_title">Excluir tipo personalizado?</string>
     <string name="body_type_delete_confirm_text">As entradas registradas continuam disponíveis na lixeira por 30 dias.</string>

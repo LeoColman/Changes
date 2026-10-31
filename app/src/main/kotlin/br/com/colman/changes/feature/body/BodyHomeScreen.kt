@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,7 +40,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import br.com.colman.changes.R
 import br.com.colman.changes.core.model.BodyChangeCategory
@@ -75,7 +82,7 @@ fun BodyHomeScreen(
             }
         },
     ) { padding ->
-        BodyHomeContent(state, onNavigate, loadThumbnail, modifier.padding(padding))
+        BodyHomeContent(state, onEvent, onNavigate, loadThumbnail, modifier.padding(padding))
     }
 
     state.newTypeDialog?.let { dialog -> NewTypeDialog(dialog, onEvent) }
@@ -84,13 +91,14 @@ fun BodyHomeScreen(
 @Composable
 private fun BodyHomeContent(
     state: BodyHomeUiState,
+    onEvent: (BodyHomeUiEvent) -> Unit,
     onNavigate: (BodyHomeNavigation) -> Unit,
     loadThumbnail: suspend (MediaAttachment, Boolean) -> ImageBitmap?,
     modifier: Modifier,
 ) {
     when {
         state.isLoading -> LoadingState(modifier)
-        state.sections.isEmpty() -> EmptyState(
+        state.sections.isEmpty() && state.hiddenTypes.isEmpty() -> EmptyState(
             title = stringResource(R.string.body_home_empty_title),
             body = stringResource(R.string.body_home_empty_body),
             modifier = modifier,
@@ -103,6 +111,70 @@ private fun BodyHomeContent(
                     BodyTypeRow(type, loadThumbnail) { onNavigate(BodyHomeNavigation.ChangeType(type.typeId)) }
                 }
             }
+            hiddenTypesSection(state, onEvent, onNavigate)
+        }
+    }
+}
+
+/** Os tipos ocultos, recolhidos até a pessoa abrir: sem foto, e os nomes só aparecem se ela pedir. */
+private fun LazyListScope.hiddenTypesSection(
+    state: BodyHomeUiState,
+    onEvent: (BodyHomeUiEvent) -> Unit,
+    onNavigate: (BodyHomeNavigation) -> Unit,
+) {
+    if (state.hiddenTypes.isEmpty()) return
+    item(key = "hidden-header") {
+        HiddenTypesHeader(state.hiddenTypes.size, state.hiddenTypesExpanded) {
+            onEvent(BodyHomeUiEvent.ToggleHiddenTypes)
+        }
+    }
+    if (state.hiddenTypesExpanded) {
+        items(state.hiddenTypes, key = { "hidden-${it.typeId}" }) { type ->
+            HiddenTypeRow(
+                type = type,
+                onOpen = { onNavigate(BodyHomeNavigation.ChangeType(type.typeId)) },
+                onShow = { onEvent(BodyHomeUiEvent.ShowType(type.typeId)) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun HiddenTypesHeader(count: Int, expanded: Boolean, onToggle: () -> Unit) {
+    val actionLabel = stringResource(
+        if (expanded) R.string.body_home_hidden_types_collapse else R.string.body_home_hidden_types_expand,
+    )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClickLabel = actionLabel, onClick = onToggle)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            pluralStringResource(R.plurals.body_home_hidden_types_title, count, count),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.weight(1f).semantics { heading() },
+        )
+        Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null)
+    }
+}
+
+@Composable
+private fun HiddenTypeRow(type: HiddenBodyType, onOpen: () -> Unit, onShow: () -> Unit) {
+    val showDescription = stringResource(R.string.body_home_show_type_description, type.label)
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onOpen).padding(start = 16.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(type.label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        TextButton(
+            onClick = onShow,
+            modifier = Modifier.semantics { contentDescription = showDescription },
+        ) {
+            Text(stringResource(R.string.body_home_show_type_action))
         }
     }
 }

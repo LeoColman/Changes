@@ -17,9 +17,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.Unarchive
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -89,6 +89,16 @@ fun BodyChangeTypeScreen(
             onDismiss = { onEvent(BodyChangeTypeUiEvent.DismissDeleteType) },
         )
     }
+
+    if (state.hideTypeRequested) {
+        ConfirmDialog(
+            title = stringResource(R.string.body_type_hide_confirm_title),
+            text = stringResource(R.string.body_type_hide_confirm_text),
+            confirmLabel = stringResource(R.string.body_type_hide_confirm_action),
+            onConfirm = { onEvent(BodyChangeTypeUiEvent.ConfirmHideType) },
+            onDismiss = { onEvent(BodyChangeTypeUiEvent.DismissHideType) },
+        )
+    }
 }
 
 @Composable
@@ -146,13 +156,16 @@ private fun BodyChangeTypeContent(
     }
 }
 
+/** O olho é só da censura das fotos (ADR 0013): ocultar o tipo usa outro ícone, para não serem confundidos. */
 @Composable
 private fun TypeActions(state: BodyChangeTypeUiState, onEvent: (BodyChangeTypeUiEvent) -> Unit) {
-    IconButton(onClick = { onEvent(BodyChangeTypeUiEvent.ToggleHidden) }) {
-        if (state.isHidden) {
-            Icon(Icons.Filled.Visibility, contentDescription = stringResource(R.string.body_type_show_action))
-        } else {
-            Icon(Icons.Filled.VisibilityOff, contentDescription = stringResource(R.string.body_type_hide_action))
+    if (state.isHidden) {
+        IconButton(onClick = { onEvent(BodyChangeTypeUiEvent.ShowType) }) {
+            Icon(Icons.Filled.Unarchive, contentDescription = stringResource(R.string.body_type_show_action))
+        }
+    } else {
+        IconButton(onClick = { onEvent(BodyChangeTypeUiEvent.RequestHideType) }) {
+            Icon(Icons.Filled.Archive, contentDescription = stringResource(R.string.body_type_hide_action))
         }
     }
     if (!state.isBuiltin) {

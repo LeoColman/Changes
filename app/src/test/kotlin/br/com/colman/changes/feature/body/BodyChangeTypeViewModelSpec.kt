@@ -53,11 +53,13 @@ class BodyChangeTypeViewModelSpec : FunSpec({
             while (state.isLoading) state = awaitItem()
             state.isHidden shouldBe false
 
-            viewModel.onEvent(BodyChangeTypeUiEvent.ToggleHidden)
+            viewModel.onEvent(BodyChangeTypeUiEvent.RequestHideType)
+            viewModel.onEvent(BodyChangeTypeUiEvent.ConfirmHideType)
             var hidden = awaitItem()
             while (!hidden.isHidden) hidden = awaitItem()
+            hidden.hideTypeRequested shouldBe false
 
-            viewModel.onEvent(BodyChangeTypeUiEvent.ToggleHidden)
+            viewModel.onEvent(BodyChangeTypeUiEvent.ShowType)
             var shown = awaitItem()
             while (shown.isHidden) shown = awaitItem()
 
@@ -65,6 +67,34 @@ class BodyChangeTypeViewModelSpec : FunSpec({
             cancelAndIgnoreRemainingEvents()
         }
         env.bodyChangeRepository.getType(created.id).shouldNotBeNull()
+    }
+
+    test("pedir para ocultar só abre a confirmação, e cancelar mantém o tipo na lista") {
+        val env = BodyTestEnvironment()
+        val type = env.typeByCode("CLITORAL_ENLARGEMENT")
+        val viewModel = BodyChangeTypeViewModel(
+            env.bodyChangeRepository,
+            env.mediaRepository,
+            env.bodyLabels,
+            env.voicePlayer,
+            type.id.toString(),
+        )
+
+        viewModel.state.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+
+            viewModel.onEvent(BodyChangeTypeUiEvent.RequestHideType)
+            while (!state.hideTypeRequested) state = awaitItem()
+            state.isHidden shouldBe false
+            env.bodyChangeRepository.getType(type.id)?.isHidden shouldBe false
+
+            viewModel.onEvent(BodyChangeTypeUiEvent.DismissHideType)
+            while (state.hideTypeRequested) state = awaitItem()
+            state.isHidden shouldBe false
+            env.bodyChangeRepository.getType(type.id)?.isHidden shouldBe false
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     test("aceite 7.3: excluir uma entrada some da linha do tempo, e Desfazer traz de volta com as fotos") {

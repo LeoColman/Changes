@@ -14,12 +14,20 @@
     <string name="body_category_other">Other</string>
 
     <string name="body_home_empty_title">No visible type</string>
-    <string name="body_home_empty_body">Show a hidden type or create a new one to start tracking changes.</string>
+    <string name="body_home_empty_body">Create a new type to start tracking changes.</string>
     <string name="body_home_shortcut_expected_changes">Expected changes</string>
     <string name="body_home_shortcut_measurements">Measurements</string>
     <string name="body_home_no_entries">No entries yet</string>
     <string name="body_home_thumbnail_description">Latest photo of %1$s</string>
     <string name="body_home_last_entry_with_intensity">%1$s, intensity %2$s</string>
+    <plurals name="body_home_hidden_types_title">
+        <item quantity="one">Hidden type (%1$d)</item>
+        <item quantity="other">Hidden types (%1$d)</item>
+    </plurals>
+    <string name="body_home_hidden_types_expand">Open the list</string>
+    <string name="body_home_hidden_types_collapse">Collapse the list</string>
+    <string name="body_home_show_type_action">Show</string>
+    <string name="body_home_show_type_description">Show %1$s in the list</string>
 
     <string name="body_new_type_title">New change type</string>
     <string name="body_new_type_name_label">Name</string>
@@ -52,6 +60,9 @@
 
     <string name="body_type_hide_action">Hide type</string>
     <string name="body_type_show_action">Show type</string>
+    <string name="body_type_hide_confirm_title">Hide this type from the list?</string>
+    <string name="body_type_hide_confirm_text">The entries and photos stay saved. The type leaves the list in the Body tab and goes to Hidden types, at the end of it, where it can be brought back. This does not censor the photos: they are already blurred until you tap the eye.</string>
+    <string name="body_type_hide_confirm_action">Hide</string>
     <string name="body_type_delete_action">Delete type</string>
     <string name="body_type_delete_confirm_title">Delete custom type?</string>
     <string name="body_type_delete_confirm_text">Recorded entries remain available in the trash for 30 days.</string>

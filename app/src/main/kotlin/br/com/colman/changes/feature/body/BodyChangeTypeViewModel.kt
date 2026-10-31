@@ -47,6 +47,7 @@ data class BodyChangeTypeUiState(
     val voicePitchPoints: List<VoicePitchPoint> = emptyList(),
     val pendingDeletionEntryId: String? = null,
     val deleteTypeRequested: Boolean = false,
+    val hideTypeRequested: Boolean = false,
     val errorMessage: BodyErrorMessage? = null,
 )
 
@@ -62,7 +63,14 @@ data class ComparisonState(
 private const val DEFAULT_SLIDER_POSITION = 0.5f
 
 sealed interface BodyChangeTypeUiEvent {
-    data object ToggleHidden : BodyChangeTypeUiEvent
+    /** Pede confirmação: o tipo sai da lista, e a pessoa precisa saber onde encontrá-lo depois. */
+    data object RequestHideType : BodyChangeTypeUiEvent
+
+    data object DismissHideType : BodyChangeTypeUiEvent
+
+    data object ConfirmHideType : BodyChangeTypeUiEvent
+
+    data object ShowType : BodyChangeTypeUiEvent
 
     data object RequestDeleteType : BodyChangeTypeUiEvent
 
@@ -110,8 +118,8 @@ class BodyChangeTypeViewModel(
     fun onEvent(event: BodyChangeTypeUiEvent) {
         if (handleVoiceEvent(event)) return
         if (handleComparisonEvent(event)) return
+        if (handleVisibilityEvent(event)) return
         when (event) {
-            BodyChangeTypeUiEvent.ToggleHidden -> toggleHidden()
             BodyChangeTypeUiEvent.RequestDeleteType -> local.update { it.copy(deleteTypeRequested = true) }
             BodyChangeTypeUiEvent.DismissDeleteType -> local.update { it.copy(deleteTypeRequested = false) }
             BodyChangeTypeUiEvent.ConfirmDeleteType -> confirmDeleteType()
@@ -120,6 +128,21 @@ class BodyChangeTypeViewModel(
             BodyChangeTypeUiEvent.ErrorMessageShown -> local.update { it.copy(errorMessage = null) }
             else -> Unit
         }
+    }
+
+    /** Ocultar e mostrar o tipo, fora do `when` principal (complexidade ciclomática). */
+    private fun handleVisibilityEvent(event: BodyChangeTypeUiEvent): Boolean {
+        when (event) {
+            BodyChangeTypeUiEvent.RequestHideType -> local.update { it.copy(hideTypeRequested = true) }
+            BodyChangeTypeUiEvent.DismissHideType -> local.update { it.copy(hideTypeRequested = false) }
+            BodyChangeTypeUiEvent.ConfirmHideType -> {
+                local.update { it.copy(hideTypeRequested = false) }
+                setHidden(true)
+            }
+            BodyChangeTypeUiEvent.ShowType -> setHidden(false)
+            else -> return false
+        }
+        return true
     }
 
     /** Seleção do par e do slider de comparação, fora do `when` principal (complexidade ciclomática). */
@@ -160,11 +183,8 @@ class BodyChangeTypeViewModel(
         local.update { it.copy(playingEntryId = null) }
     }
 
-    private fun toggleHidden() {
-        viewModelScope.launch {
-            val type = bodyChangeRepository.getType(typeUuid) ?: return@launch
-            bodyChangeRepository.setTypeHidden(typeUuid, !type.isHidden)
-        }
+    private fun setHidden(hidden: Boolean) {
+        viewModelScope.launch { bodyChangeRepository.setTypeHidden(typeUuid, hidden) }
     }
 
     private fun confirmDeleteType() {
@@ -221,6 +241,7 @@ class BodyChangeTypeViewModel(
             voicePitchPoints = if (showsVoicePitch) voicePitchPoints(summaries) else emptyList(),
             pendingDeletionEntryId = localState.pendingDeletionEntryId,
             deleteTypeRequested = localState.deleteTypeRequested,
+            hideTypeRequested = localState.hideTypeRequested,
             errorMessage = localState.errorMessage,
         )
     }
@@ -254,6 +275,7 @@ class BodyChangeTypeViewModel(
         val playingEntryId: String? = null,
         val pendingDeletionEntryId: String? = null,
         val deleteTypeRequested: Boolean = false,
+        val hideTypeRequested: Boolean = false,
         val errorMessage: BodyErrorMessage? = null,
     )
 

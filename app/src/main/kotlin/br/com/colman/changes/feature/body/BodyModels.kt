@@ -24,6 +24,10 @@ data class BodyTypeSummary(
 @Immutable
 data class BodyCategorySection(val category: BodyChangeCategory, val types: List<BodyTypeSummary>)
 
+/** Um tipo oculto pela pessoa na tela inicial: só o rótulo, sem foto nem última observação. */
+@Immutable
+data class HiddenBodyType(val typeId: String, val label: String)
+
 /**
  * Resumo de uma entrada na linha do tempo de um tipo. [photo] e [voice] nunca se confundem: o
  * primeiro filtra `!isAudio`, o segundo filtra `isAudio` (ADR 0013).
